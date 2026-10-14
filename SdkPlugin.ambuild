@@ -1,0 +1,199 @@
+# vim: set sts=2 ts=8 sw=2 tw=99 et ft=python:
+#
+# Helper for building a Source2Mod plugin with AMBuild.
+#
+# The SDK normally lives outside a plugin's own source tree (SOURCE2MOD_SDK),
+# and AMBuild's builder.Build() only reaches scripts inside the tree, so a plugin
+# pulls this in the way s2sdk-manifests' SdkHelpers.ambuild is pulled in -- by
+# absolute path through builder.Eval():
+#
+#   Source2ModSdk = builder.Eval(os.path.join(os.environ['SOURCE2MOD_SDK'],
+#                                          'SdkPlugin.ambuild'), {})
+#   SdkHelpers = Source2ModSdk.LoadSdkHelpers(builder, builder.options.s2sdk_manifests)
+#   ...
+#   Source2ModSdk.AddToBinary(binary, sdk)
+#   SdkHelpers.configureCxx(builder, binary, sdk)
+#   Source2ModSdk.AddProtobufs(builder, binary, sdk_target)
+#
+# LoadSdkHelpers() evaluates s2sdk-manifests' SdkHelpers.ambuild -- the
+# checkout given, else S2SDK_MANIFESTS_DIR, else the SDK's own
+# vendor/s2sdk-manifests submodule. SdkHelpers.configureCxx() then adds what a
+# binary needs from s2sdk (include paths, defines, libraries with the Steam
+# API), the same lists s2sdk::s2sdk carries in CMake.
+#
+# AddToBinary() adds Source2Mod SDK's include paths, its sources and the s2sdk
+# translation units it owns. The objects end up inside the plugin binary, which
+# is what the CMake path produces too -- there the SDK is a static library, and
+# a static library is just those same objects.
+#
+# Hooks are KHook, header-only for a plugin: the engine comes from metamod at
+# load time. The headers are the SDK's own vendor/khook submodule (nothing of
+# it is built), so a plugin needs no metamod-source checkout.
+# SOURCE2MOD_KHOOK_HEADER (a hash of its khook.hpp) and SOURCE2MOD_KHOOK_COMMIT,
+# defined from that submodule, are what KHOOK_INIT() compares with the core's
+# own KHook at plugin load.
+import hashlib, os, subprocess
+
+class Source2ModSdkPlugin(object):
+  def __init__(self):
+    self.sourcePath = os.environ.get('SOURCE2MOD_SDK')
+    if not self.sourcePath or not os.path.isdir(self.sourcePath):
+      raise Exception('SOURCE2MOD_SDK is not set to a valid directory')
+
+    self.khookPath = os.path.join(self.sourcePath, 'vendor', 'khook')
+    if not os.path.isfile(os.path.join(self.khookPath, 'include', 'khook.hpp')):
+      raise Exception('KHook headers not found at {} -- initialise the submodule: '
+                      'git submodule update --init --recursive'.format(self.khookPath))
+
+    # Mirrors CMakeLists.txt: "unknown" when git cannot say, which the
+    # load-time check reports but lets through.
+    try:
+      out = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=self.khookPath,
+                                    stderr=subprocess.DEVNULL)
+      self.khookCommit = out.decode('ascii', 'ignore').strip() or 'unknown'
+    except Exception:
+      self.khookCommit = 'unknown'
+
+    # Mirrors CMakeLists.txt's source2mod_khook_header_hash(): the first 16 hex
+    # digits of the SHA-256 of khook.hpp with CRs dropped.
+    with open(os.path.join(self.khookPath, 'include', 'khook.hpp'), 'rb') as f:
+      self.khookHeader = hashlib.sha256(f.read().replace(b'\r', b'')).hexdigest()[:16]
+
+    self.SdkHelpers = None
+
+  def ManifestsPath(self, path=None):
+    # The checkout given (a plugin's --s2sdk-manifests), else
+    # S2SDK_MANIFESTS_DIR, else the SDK's own submodule -- the one its CMake
+    # build uses too.
+    for candidate in [path, os.environ.get('S2SDK_MANIFESTS_DIR'),
+                      os.path.join(self.sourcePath, 'vendor', 's2sdk-manifests')]:
+      if candidate and os.path.isfile(os.path.join(candidate, 'SdkHelpers.ambuild')):
+        return os.path.abspath(candidate)
+    raise Exception('Could not find s2sdk-manifests -- run git submodule update --init '
+                    '--recursive in the SDK, pass --s2sdk-manifests or set S2SDK_MANIFESTS_DIR')
+
+  def LoadSdkHelpers(self, builder, path=None):
+    # s2sdk-manifests' SdkHelpers (findSdks, configureCxx, addProtobufs, ...).
+    self.SdkHelpers = builder.Eval(os.path.join(self.ManifestsPath(path), 'SdkHelpers.ambuild'))
+    return self.SdkHelpers
+
+  def FindS2Sdk(self, sdk_name):
+    # The manifest's environment variables (cs2: S2SDK_CS2, S2SDKCS2, S2SDK,
+    # HL2SDK_CS2, HL2SDKCS2 -- first set wins), else the SDK's own vendor/s2sdk.
+    path = self.SdkHelpers.findSdkPathFromEnv(sdk_name) if self.SdkHelpers else None
+    if path and os.path.isdir(path):
+      return path
+    vendored = os.path.join(self.sourcePath, 'vendor', 's2sdk')
+    if sdk_name == 'cs2' and os.path.isfile(os.path.join(vendored, 'public', 'tier0', 'platform.h')):
+      return vendored
+    return None
+
+  def AddPublicIncludes(self, binary):
+    # The one call a consumer of "source2mod/ISource2ModPlugin.h" needs.
+    # KHook is in there because ISource2ModPlugin.h includes "khook.hpp".
+    binary.compiler.cxxincludes += [
+      os.path.join(self.sourcePath, 'public'),
+      os.path.join(self.sourcePath, 'src'),
+      os.path.join(self.khookPath, 'include'),
+    ]
+
+  def AddSdkIncludes(self, binary, sdk):
+    # What Source2Mod headers reach into beyond s2sdk-manifests' include
+    # list -- the same list, in the same order, as CMakeLists.txt's. Ahead of
+    # s2sdk's own paths as there, so AddToBinary() goes before
+    # SdkHelpers.configureCxx().
+    binary.compiler.cxxincludes += [
+      sdk['path'],
+      os.path.join(sdk['path'], 'public', 'schemasystem'),
+    ]
+
+  def Sources(self, sdk):
+    sources = []
+
+    for root, _, files in os.walk(os.path.join(self.sourcePath, 'src')):
+      for f in files:
+        if f.endswith('.cpp'):
+          sources += [os.path.join(root, f)]
+
+    # The s2sdk translation units Source2Mod owns; a plugin must not add
+    # these itself as well.
+    sources += [
+      os.path.join(sdk['path'], 'public', 'tier0', 'memoverride.cpp'),
+      os.path.join(sdk['path'], 'tier0_perproject', 'keyvalues3.cpp'),
+      os.path.join(sdk['path'], 'tier0_perproject', 'convar.cpp'),
+      os.path.join(sdk['path'], 'entity2', 'entityidentity.cpp'),
+      os.path.join(sdk['path'], 'entity2', 'entitysystem.cpp'),
+      os.path.join(sdk['path'], 'entity2', 'entitykeyvalues.cpp'),
+    ]
+
+    return sources
+
+  def ProtoSources(self, sdk):
+    # The game protobufs, from s2sdk's own protos.
+    names = [
+      'common/network_connection.proto',
+      'common/networkbasetypes.proto',
+      'game/shared/cs/cs_gameevents.proto',
+      'game/shared/cs/cs_usercmd.proto',
+      'game/shared/base_gcmessages.proto',
+      'game/shared/econ/econ_gcmessages.proto',
+      'common/engine_gcmessages.proto',
+      'gcsdk/gcsdk_gcmessages.proto',
+      'gcsdk/gcsystemmsgs.proto',
+      'game/shared/cstrike15/cstrike15_gcmessages.proto',
+      'game/shared/cstrike15/cstrike15_usermessages.proto',
+      'common/source2_steam_stats.proto',
+      'common/netmessages.proto',
+      'networksystem/networksystem_protomessages.proto',
+      'gcsdk/steammessages.proto',
+      'game/shared/usercmd.proto',
+      'game/shared/usermessages.proto',
+      'game/shared/gameevents.proto',
+      'game/shared/clientmessages.proto',
+      'game/shared/te.proto',
+      'common/valveextensions.proto',
+    ]
+    return [os.path.join(sdk['path'], *name.split('/')) for name in names]
+
+  def AddProtobufs(self, builder, binary, sdk_target):
+    # The game protobufs, generated and compiled into the binary --
+    # s2sdk_protobufs() in CMakeLists.txt. The protos import each other by
+    # name, also from folders s2sdk-manifests' protoc doesn't search
+    # (s2sdk_protobufs() adds every listed proto's folder).
+    sdk = sdk_target.sdk
+    self.SdkHelpers.addProtobufs(builder, binary, sdk_target, self.ProtoSources(sdk))
+    binary.custom[-1].protoc.includes += [
+      os.path.join(sdk['path'], 'gcsdk'),
+      os.path.join(sdk['path'], 'game', 'shared', 'cstrike15'),
+    ]
+
+  def Protoc(self, builder, sdk_target):
+    # The same as AddProtobufs(), as a job for binary.custom -- for plugin
+    # scripts from before it.
+    sdk = sdk_target.sdk
+    protoc = builder.tools.Protoc(protoc=sdk_target.protoc, sources=self.ProtoSources(sdk))
+    protoc.protoc.includes += [
+      os.path.join(sdk['path'], 'gcsdk'),
+      os.path.join(sdk['path'], 'game', 'shared', 'cstrike15'),
+    ]
+    return protoc
+
+  def Defines(self, binary):
+    # On top of s2sdk-manifests' defines (META_IS_SOURCE2, _GLIBCXX_USE_CXX11_ABI=0
+    # on Linux, _ITERATOR_DEBUG_LEVEL=0 on Windows among them).
+    binary.compiler.defines += [
+      # Read back by KHOOK_INIT() and compared with the core's KHook.
+      'SOURCE2MOD_KHOOK_COMMIT="{}"'.format(self.khookCommit),
+      'SOURCE2MOD_KHOOK_HEADER="{}"'.format(self.khookHeader),
+    ]
+
+  def AddToBinary(self, binary, sdk):
+    self.AddPublicIncludes(binary)
+    self.AddSdkIncludes(binary, sdk)
+    self.Defines(binary)
+    binary.sources += self.Sources(sdk)
+    # s2sdk's libraries, the Steam API among them, come from
+    # SdkHelpers.configureCxx().
+
+
+rvalue = Source2ModSdkPlugin()

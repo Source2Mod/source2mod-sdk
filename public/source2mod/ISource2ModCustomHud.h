@@ -1,0 +1,140 @@
+﻿/**
+* vim: set ts=4 sw=4 tw=99 noet:
+ * =============================================================================
+ * Source2Mod
+ * Copyright (C) 2025-2026 Michal "Slynx (˙·٠● S l y n x ●٠·˙)" Přikryl.
+ * All rights reserved.
+ * =============================================================================
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, version 3.0, as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * As a special exception, Michal "Slynx (˙·٠● S l y n x ●٠·˙)" Přikryl
+ * gives you permission to link the code of this program
+ * (as well as its derivative works) to "Counter-Strike 2," "Source 2,"
+ * "Steam," and any Game MODs or server software running on software by
+ * Valve Corporation. You must obey the GNU General Public License in all
+ * respects for all other code used.
+ *
+ * Additionally, this exception applies to all derivative works unless
+ * otherwise stated in LICENSE.txt.
+ *
+ * Authors:
+ *   - Michal "Slynx (˙·٠● S l y n x ●٠·˙)" Přikryl
+ *
+ * Project: Source2Mod
+ */
+
+/**
+
+* @file ISource2ModCustomHud.h
+* @brief Interface for the panorama custom HUD layouts.
+*
+* `custom_hud_layout` entities render a panorama layout on top of the game HUD.
+* The entity itself is driven through CCSCustomHudLayout; this interface only
+* owns the click callbacks, because the button press arrives as a user message
+* on the core's own hook and has to be routed back to whichever plugin created
+* the layout.
+*
+* @note Plugins do not normally touch this interface -- CCSCustomHudLayout's
+*       HookClick() forwards here for them.
+  */
+
+#ifndef _INCLUDE_ISOURCE2MOD_CUSTOMHUD_H
+#define _INCLUDE_ISOURCE2MOD_CUSTOMHUD_H
+
+#pragma once
+#include "ISource2ModPlugin.h"
+
+/* =========================
+Forward declarations
+========================= */
+
+class CCSCustomHudLayout;
+class CCSPlayerController;
+
+/**
+
+* @brief Callback type for custom HUD button clicks.
+*
+* @param player Player who clicked
+* @param pLayout Layout the button lives on
+* @param pszButtonId `id` attribute of the clicked panel
+  */
+using CustomHudClickHandler = Source2ModCallback<void(CCSPlayerController* player, CCSCustomHudLayout* pLayout, const char* pszButtonId)>;
+
+/* =========================
+Core Source2Mod Custom HUD
+========================= */
+
+/**
+
+* @brief Registry of custom HUD click callbacks.
+*
+* Callbacks are keyed by layout entity, so several plugins may listen on their
+* own layouts at once. Every callback a plugin registers is dropped when that
+* plugin unloads, and the whole registry is cleared on level shutdown along
+* with the entities it points at.
+  */
+#define SOURCE2MOD_CUSTOMHUD_INTERFACE "ISource2ModCustomHud002"
+
+class ISource2ModCustomHud
+{
+public:
+    virtual ~ISource2ModCustomHud() = default;
+
+    /**
+     * @brief Registers a click callback for one layout entity.
+     *
+     * Whose it is, the core reads off the handler (see Source2ModCallback); what
+     * a plugin still holds at unload the core drops for it.
+     *
+     * @param pLayout Layout to listen on
+     * @param handler A function, an object and a method, or a lambda
+     * @return The id UnhookCustomHudClick(id) takes
+     */
+    virtual Source2ModHookId HookCustomHudClick(CCSCustomHudLayout* pLayout, CustomHudClickHandler handler) = 0;
+
+    /**
+     * @brief Drops the hook with this handler -- a function or an object and
+     * a method; a lambda goes by its id.
+     *
+     * @return true when one was found
+     */
+    virtual bool UnhookCustomHudClick(CCSCustomHudLayout* pLayout, const CustomHudClickHandler& handler) = 0;
+
+    /**
+     * @brief Drops the hook HookCustomHudClick() returned the id for.
+     *
+     * @return true when it was still there
+     */
+    virtual bool UnhookCustomHudClick(Source2ModHookId id) = 0;
+
+    /**
+
+    * @brief Drops every callback registered for a layout.
+    *
+    * @param pLayout Layout to stop listening on
+      */
+    virtual void UnhookCustomHudClick(CCSCustomHudLayout* pLayout) = 0;
+};
+
+/**
+ * @brief Hook macros, matching HOOK_GAME_EVENT.
+ */
+#define HOOK_CUSTOM_HUD_CLICK(pLayout, handler) \
+    g_pSource2ModCustomHud->HookCustomHudClick(pLayout, handler)
+
+#define UNHOOK_CUSTOM_HUD_CLICK(pLayout) \
+    g_pSource2ModCustomHud->UnhookCustomHudClick(pLayout)
+
+#endif //_INCLUDE_ISOURCE2MOD_CUSTOMHUD_H

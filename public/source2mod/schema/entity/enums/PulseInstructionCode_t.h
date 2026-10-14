@@ -1,0 +1,179 @@
+/**
+* vim: set ts=4 sw=4 tw=99 noet:
+ * =============================================================================
+ * Source2Mod
+ * Copyright (C) 2025-2026 Michal "Slynx (˙·٠● S l y n x ●٠·˙)" Přikryl.
+ * All rights reserved.
+ * =============================================================================
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, version 3.0, as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * As a special exception, Michal "Slynx (˙·٠● S l y n x ●٠·˙)" Přikryl
+ * gives you permission to link the code of this program
+ * (as well as its derivative works) to "Counter-Strike 2," "Source 2,"
+ * "Steam," and any Game MODs or server software running on software by
+ * Valve Corporation. You must obey the GNU General Public License in all
+ * respects for all other code used.
+ *
+ * Additionally, this exception applies to all derivative works unless
+ * otherwise stated in LICENSE.txt.
+ *
+ * Authors:
+ *   - Michal "Slynx (˙·٠● S l y n x ●٠·˙)" Přikryl
+ *
+ * Project: Source2Mod
+ */
+
+#ifndef _INCLUDE_PULSEINSTRUCTIONCODE_T_H
+#define _INCLUDE_PULSEINSTRUCTIONCODE_T_H
+#ifdef _WIN32
+#pragma once
+#endif
+
+#include <cstdint>
+
+enum class PulseInstructionCode_t : uint16_t
+{
+    INVALID = 0,
+    IMMEDIATE_HALT = 1,
+    RETURN_VOID = 2,
+    RETURN_VALUE = 3,
+    LOOP_BREAK = 4,
+    NOP = 5,
+    JUMP = 6,
+    JUMP_COND = 7,
+    CHUNK_LEAP = 8,
+    CHUNK_LEAP_COND = 9,
+    PULSE_CALL_SYNC = 10,
+    PULSE_CALL_ASYNC_FIRE = 11,
+    CREATE_CHILD_CURSOR_OUTFLOW = 12,
+    CELL_INVOKE = 13,
+    LIBRARY_INVOKE = 14,
+    SET_VAR = 15,
+    GET_VAR = 16,
+    GET_VAR_DETACH = 17,
+    DETACH_REGISTER = 18,
+    SET_VAR_ARRAY_ELEMENT_1D = 19,
+    SET_VAR_OBSERVABLE = 20,
+    GET_CONST = 21,
+    GET_ARRAY_ELEMENT = 22,
+    GET_DOMAIN_VALUE = 23,
+    COPY = 24,
+    NOT = 25,
+    NEGATE = 26,
+    ADD = 27,
+    SUB = 28,
+    MUL = 29,
+    DIV = 30,
+    MOD = 31,
+    LT = 32,
+    LTE = 33,
+    EQ = 34,
+    NE = 35,
+    AND = 36,
+    OR = 37,
+    SCALE = 38,
+    SCALE_INV = 39,
+    ELEMENT_ACCESS = 40,
+    CONVERT_VALUE = 41,
+    REINTERPRET_INSTANCE = 42,
+    GET_BLACKBOARD_REFERENCE = 43,
+    SET_BLACKBOARD_REFERENCE = 44,
+    GET_TEMPVAR = 45,
+    SET_TEMPVAR = 46,
+    SET_TEMPVAR_OBSERVABLE = 47,
+    LAST_SERIALIZED_CODE = 48,
+    NEGATE_INT = 49,
+    NEGATE_FLOAT = 50,
+    NEGATE_VEC2 = 51,
+    NEGATE_VEC3 = 52,
+    NEGATE_VEC4 = 53,
+    ADD_INT = 54,
+    ADD_FLOAT = 55,
+    ADD_STRING = 56,
+    ADD_VEC2 = 57,
+    ADD_VEC3 = 58,
+    ADD_VEC3WS_VEC3 = 59,
+    ADD_VEC3_VEC3WS = 60,
+    ADD_VEC4 = 61,
+    ADD_GAMETIME_FLOAT = 62,
+    ADD_FLOAT_GAMETIME = 63,
+    SUB_INT = 64,
+    SUB_FLOAT = 65,
+    SUB_VEC2 = 66,
+    SUB_VEC3 = 67,
+    SUB_VEC3WS_VEC3 = 68,
+    SUB_VEC3WS_VEC3WS = 69,
+    SUB_VEC4 = 70,
+    SUB_GAMETIME_FLOAT = 71,
+    SUB_GAMETIME = 72,
+    MUL_INT = 73,
+    MUL_FLOAT = 74,
+    DIV_FLOAT = 75,
+    MOD_INT = 76,
+    MOD_FLOAT = 77,
+    LT_INT = 78,
+    LT_FLOAT = 79,
+    LT_GAMETIME = 80,
+    LTE_INT = 81,
+    LTE_FLOAT = 82,
+    LTE_GAMETIME = 83,
+    EQ_BOOL = 84,
+    EQ_INT = 85,
+    EQ_FLOAT = 86,
+    EQ_VEC2 = 87,
+    EQ_VEC3 = 88,
+    EQ_VEC3WS = 89,
+    EQ_VEC4 = 90,
+    EQ_STRING = 91,
+    EQ_ENTITY_NAME = 92,
+    EQ_SCHEMA_ENUM = 93,
+    EQ_EHANDLE = 94,
+    EQ_PANEL_HANDLE = 95,
+    EQ_OPAQUE_HANDLE = 96,
+    EQ_TEST_HANDLE = 97,
+    EQ_COLOR_RGB = 98,
+    EQ_ARRAY = 99,
+    EQ_GAMETIME = 100,
+    NE_BOOL = 101,
+    NE_INT = 102,
+    NE_FLOAT = 103,
+    NE_VEC2 = 104,
+    NE_VEC3 = 105,
+    NE_VEC3WS = 106,
+    NE_VEC4 = 107,
+    NE_STRING = 108,
+    NE_ENTITY_NAME = 109,
+    NE_SCHEMA_ENUM = 110,
+    NE_EHANDLE = 111,
+    NE_PANEL_HANDLE = 112,
+    NE_OPAQUE_HANDLE = 113,
+    NE_TEST_HANDLE = 114,
+    NE_COLOR_RGB = 115,
+    NE_ARRAY = 116,
+    NE_GAMETIME = 117,
+    SCALE_VEC3 = 118,
+    SCALE_VEC2 = 119,
+    SCALE_VEC4 = 120,
+    SCALE_INV_VEC3 = 121,
+    SCALE_INV_VEC2 = 122,
+    SCALE_INV_VEC4 = 123,
+    ELEMENT_ACCESS_VEC2 = 124,
+    ELEMENT_ACCESS_VEC3 = 125,
+    ELEMENT_ACCESS_VEC3WS = 126,
+    ELEMENT_ACCESS_VEC4 = 127,
+    ELEMENT_ACCESS_COLOR_RGB = 128,
+    GET_CONST_INLINE_STORAGE = 129,
+};
+
+#endif // _INCLUDE_PULSEINSTRUCTIONCODE_T_H

@@ -1,0 +1,410 @@
+# vim: set sts=2 ts=8 sw=2 tw=99 et ft=python:
+#
+# Buildable two ways:
+#  - Standalone (configure.py + ambuild): detects an SDK itself and builds the
+#    static library on its own.
+#  - As a sub-build from a plugin's own AMBuildScript:
+#
+#      Source2ModSdk = builder.Build('<sdk path>/AMBuildScript', {
+#        'Source2ModSdkTarget': sdk_target,     # the caller's own sdk_target,
+#        'Source2ModSdkHelpers': SdkHelpers,    # s2sdk-manifests' SdkHelpers, so the
+#                                            # SDK is not detected twice
+#      })
+#      ...
+#      Source2ModSdk['config'].AddPublicIncludes(binary)
+#      binary.compiler.linkflags += [Source2ModSdk['binaries_by_arch'][cxx.target.arch]]
+#
+#    AddPublicIncludes() is the point: it adds every include path a consumer of
+#    "source2mod/ISource2ModPlugin.h" needs -- public/ and KHook -- in one
+#    call, computed from *this* repo's own directory, so a caller never
+#    hand-lists the SDK's folder layout and re-breaks every time it changes.
+#
+#    Hooks are KHook, header-only for a plugin: the engine comes from metamod
+#    at load time. The headers are the vendor/khook submodule of this repo
+#    (nothing of it is built), so a plugin needs no metamod-source checkout.
+#    SOURCE2MOD_KHOOK_HEADER (a hash of its khook.hpp) and SOURCE2MOD_KHOOK_COMMIT,
+#    defined here from that submodule, are what KHOOK_INIT() compares with the
+#    core's own KHook at plugin load.
+import hashlib, json, os, sys, subprocess
+
+# Injected by a parent build; None when standalone.
+Source2ModSdkTarget = globals().get('Source2ModSdkTarget', None)
+Source2ModSdkHelpers = globals().get('Source2ModSdkHelpers', None)
+
+
+def ResolveS2SdkManifests(sourcePath, option):
+  """s2sdk-manifests: --s2sdk-manifests, else S2SDK_MANIFESTS_DIR, else this
+  SDK's own vendor/s2sdk-manifests submodule -- the checkout CMake uses too
+  (S2SDK_MANIFESTS_DIR, else the submodule, else s2sdk fetches it)."""
+  for path in [option, os.environ.get('S2SDK_MANIFESTS_DIR'),
+               os.path.join(sourcePath, 'vendor', 's2sdk-manifests')]:
+    if path and os.path.isfile(os.path.join(path, 'SdkHelpers.ambuild')):
+      return os.path.abspath(path)
+  raise Exception('Could not find s2sdk-manifests -- run git submodule update --init '
+                  '--recursive, pass --s2sdk-manifests or set S2SDK_MANIFESTS_DIR')
+
+
+def ResolveEnvPath(env, folder):
+  if env in os.environ:
+    path = os.environ[env]
+    if os.path.isdir(path):
+      return path
+  else:
+    head = os.getcwd()
+    oldhead = None
+    while head != None and head != oldhead:
+      path = os.path.join(head, folder)
+      if os.path.isdir(path):
+        return path
+      oldhead = head
+      head, tail = os.path.split(head)
+  return None
+
+
+def DepsPath(sourcePath):
+  """Where tools/deps.py pointed s2sdk (deps.json), or None when it was never
+  run or s2sdk follows the environment variable."""
+  config_path = os.path.join(sourcePath, "deps.json")
+  if not os.path.isfile(config_path):
+    return None
+  with open(config_path, "r") as f:
+    config = json.load(f)
+  # deps.json written before s2sdk called it "hl2sdk".
+  entry = config.get("s2sdk") or config.get("hl2sdk") or {}
+  if entry.get("mode") in ("submodule", "download"):
+    return os.path.join(sourcePath, "vendor", "s2sdk")
+  return entry.get("path")
+
+
+def KHookPath(sourcePath):
+  path = os.path.join(sourcePath, 'vendor', 'khook')
+  if not os.path.isfile(os.path.join(path, 'include', 'khook.hpp')):
+    raise Exception('KHook headers not found at {} -- initialise the submodule: '
+                    'git submodule update --init --recursive'.format(path))
+  return path
+
+
+def KHookCommit(khookPath):
+  # Mirrors CMakeLists.txt: "unknown" when git cannot say, which the load-time
+  # check reports but lets through.
+  try:
+    out = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=khookPath,
+                                  stderr=subprocess.DEVNULL)
+    commit = out.decode('ascii', 'ignore').strip()
+    return commit or 'unknown'
+  except Exception:
+    return 'unknown'
+
+
+def KHookHeader(khookPath):
+  # Mirrors CMakeLists.txt's source2mod_khook_header_hash(): the first 16 hex
+  # digits of the SHA-256 of khook.hpp with CRs dropped.
+  with open(os.path.join(khookPath, 'include', 'khook.hpp'), 'rb') as f:
+    content = f.read().replace(b'\r', b'')
+  return hashlib.sha256(content).hexdigest()[:16]
+
+
+class Source2ModSdkConfig(object):
+  def __init__(self):
+    # Snapshot now, while this repo's own AMBuildScript is the currently
+    # executing context -- builder.currentSourcePath is a live attribute that
+    # ambuild2 mutates as it walks in and out of each BuildScript, so reading it
+    # lazily from inside AddPublicIncludes() would point at whichever project
+    # happens to be calling.
+    self.sourcePath = builder.currentSourcePath
+    self.khookPath = KHookPath(self.sourcePath)
+    self.khookCommit = KHookCommit(self.khookPath)
+    self.khookHeader = KHookHeader(self.khookPath)
+
+    self.all_targets = []
+    self.binaries = []
+    self.binaries_by_arch = {}
+    self.sdks = {}
+    self.sdk_manifests = []
+    self.sdk_targets = []
+
+    if Source2ModSdkTarget is not None:
+      # Reuse the caller's compiler and SDK; detecting our own would configure
+      # the same SDK twice in one build.
+      self.all_targets = [Source2ModSdkTarget.cxx]
+      self.sdk_targets = [Source2ModSdkTarget]
+      return
+
+    if builder.options.targets:
+      target_archs = builder.options.targets.split(',')
+    else:
+      target_archs = ['x86_64']
+
+    for arch in target_archs:
+      try:
+        cxx = builder.DetectCxx(target_arch=arch)
+      except Exception as e:
+        if builder.options.targets:
+          raise
+        print('Skipping target {}: {}'.format(arch, e))
+        continue
+      self.all_targets.append(cxx)
+
+    if not self.all_targets:
+      raise Exception('No suitable C/C++ compiler was found.')
+
+  def findSdkPath(self, sdk_name):
+    # Order: --hl2sdk-root, an explicit deps.py choice, the environment (the
+    # manifest's env_vars: S2SDK_CS2, S2SDKCS2, S2SDK, HL2SDK_CS2, HL2SDKCS2 --
+    # the same list as CMakeLists.txt, first set wins), then the vendor/s2sdk
+    # submodule.
+    dir_names = ['s2sdk', 'hl2sdk-{}'.format(sdk_name)] if sdk_name == 'cs2' else ['hl2sdk-{}'.format(sdk_name)]
+    if builder.options.hl2sdk_root:
+      for dir_name in dir_names:
+        sdk_path = os.path.join(builder.options.hl2sdk_root, dir_name)
+        if os.path.exists(sdk_path):
+          return sdk_path
+    if sdk_name != 'cs2':
+      return ResolveEnvPath('HL2SDK{}'.format(sdk_name.upper()), dir_names[0])
+    deps = DepsPath(self.sourcePath)
+    if deps and os.path.isdir(deps):
+      return deps
+    env = SdkHelpers.findSdkPathFromEnv(sdk_name)
+    if env and os.path.isdir(env):
+      return env
+    vendored = os.path.join(self.sourcePath, "vendor", "s2sdk")
+    if os.path.isfile(os.path.join(vendored, "public", "tier0", "platform.h")):
+      return vendored
+    return None
+
+  def detectSDKs(self):
+    global SdkHelpers
+
+    if Source2ModSdkHelpers is not None:
+      SdkHelpers = Source2ModSdkHelpers
+      self.sdks = SdkHelpers.sdks
+      self.sdk_manifests = SdkHelpers.sdk_manifests
+      return
+
+    # s2sdk-manifests ships with the SDK (vendor/s2sdk-manifests), so
+    # --s2sdk-manifests is only there to point at a different checkout. It
+    # has what a binary needs from s2sdk -- include paths, defines, libraries
+    # with the Steam API, protoc -- the same lists s2sdk::s2sdk has in CMake.
+    manifests = ResolveS2SdkManifests(self.sourcePath, builder.options.s2sdk_manifests)
+    SdkHelpers = builder.Eval(os.path.join(manifests, 'SdkHelpers.ambuild'))
+
+    sdk_list = [s for s in builder.options.sdks.split(',') if s]
+    SdkHelpers.find_sdk_path = self.findSdkPath
+    SdkHelpers.findSdks(builder, self.all_targets, sdk_list)
+
+    self.sdks = SdkHelpers.sdks
+    self.sdk_manifests = SdkHelpers.sdk_manifests
+    self.sdk_targets = SdkHelpers.sdk_targets
+
+    if len(self.sdks) > 1:
+      raise Exception('Only one sdk at a time is supported.')
+
+  def configure(self):
+    if Source2ModSdkTarget is not None:
+      # The caller already configured its own compiler; leave it alone.
+      return
+
+    for cxx in self.all_targets:
+      if cxx.target.arch not in ['x86', 'x86_64']:
+        raise Exception('Unknown target architecture: {0}'.format(cxx.target.arch))
+      self.configure_cxx(cxx)
+
+  def configure_cxx(self, cxx):
+    # The SDK's defines (platform, stricmp=strcasecmp, _GLIBCXX_USE_CXX11_ABI=0,
+    # X64BITS, _ITERATOR_DEBUG_LEVEL=0, ...) come from s2sdk-manifests, through
+    # SdkHelpers.configureCxx() in AddSdkIncludes().
+    if cxx.behavior == 'gcc':
+      cxx.defines += [
+        '_snprintf=snprintf',
+        'HAVE_STDINT_H',
+      ]
+      cxx.cflags += [
+        '-pipe',
+        '-fno-strict-aliasing',
+        '-Wall',
+        '-Wno-uninitialized',
+        '-Wno-unused',
+        '-Wno-switch',
+        '-Wno-parentheses',
+        '-Wno-invalid-offsetof',
+        '-msse',
+        '-fPIC',
+      ]
+      cxx.cxxflags += [
+        '-std=c++20',
+        '-frtti',
+        '-fno-threadsafe-statics',
+        '-Wno-non-virtual-dtor',
+        '-Wno-overloaded-virtual',
+        '-Wno-register',
+      ]
+      if cxx.family == 'gcc':
+        cxx.cflags += ['-mfpmath=sse']
+      if cxx.family == 'clang':
+        cxx.cxxflags += [
+          '-Wno-implicit-exception-spec-mismatch',
+          '-Wno-inconsistent-missing-override',
+        ]
+    elif cxx.like('msvc'):
+      if builder.options.debug == '1':
+        cxx.cflags += ['/MTd']
+        cxx.linkflags += ['/NODEFAULTLIB:libcmt']
+      else:
+        cxx.cflags += ['/MT']
+      cxx.defines += [
+        '_CRT_SECURE_NO_DEPRECATE',
+        '_CRT_SECURE_NO_WARNINGS',
+        '_CRT_NONSTDC_NO_DEPRECATE',
+      ]
+      cxx.cflags += ['/W3', '/Zi', '/EHsc', '/std:c++20', '/bigobj']
+      cxx.cxxflags += ['/TP']
+
+    if builder.options.opt == '1':
+      cxx.defines += ['NDEBUG']
+      if cxx.behavior == 'gcc':
+        cxx.cflags += ['-O3']
+      elif cxx.behavior == 'msvc':
+        cxx.cflags += ['/Ox', '/Zo']
+
+    if builder.options.debug == '1':
+      cxx.defines += ['DEBUG', '_DEBUG']
+      if cxx.behavior == 'gcc':
+        cxx.cflags += ['-g3']
+      elif cxx.behavior == 'msvc':
+        cxx.cflags += ['/Od', '/RTC1']
+
+    if cxx.target.platform == 'linux':
+      cxx.defines += ['_FILE_OFFSET_BITS=64']
+      if cxx.family == 'gcc':
+        cxx.linkflags += ['-static-libgcc']
+      elif cxx.family == 'clang':
+        cxx.linkflags += ['-lgcc_eh']
+      cxx.linkflags += ['-static-libstdc++']
+    elif cxx.target.platform == 'windows':
+      cxx.defines += ['_WINDOWS']
+
+    cxx.defines += ['META_IS_SOURCE2']
+    cxx.defines += ['SOURCE2MOD_KHOOK_COMMIT="{}"'.format(self.khookCommit)]
+    cxx.defines += ['SOURCE2MOD_KHOOK_HEADER="{}"'.format(self.khookHeader)]
+
+  def AddPublicIncludes(self, binary):
+    # The one call a consumer of "source2mod/ISource2ModPlugin.h" needs:
+    # public/ for Source2Mod headers, and KHook because ISource2ModPlugin.h
+    # includes "khook.hpp" itself. The hl2sdk include paths come from
+    # SdkHelpers.configureCxx() on the consumer's own binary.
+    binary.compiler.cxxincludes += [
+      os.path.join(self.sourcePath, 'public'),
+      os.path.join(self.khookPath, 'include'),
+    ]
+    # The consumer has to carry the same KHook the SDK objects do, or its
+    # KHOOK_INIT() would compare the core against the wrong value.
+    binary.compiler.defines += ['SOURCE2MOD_KHOOK_COMMIT="{}"'.format(self.khookCommit)]
+    binary.compiler.defines += ['SOURCE2MOD_KHOOK_HEADER="{}"'.format(self.khookHeader)]
+
+  def AddSdkIncludes(self, binary, sdk):
+    # What Source2Mod headers reach into beyond s2sdk-manifests' include
+    # list -- the same list, in the same order, as CMakeLists.txt's, ahead of
+    # s2sdk's own paths as there.
+    binary.compiler.cxxincludes += [
+      sdk['path'],
+      os.path.join(sdk['path'], 'public', 'schemasystem'),
+    ]
+
+    # s2sdk-manifests knows the SDK's include list and the defines its headers
+    # expect (COMPILER_GCC and friends -- without them public/tier0/platform.h
+    # reaches for a Windows <new.h>), so let it do it rather than hand-listing
+    # folders here.
+    SdkHelpers.configureCxx(builder, binary, sdk)
+
+  def ProtoSources(self, sdk):
+    # The game protobufs, from s2sdk's own protos.
+    names = [
+      'common/network_connection.proto',
+      'common/networkbasetypes.proto',
+      'game/shared/cs/cs_gameevents.proto',
+      'game/shared/cs/cs_usercmd.proto',
+      'game/shared/base_gcmessages.proto',
+      'game/shared/econ/econ_gcmessages.proto',
+      'common/engine_gcmessages.proto',
+      'gcsdk/gcsdk_gcmessages.proto',
+      'gcsdk/gcsystemmsgs.proto',
+      'game/shared/cstrike15/cstrike15_gcmessages.proto',
+      'game/shared/cstrike15/cstrike15_usermessages.proto',
+      'common/source2_steam_stats.proto',
+      'common/netmessages.proto',
+      'networksystem/networksystem_protomessages.proto',
+      'gcsdk/steammessages.proto',
+      'game/shared/usercmd.proto',
+      'game/shared/usermessages.proto',
+      'game/shared/gameevents.proto',
+      'game/shared/clientmessages.proto',
+      'game/shared/te.proto',
+      'common/valveextensions.proto',
+    ]
+    return [os.path.join(sdk['path'], *name.split('/')) for name in names]
+
+  def AddProtobufs(self, binary, sdk_target):
+    # s2sdk_protobufs() in CMakeLists.txt. The protos import each other by
+    # name, also from folders s2sdk-manifests' protoc doesn't search
+    # (s2sdk_protobufs() adds every listed proto's folder).
+    sdk = sdk_target.sdk
+    SdkHelpers.addProtobufs(builder, binary, sdk_target, self.ProtoSources(sdk))
+    binary.custom[-1].protoc.includes += [
+      os.path.join(sdk['path'], 'gcsdk'),
+      os.path.join(sdk['path'], 'game', 'shared', 'cstrike15'),
+    ]
+
+  def Library(self, cxx, name):
+    return cxx.StaticLibrary(name)
+
+  def build(self):
+    for sdk_target in self.sdk_targets:
+      sdk = sdk_target.sdk
+      cxx = sdk_target.cxx
+
+      lib = self.Library(cxx, 'source2mod-sdk')
+
+      self.AddPublicIncludes(lib)
+      self.AddSdkIncludes(lib, sdk)
+      lib.compiler.cxxincludes += [os.path.join(self.sourcePath, 'src')]
+
+      for other_sdk in self.sdk_manifests:
+        lib.compiler.defines += ['SE_{}={}'.format(other_sdk['define'], other_sdk['code'])]
+
+      for root, _, files in os.walk(os.path.join(self.sourcePath, 'src')):
+        for f in files:
+          if f.endswith('.cpp'):
+            lib.sources += [os.path.relpath(os.path.join(root, f), self.sourcePath)]
+
+      # The hl2sdk translation units Source2Mod needs compiled in, matching
+      # CMakeLists.txt. A plugin must not compile these again.
+      lib.sources += [
+        os.path.join(sdk['path'], 'public', 'tier0', 'memoverride.cpp'),
+        os.path.join(sdk['path'], 'tier0_perproject', 'bitbuf.cpp'),
+        os.path.join(sdk['path'], 'tier0_perproject', 'convar.cpp'),
+        os.path.join(sdk['path'], 'tier0_perproject', 'keyvalues3.cpp'),
+        os.path.join(sdk['path'], 'entity2', 'entityidentity.cpp'),
+        os.path.join(sdk['path'], 'entity2', 'entitysystem.cpp'),
+        os.path.join(sdk['path'], 'entity2', 'entitykeyvalues.cpp'),
+      ]
+
+      self.AddProtobufs(lib, sdk_target)
+
+      node = builder.Add(lib)
+      self.binaries += [node]
+      self.binaries_by_arch[cxx.target.arch] = node.binary
+
+
+Source2ModSdk = Source2ModSdkConfig()
+Source2ModSdk.detectSDKs()
+Source2ModSdk.configure()
+Source2ModSdk.build()
+
+# What a parent build gets back: the compiled-library paths ({arch: path}),
+# plus the config object so the caller can call
+# Source2ModSdk['config'].AddPublicIncludes(binary) instead of re-declaring the
+# SDK's folder layout by hand.
+rvalue = {
+  'binaries_by_arch': Source2ModSdk.binaries_by_arch,
+  'config': Source2ModSdk,
+}

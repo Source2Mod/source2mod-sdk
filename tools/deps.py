@@ -1,0 +1,366 @@
+#!/usr/bin/env python3
+# vim: set ts=4 sw=4 tw=99 et:
+"""
+Source2Mod SDK -- dependency setup.
+
+The SDK compiles against:
+
+  * s2sdk               -- AlliedModders' s2sdk (cs2 branch, formerly hl2sdk's
+                           cs2 branch), the game protobufs included;
+                           vendor/s2sdk, a submodule, unless you point at
+                           your own checkout
+  * KHook               -- vendor/khook, a submodule, which has to be the very
+                           commit metamod-source was built with or Source2Mod
+                           core refuses every plugin at load time
+  * s2sdk-manifests     -- vendor/s2sdk-manifests, a submodule: what a binary
+                           needs from s2sdk, for AMBuild (SdkHelpers.ambuild)
+                           and CMake (s2sdk's s2sdk::s2sdk) alike;
+                           S2SDK_MANIFESTS_DIR points both at another checkout
+
+`init` asks, once, where s2sdk comes from: a checkout you already have (found
+through an environment variable -- S2SDK_CS2, S2SDKCS2, S2SDK, HL2SDK_CS2 or
+HL2SDKCS2, first set wins -- or a path you type), or the vendor/s2sdk
+submodule. The answer is saved in deps.json next to this SDK, and `update`
+then brings everything up to date the same way every time: pulls your
+checkout or puts the submodule on the commit this SDK pins, moves KHook to the
+commit metamod-source pins, moves the manifests to their latest.
+
+Without deps.py at all, CMake and AMBuild take s2sdk from the environment when
+one of those variables is set and from vendor/s2sdk otherwise.
+
+    python tools/deps.py init
+    python tools/deps.py init --s2sdk submodule
+    python tools/deps.py update
+    python tools/deps.py status
+
+Nothing here needs more than Python 3 and git.
+"""
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+import urllib.request
+
+SDK_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_PATH = os.path.join(SDK_ROOT, 'deps.json')
+CMAKE_PATH = os.path.join(SDK_ROOT, 'deps.cmake')
+VENDOR = os.path.join(SDK_ROOT, 'vendor')
+SUBMODULE = os.path.join(VENDOR, 's2sdk')
+
+# First set wins; the same list CMakeLists.txt and AMBuildScript read.
+S2SDK_ENV = ['S2SDK_CS2', 'S2SDKCS2', 'S2SDK', 'HL2SDK_CS2', 'HL2SDKCS2']
+S2SDK_REPO = 'https://github.com/FUNPLAY-pro-CS2/s2sdk.git'
+# What has to exist for a path to count as an s2sdk checkout.
+S2SDK_PROBE = os.path.join('public', 'tier0', 'platform.h')
+
+# KHook follows this repository's pin, read from GitHub without cloning it.
+KHOOK_TRACK = {
+    'repo': 'alliedmodders/metamod-source',
+    'branch': 'master',
+    'path': 'third_party/khook',
+}
+
+
+# =========================
+# Small helpers
+# =========================
+
+def say(msg):
+    print('[deps] ' + msg)
+
+
+def die(msg):
+    print('[deps] error: ' + msg, file=sys.stderr)
+    sys.exit(1)
+
+
+def git(args, cwd, check=True, capture=False):
+    cmd = ['git'] + args
+    if capture:
+        return subprocess.run(cmd, cwd=cwd, check=check, stdout=subprocess.PIPE,
+                              stderr=subprocess.STDOUT, text=True).stdout.strip()
+    return subprocess.run(cmd, cwd=cwd, check=check).returncode
+
+
+def is_git_repo(path):
+    return os.path.isdir(path) and git(['rev-parse', '--is-inside-work-tree'], path,
+                                       check=False, capture=True) == 'true'
+
+
+def git_head(path):
+    return git(['rev-parse', 'HEAD'], path, check=False, capture=True) if is_git_repo(path) else ''
+
+
+def git_dirty(path):
+    return bool(git(['status', '--porcelain', '--untracked-files=no'], path, check=False, capture=True))
+
+
+def env_lookup():
+    """(variable, value) of the first s2sdk environment variable that is set."""
+    for var in S2SDK_ENV:
+        if os.environ.get(var):
+            return var, os.environ[var]
+    return S2SDK_ENV[0], ''
+
+
+def is_s2sdk(path):
+    return bool(path) and os.path.isfile(os.path.join(path, S2SDK_PROBE))
+
+
+def load_config():
+    if not os.path.isfile(CONFIG_PATH):
+        return None
+    with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
+        config = json.load(f)
+    # Written before s2sdk: the dependency was "hl2sdk", its clone vendor/hl2sdk-cs2;
+    # the protos are s2sdk's own now.
+    if 'hl2sdk' in config and 's2sdk' not in config:
+        entry = config.pop('hl2sdk')
+        config['s2sdk'] = {'mode': 'submodule'} if entry.get('mode') == 'download' else entry
+    config.pop('protobufs', None)
+    return config
+
+
+def save_config(config):
+    with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
+        json.dump(config, f, indent=2)
+        f.write('\n')
+    write_cmake(config)
+    say('saved ' + os.path.relpath(CONFIG_PATH, SDK_ROOT) + ' and ' + os.path.relpath(CMAKE_PATH, SDK_ROOT))
+
+
+def s2sdk_path(entry):
+    """Where s2sdk is, for the mode saved."""
+    if entry['mode'] == 'env':
+        return entry.get('path') or env_lookup()[1]
+    return SUBMODULE
+
+
+def write_cmake(config):
+    """CMake 3.18 cannot read JSON, so the path goes into a file it can include.
+    Only the submodule and a typed path: a plain env-var choice is what CMake
+    does anyway."""
+    lines = ['# Generated by tools/deps.py -- do not edit, run `deps.py init` again.']
+    entry = config.get('s2sdk', {})
+    if entry.get('mode') == 'submodule' or entry.get('path'):
+        lines.append('set(SOURCESDK "{}")'.format(s2sdk_path(entry).replace('\\', '/')))
+    with open(CMAKE_PATH, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(lines) + '\n')
+
+
+# =========================
+# init
+# =========================
+
+def ask_choice(env_var, env_path):
+    print()
+    print('s2sdk:')
+    if env_path:
+        print('  1) use the checkout {} points at: {}'.format(env_var, env_path))
+    else:
+        print('  1) use a checkout I already have ({} not set -- you will be asked for the path)'.format(' / '.join(S2SDK_ENV)))
+    print('  2) use the vendor/s2sdk submodule of this SDK ({} cs2)'.format(S2SDK_REPO))
+    while True:
+        answer = input('  choice [1/2]: ').strip()
+        if answer == '1':
+            return 'env'
+        if answer == '2':
+            return 'submodule'
+
+
+def init(args):
+    config = load_config() or {}
+    env_var, env_path = env_lookup()
+
+    mode = args.s2sdk
+    if mode == 'download':
+        mode = 'submodule'
+    if not mode:
+        if not sys.stdin.isatty():
+            die('--s2sdk is required when not run from a terminal')
+        mode = ask_choice(env_var, env_path)
+
+    entry = {'mode': mode}
+    if mode == 'env':
+        path = env_path
+        if not is_s2sdk(path):
+            if env_path:
+                say('{} = {} does not look like s2sdk ({} missing)'.format(env_var, env_path, S2SDK_PROBE))
+            if sys.stdin.isatty():
+                path = input('  path to your s2sdk checkout: ').strip()
+            if not is_s2sdk(path):
+                die('no usable s2sdk checkout at "{}"'.format(path))
+        # Only remember an explicit path; the env var is read fresh each time.
+        if path != env_path:
+            entry['path'] = os.path.abspath(path)
+    config['s2sdk'] = entry
+
+    config['khook'] = {
+        'repo': args.metamod_repo or config.get('khook', {}).get('repo', KHOOK_TRACK['repo']),
+        'branch': args.metamod_branch or config.get('khook', {}).get('branch', KHOOK_TRACK['branch']),
+    }
+
+    save_config(config)
+    update(args, config)
+
+
+# =========================
+# update
+# =========================
+
+def update_s2sdk(entry):
+    if entry['mode'] == 'submodule':
+        # The commit this SDK pins, not the branch head: Source2Mod headers
+        # are checked against that one.
+        say('s2sdk: vendor/s2sdk -> the commit this SDK pins')
+        git(['submodule', 'update', '--init', '--recursive', 'vendor/s2sdk'], SDK_ROOT, check=False)
+        return
+
+    path = s2sdk_path(entry)
+    if not is_git_repo(path):
+        say('s2sdk: {} is not a git checkout, left alone'.format(path))
+        return
+    if git_dirty(path):
+        say('s2sdk: {} has local changes, not pulling'.format(path))
+        return
+    upstream = git(['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'], path, check=False, capture=True)
+    if not upstream or upstream.startswith('fatal'):
+        say('s2sdk: {} has no upstream branch, not pulling'.format(path))
+        return
+    say('s2sdk: pulling {}'.format(path))
+    git(['pull', '--ff-only', '--quiet'], path, check=False)
+    git(['submodule', 'update', '--init', '--recursive', '--quiet'], path, check=False)
+
+
+def metamod_khook_sha(track):
+    """The commit of third_party/khook in the metamod-source repo, from the
+    GitHub contents API -- a submodule entry carries its pinned sha."""
+    url = 'https://api.github.com/repos/{}/contents/{}?ref={}'.format(track['repo'], KHOOK_TRACK['path'], track['branch'])
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'source2mod-sdk-deps'}), timeout=20) as r:
+            data = json.load(r)
+    except Exception as e:  # noqa: BLE001 -- any failure just means "unknown"
+        say('khook: could not read {} ({})'.format(url, e))
+        return None
+    if data.get('type') != 'submodule':
+        say('khook: {} in {} is not a submodule'.format(KHOOK_TRACK['path'], track['repo']))
+        return None
+    return data.get('sha')
+
+
+def update_khook(track):
+    path = os.path.join(VENDOR, 'khook')
+    git(['submodule', 'update', '--init', 'vendor/khook'], SDK_ROOT, check=False)
+    if not is_git_repo(path):
+        die('vendor/khook is not checked out')
+
+    current = git_head(path)
+    wanted = metamod_khook_sha(track)
+    if not wanted:
+        say('khook: staying on {}'.format(current[:12]))
+        return
+    if wanted == current:
+        say('khook: {} already matches {} {}'.format(current[:12], track['repo'], track['branch']))
+        return
+
+    say('khook: {} -> {} (the commit {} {} pins)'.format(current[:12], wanted[:12], track['repo'], track['branch']))
+    git(['fetch', '--quiet', 'origin'], path, check=False)
+    if git(['cat-file', '-e', wanted + '^{commit}'], path, check=False) != 0:
+        git(['fetch', '--quiet', 'origin', wanted], path, check=False)
+    git(['checkout', '--quiet', '--detach', wanted], path)
+    say('khook: vendor/khook now points elsewhere than this SDK commit; commit the submodule bump if this is the SDK you maintain')
+
+
+def update_manifests():
+    say('manifests: vendor/s2sdk-manifests -> latest master')
+    git(['submodule', 'update', '--init', '--remote', 'vendor/s2sdk-manifests'], SDK_ROOT, check=False)
+    if os.environ.get('S2SDK_MANIFESTS_DIR'):
+        say('manifests: note -- S2SDK_MANIFESTS_DIR is set, so builds use {} instead'.format(os.environ['S2SDK_MANIFESTS_DIR']))
+
+
+def update(args, config=None):
+    config = config or load_config()
+    if not config:
+        die('no deps.json yet -- run `deps.py init` first')
+
+    if 's2sdk' in config:
+        update_s2sdk(config['s2sdk'])
+    if not getattr(args, 'no_khook', False):
+        update_khook(config.get('khook', KHOOK_TRACK))
+    if not getattr(args, 'no_manifests', False):
+        update_manifests()
+
+    write_cmake(config)
+    status(args, config)
+
+
+# =========================
+# status
+# =========================
+
+def status(args, config=None):
+    config = config or load_config()
+    if not config:
+        die('no deps.json yet -- run `deps.py init` first')
+
+    print()
+    entry = config.get('s2sdk')
+    env_var, env_path = env_lookup()
+    if not entry:
+        print('  {:<10} not configured'.format('s2sdk'))
+    else:
+        path = s2sdk_path(entry)
+        where = 'from ' + env_var if entry['mode'] == 'env' and 'path' not in entry else entry['mode']
+        ok = 'ok' if is_s2sdk(path) else 'MISSING ' + S2SDK_PROBE
+        print('  {:<10} {:<10} {}  [{}] {}'.format('s2sdk', where, path, git_head(path)[:12] or 'not git', ok))
+
+    khook = git_head(os.path.join(VENDOR, 'khook'))
+    track = config.get('khook', KHOOK_TRACK)
+    print('  {:<10} {:<10} {}  (tracks {} {})'.format('khook', 'submodule', khook[:12] or 'not checked out', track['repo'], track['branch']))
+    manifests_env = os.environ.get('S2SDK_MANIFESTS_DIR')
+    if manifests_env:
+        print('  {:<10} {:<10} {}  [{}]'.format('manifests', 'env', manifests_env, git_head(manifests_env)[:12] or 'not git'))
+    else:
+        manifests = git_head(os.path.join(VENDOR, 's2sdk-manifests'))
+        print('  {:<10} {:<10} {}'.format('manifests', 'submodule', manifests[:12] or 'not checked out'))
+
+    if entry and entry['mode'] != 'env' and env_path:
+        print()
+        print('  note: {} is set in your environment but deps.json says "{}" -- '
+              'CMake and AMBuild use vendor/s2sdk.'.format(env_var, entry['mode']))
+
+
+# =========================
+# main
+# =========================
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = parser.add_subparsers(dest='command', required=True)
+
+    p_init = sub.add_parser('init', help='choose where s2sdk comes from, then update')
+    p_init.add_argument('--s2sdk', '--hl2sdk', dest='s2sdk', choices=('env', 'submodule', 'download'),
+                        help='"env": the checkout {} points at; "submodule": vendor/s2sdk '
+                             '("download" means the same)'.format(' / '.join(S2SDK_ENV)))
+    p_init.add_argument('--metamod-repo', help='GitHub repo whose KHook pin to follow (default {})'.format(KHOOK_TRACK['repo']))
+    p_init.add_argument('--metamod-branch', help='branch of that repo (default {})'.format(KHOOK_TRACK['branch']))
+    p_init.add_argument('--no-khook', action='store_true', help='leave vendor/khook where it is')
+    p_init.add_argument('--no-manifests', action='store_true', help='leave vendor/s2sdk-manifests where it is')
+    p_init.set_defaults(func=init)
+
+    p_update = sub.add_parser('update', help='bring every dependency up to date the way deps.json says')
+    p_update.add_argument('--no-khook', action='store_true', help='leave vendor/khook where it is')
+    p_update.add_argument('--no-manifests', action='store_true', help='leave vendor/s2sdk-manifests where it is')
+    p_update.set_defaults(func=update)
+
+    p_status = sub.add_parser('status', help='show what is configured and which commits are checked out')
+    p_status.set_defaults(func=status)
+
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == '__main__':
+    main()
