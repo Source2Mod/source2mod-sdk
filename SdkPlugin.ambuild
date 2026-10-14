@@ -90,9 +90,11 @@ class Source2ModSdkPlugin(object):
 
   def AddPublicIncludes(self, binary):
     # The one call a consumer of "source2mod/ISource2ModPlugin.h" needs.
-    # KHook is in there because ISource2ModPlugin.h includes "khook.hpp".
+    # KHook is in there because ISource2ModPlugin.h includes "khook.hpp";
+    # public/sourcepawn for ISource2ModNatives.h.
     binary.compiler.cxxincludes += [
       os.path.join(self.sourcePath, 'public'),
+      os.path.join(self.sourcePath, 'public', 'sourcepawn'),
       os.path.join(self.sourcePath, 'src'),
       os.path.join(self.khookPath, 'include'),
     ]

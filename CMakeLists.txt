@@ -333,6 +333,12 @@ target_include_directories(source2mod-sdk PUBLIC
         ${KHOOK_DIR}/include
 )
 
+# SourcePawn's public headers, for ISource2ModNatives.h. The core has the
+# VM's own copy (vendor/sourcepawn/include) and must not see a second one.
+if (NOT SOURCE2MOD_CORE)
+    target_include_directories(source2mod-sdk PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/public/sourcepawn)
+endif()
+
 # Which KHook this binary -- and everything linking it -- was compiled
 # against. Read back by SOURCE2MOD_SAVEVARS() and by the core's Source2ModFactory.
 target_compile_definitions(source2mod-sdk PUBLIC

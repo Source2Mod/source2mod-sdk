@@ -43,6 +43,14 @@ source2mod's plugin manager, interface sharing and GameDLL communication follow
 Metamod:Source's model, and s2sdk is its reference for engine structures and
 interfaces.
 
+## SourcePawn
+
+`public/sourcepawn` holds SourcePawn's public headers (sp_vm_api.h and the
+ones it includes), AlliedModders LLC's work, copied unchanged from the VM the
+core runs (vendor/sourcepawn in Source2Mod) with their license headers. They
+are what ISource2ModNatives.h hands a native plugin to write natives for
+`.smx` scripts with.
+
 ## KHook
 
 Detouring library Source2Mod and its plugins hook with -- virtual, vtable and
