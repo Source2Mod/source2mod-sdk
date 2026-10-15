@@ -254,7 +254,11 @@ inline bool Source2ModKHookVersionMatches(const char* coreHeader, const char* co
 // version than the core's is refused.
 // 3 (v1.0.37): OnClientAuthorized, OnClientAuthorizeFailed and
 // OnPermissionsChanged on ISource2ModListener.
-#define SOURCE2MOD_PLAPI_VERSION 3
+// 4: OnClientConnect (may refuse the connection), OnClientConnected and
+// OnClientDisconnectPost on ISource2ModListener, which is now in the order
+// the engine calls it; OnClientDisconnect is called pre instead of post. The
+// slots moved, so a plugin built against 3 or older is refused.
+#define SOURCE2MOD_PLAPI_VERSION 4
 
 /// Plugin API interface name
 #define SOURCE2MOD_PLAPI_NAME "ISource2ModPlugin"
@@ -468,42 +472,49 @@ public:
     {
     }
 
-    /// Post IServerGameClients::ClientPutInServer.
+    /// Pre ISource2GameClients::ClientConnect: a player asks to join (the
+    /// engine does not call it for bots). Return false to refuse; what is
+    /// written into `rejectReason` is what the player is shown. The first
+    /// plugin to refuse ends it -- the ones after it are not asked.
+    virtual bool OnClientConnect(CPlayerSlot slot, const char* name, uint64 xuid, const char* networkId, bool unk1, CBufferString* rejectReason)
+    {
+        return true;
+    }
+
+    /// Post ISource2GameClients::OnClientConnected: the slot is taken, by a
+    /// player or a bot (`fakePlayer`); `address` is the player's "ip:port".
+    virtual void OnClientConnected(CPlayerSlot slot, const char* name, uint64 xuid, const char* networkId, const char* address, bool fakePlayer)
+    {
+    }
+
+    /// Post ISource2GameClients::ClientPutInServer: the player (type 0) or
+    /// bot (type 1) is in the game and has a controller.
     virtual void OnClientPutInServer(CPlayerSlot slot, const char* name, int type, uint64 xuid)
     {
     }
 
-    /// Post IServerGameClients::ClientDisconnect.
+    /// Pre ISource2GameClients::ClientDisconnect: the player is leaving and
+    /// everything of theirs is still there.
     virtual void OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason, const char* name, uint64 xuid, const char* networkId)
     {
     }
 
-    /// Steam validated the player in this slot: from now on they are checked
-    /// under `steamId` whatever SteamAuthMode says. Not called for bots.
-    virtual void OnClientAuthorized(CPlayerSlot slot, uint64 steamId)
+    /// Post ISource2GameClients::ClientDisconnect: the game is done with the
+    /// player; Source2Mod forgets the slot's permissions and cookies only
+    /// after this.
+    virtual void OnClientDisconnectPost(CPlayerSlot slot, ENetworkDisconnectionReason reason, const char* name, uint64 xuid, const char* networkId)
     {
     }
 
-    /// Steam refused the ticket of the player in this slot; `steamId` is the
-    /// one they claimed.
-    virtual void OnClientAuthorizeFailed(CPlayerSlot slot, uint64 steamId)
-    {
-    }
-
-    /// Post IServerGameClients::ClientVoice.
+    /// Post ISource2GameClients::ClientVoice: the player in this slot is
+    /// talking.
     virtual void OnClientVoice(CPlayerSlot slot)
     {
     }
 
-    /// Post IServerGameClients::ClientSettingsChanged.
+    /// Post ISource2GameClients::ClientSettingsChanged: the player's convars
+    /// (name, language, ...) changed.
     virtual void OnClientSettingsChanged(CPlayerSlot slot)
-    {
-    }
-
-    /// What this SteamID64 holds may have changed -- a grant, a group, a
-    /// reload. 0 when a change can touch anybody (a group was edited,
-    /// permissions.json was re-read).
-    virtual void OnPermissionsChanged(uint64 steamId)
     {
     }
 
@@ -522,6 +533,25 @@ public:
     /// called on: the place to keep it, or to register a .gameevents file of
     /// your own.
     virtual void OnLoadEventsFromFile(IGameEventManager2* manager, const char* filename, bool searchAll)
+    {
+    }
+
+    /// Steam validated the player in this slot: from now on they are checked
+    /// under `steamId` whatever SteamAuthMode says. Not called for bots.
+    virtual void OnClientAuthorized(CPlayerSlot slot, uint64 steamId)
+    {
+    }
+
+    /// Steam refused the ticket of the player in this slot; `steamId` is the
+    /// one they claimed.
+    virtual void OnClientAuthorizeFailed(CPlayerSlot slot, uint64 steamId)
+    {
+    }
+
+    /// What this SteamID64 holds may have changed -- a grant, a group, a
+    /// reload. 0 when a change can touch anybody (a group was edited,
+    /// permissions.json was re-read).
+    virtual void OnPermissionsChanged(uint64 steamId)
     {
     }
 };
@@ -551,10 +581,10 @@ Globals
   */
 #define SOURCE2MOD_DEFINE_GLOBALVARS() \
     ISource2ModAPI*             g_Source2ModAPI              = nullptr; \
-    ISource2ModPlugin*          g_PluginAPI               = nullptr; \
-    PluginId                 g_PluginID                = 0; \
-    const char*             g_Source2ModCoreKHookCommit = nullptr; \
-    const char*             g_Source2ModCoreKHookHeader = nullptr; \
+    ISource2ModPlugin*          g_PluginAPI                  = nullptr; \
+    PluginId                    g_PluginID                   = 0; \
+    const char*                 g_Source2ModCoreKHookCommit  = nullptr; \
+    const char*                 g_Source2ModCoreKHookHeader  = nullptr; \
     ISource2ModAddresses*       g_pSource2ModAddresses       = nullptr; \
     ISource2ModCommands*        g_pSource2ModCommands        = nullptr; \
     ISource2ModConVars*         g_pSource2ModConVars         = nullptr; \
@@ -606,9 +636,9 @@ Globals
 #define SOURCE2MOD_GLOBALVARS() \
     extern ISource2ModAPI*             g_Source2ModAPI; \
     extern ISource2ModPlugin*          g_PluginAPI; \
-    extern PluginId                 g_PluginID; \
-    extern const char*             g_Source2ModCoreKHookCommit; \
-    extern const char*             g_Source2ModCoreKHookHeader; \
+    extern PluginId                    g_PluginID; \
+    extern const char*                 g_Source2ModCoreKHookCommit; \
+    extern const char*                 g_Source2ModCoreKHookHeader; \
     extern ISource2ModAddresses*       g_pSource2ModAddresses; \
     extern ISource2ModCommands*        g_pSource2ModCommands; \
     extern ISource2ModConVars*         g_pSource2ModConVars; \
@@ -673,11 +703,11 @@ Globals
     g_pSource2ModScripts         = (ISource2ModScripts*)        (api)->Source2ModFactory(SOURCE2MOD_SCRIPTS_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModSounds          = (ISource2ModSounds*)         (api)->Source2ModFactory(SOURCE2MOD_SOUNDS_INTERFACE,          nullptr, nullptr); \
     g_pSource2ModTrace           = (ISource2ModTrace*)          (api)->Source2ModFactory(SOURCE2MOD_TRACE_INTERFACE,           nullptr, nullptr); \
-    g_pSource2ModClients         = (ISource2ModClients*)(api)->Source2ModFactory(SOURCE2MOD_CLIENTS_INTERFACE, nullptr, nullptr); \
-    g_pSource2ModFiles           = (ISource2ModFiles*)(api)->Source2ModFactory(SOURCE2MOD_FILES_INTERFACE, nullptr, nullptr); \
-    g_pSource2ModTargeting       = (ISource2ModTargeting*)(api)->Source2ModFactory(SOURCE2MOD_TARGETING_INTERFACE, nullptr, nullptr); \
-    g_pSource2ModTranslations    = (ISource2ModTranslations*)(api)->Source2ModFactory(SOURCE2MOD_TRANSLATIONS_INTERFACE, nullptr, nullptr); \
-    g_pSource2ModUtils           = (ISource2ModUtils*)(api)->Source2ModFactory(SOURCE2MOD_UTILS_INTERFACE, nullptr, nullptr); \
+    g_pSource2ModClients         = (ISource2ModClients*)        (api)->Source2ModFactory(SOURCE2MOD_CLIENTS_INTERFACE,         nullptr, nullptr); \
+    g_pSource2ModFiles           = (ISource2ModFiles*)          (api)->Source2ModFactory(SOURCE2MOD_FILES_INTERFACE,           nullptr, nullptr); \
+    g_pSource2ModTargeting       = (ISource2ModTargeting*)      (api)->Source2ModFactory(SOURCE2MOD_TARGETING_INTERFACE,       nullptr, nullptr); \
+    g_pSource2ModTranslations    = (ISource2ModTranslations*)   (api)->Source2ModFactory(SOURCE2MOD_TRANSLATIONS_INTERFACE,    nullptr, nullptr); \
+    g_pSource2ModUtils           = (ISource2ModUtils*)          (api)->Source2ModFactory(SOURCE2MOD_UTILS_INTERFACE,           nullptr, nullptr); \
     g_pSource2ModTransmit        = (ISource2ModTransmit*)       (api)->Source2ModFactory(SOURCE2MOD_TRANSMIT_INTERFACE,        nullptr, nullptr);
 
 /**
