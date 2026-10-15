@@ -94,7 +94,8 @@ public:
     /// A cvar the client sent (cl_language, ...); empty when it did not.
     virtual std::string GetClientConVar(CPlayerSlot slot, const char* name) = 0;
 
-    /// Disconnects a client with a message they are shown.
+    /// Disconnects a client. CS2 shows them the kick reason's own text;
+    /// @p message is the reason the server logs.
     virtual void Kick(CPlayerSlot slot, const char* message) = 0;
 
     /// Clients on the server, bots included.
