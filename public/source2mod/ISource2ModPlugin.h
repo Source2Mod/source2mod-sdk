@@ -83,13 +83,19 @@ class ISource2ModAPI;
 // header's guard already set, so its include below is a no-op and the class
 // would otherwise still be unknown when the macros expand.
 class ISource2ModAddresses;
+class ISource2ModClients;
+class ISource2ModFiles;
+class ISource2ModMenuBuilder;
+class ISource2ModTargeting;
+class ISource2ModTranslations;
+class ISource2ModUtils;
 class ISource2ModCommands;
 class ISource2ModConVars;
 class ISource2ModEntities;
 class ISource2ModEvents;
 class ISource2ModGameConfig;
 class ISource2ModMenus;
-class ISource2ModMySQL;
+class ISource2ModSQL;
 class ISource2ModNetworkMessages;
 class ISource2ModPermissions;
 class ISource2ModScheduler;
@@ -115,7 +121,7 @@ class ISource2ModTransmit;
 #include "ISource2ModHTTP.h"
 #include "ISource2ModJSON.h"
 #include "ISource2ModMenus.h"
-#include "ISource2ModMySQL.h"
+#include "ISource2ModSQL.h"
 #include "ISource2ModNetworkMessages.h"
 #include "ISource2ModPaths.h"
 #include "ISource2ModPermissions.h"
@@ -124,6 +130,13 @@ class ISource2ModTransmit;
 #include "ISource2ModSounds.h"
 #include "ISource2ModTrace.h"
 #include "ISource2ModTransmit.h"
+#include "ISource2ModClients.h"
+#include "ISource2ModFiles.h"
+#include "ISource2ModTargeting.h"
+#include "ISource2ModTranslations.h"
+#include "ISource2ModUtils.h"
+// After ISource2ModMenus.h: it uses PostSelectAction.
+#include "ISource2ModMenuBuilder.h"
 
 /* =========================
 Interface status
@@ -553,7 +566,7 @@ Globals
     ISource2ModHTTP*            g_pSource2ModHTTP            = nullptr; \
     ISource2ModJSON*            g_pSource2ModJSON            = nullptr; \
     ISource2ModMenus*           g_pSource2ModMenus           = nullptr; \
-    ISource2ModMySQL*           g_pSource2ModMySQL           = nullptr; \
+    ISource2ModSQL*             g_pSource2ModSQL             = nullptr; \
     ISource2ModNetworkMessages* g_pSource2ModNetworkMessages = nullptr; \
     ISource2ModPaths*           g_pSource2ModPaths           = nullptr; \
     ISource2ModPermissions*     g_pSource2ModPermissions     = nullptr; \
@@ -561,6 +574,12 @@ Globals
     ISource2ModScripts*         g_pSource2ModScripts         = nullptr; \
     ISource2ModSounds*          g_pSource2ModSounds          = nullptr; \
     ISource2ModTrace*           g_pSource2ModTrace           = nullptr; \
+    ISource2ModClients*         g_pSource2ModClients         = nullptr; \
+    ISource2ModFiles*           g_pSource2ModFiles           = nullptr; \
+    ISource2ModMenuBuilder*     g_pSource2ModMenuBuilder     = nullptr; \
+    ISource2ModTargeting*       g_pSource2ModTargeting       = nullptr; \
+    ISource2ModTranslations*    g_pSource2ModTranslations    = nullptr; \
+    ISource2ModUtils*           g_pSource2ModUtils           = nullptr; \
     ISource2ModTransmit*        g_pSource2ModTransmit        = nullptr;
 
 /**
@@ -598,7 +617,7 @@ Globals
     extern ISource2ModHTTP*            g_pSource2ModHTTP; \
     extern ISource2ModJSON*            g_pSource2ModJSON; \
     extern ISource2ModMenus*           g_pSource2ModMenus; \
-    extern ISource2ModMySQL*           g_pSource2ModMySQL; \
+    extern ISource2ModSQL*             g_pSource2ModSQL; \
     extern ISource2ModNetworkMessages* g_pSource2ModNetworkMessages; \
     extern ISource2ModPaths*           g_pSource2ModPaths; \
     extern ISource2ModPermissions*     g_pSource2ModPermissions; \
@@ -606,6 +625,12 @@ Globals
     extern ISource2ModScripts*         g_pSource2ModScripts; \
     extern ISource2ModSounds*          g_pSource2ModSounds; \
     extern ISource2ModTrace*           g_pSource2ModTrace; \
+    extern ISource2ModClients*         g_pSource2ModClients; \
+    extern ISource2ModFiles*           g_pSource2ModFiles; \
+    extern ISource2ModMenuBuilder*     g_pSource2ModMenuBuilder; \
+    extern ISource2ModTargeting*       g_pSource2ModTargeting; \
+    extern ISource2ModTranslations*    g_pSource2ModTranslations; \
+    extern ISource2ModUtils*           g_pSource2ModUtils; \
     extern ISource2ModTransmit*        g_pSource2ModTransmit; \
     namespace KHook { extern KHook::IKHook* __exported__khook; }
 
@@ -628,7 +653,7 @@ Globals
     g_pSource2ModGameSystems     = (ISource2ModGameSystems*)    (api)->Source2ModFactory(SOURCE2MOD_GAMESYSTEMS_INTERFACE,     nullptr, nullptr); \
     g_pSource2ModHTTP            = (ISource2ModHTTP*)           (api)->Source2ModFactory(SOURCE2MOD_HTTP_INTERFACE,            nullptr, nullptr); \
     g_pSource2ModMenus           = (ISource2ModMenus*)          (api)->Source2ModFactory(SOURCE2MOD_MENUS_INTERFACE,           nullptr, nullptr); \
-    g_pSource2ModMySQL           = (ISource2ModMySQL*)          (api)->Source2ModFactory(SOURCE2MOD_MYSQL_INTERFACE,           nullptr, nullptr); \
+    g_pSource2ModSQL             = (ISource2ModSQL*)            (api)->Source2ModFactory(SOURCE2MOD_SQL_INTERFACE,             nullptr, nullptr); \
     g_pSource2ModNetworkMessages = (ISource2ModNetworkMessages*)(api)->Source2ModFactory(SOURCE2MOD_NETWORKMESSAGES_INTERFACE, nullptr, nullptr); \
     g_pSource2ModPaths           = (ISource2ModPaths*)          (api)->Source2ModFactory(SOURCE2MOD_PATHS_INTERFACE,           nullptr, nullptr); \
     g_pSource2ModPermissions     = (ISource2ModPermissions*)    (api)->Source2ModFactory(SOURCE2MOD_PERMISSIONS_INTERFACE,     nullptr, nullptr); \
@@ -637,6 +662,12 @@ Globals
     g_pSource2ModScripts         = (ISource2ModScripts*)        (api)->Source2ModFactory(SOURCE2MOD_SCRIPTS_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModSounds          = (ISource2ModSounds*)         (api)->Source2ModFactory(SOURCE2MOD_SOUNDS_INTERFACE,          nullptr, nullptr); \
     g_pSource2ModTrace           = (ISource2ModTrace*)          (api)->Source2ModFactory(SOURCE2MOD_TRACE_INTERFACE,           nullptr, nullptr); \
+    g_pSource2ModClients         = (ISource2ModClients*)(api)->Source2ModFactory(SOURCE2MOD_CLIENTS_INTERFACE, nullptr, nullptr); \
+    g_pSource2ModFiles           = (ISource2ModFiles*)(api)->Source2ModFactory(SOURCE2MOD_FILES_INTERFACE, nullptr, nullptr); \
+    g_pSource2ModMenuBuilder     = (ISource2ModMenuBuilder*)(api)->Source2ModFactory(SOURCE2MOD_MENUBUILDER_INTERFACE, nullptr, nullptr); \
+    g_pSource2ModTargeting       = (ISource2ModTargeting*)(api)->Source2ModFactory(SOURCE2MOD_TARGETING_INTERFACE, nullptr, nullptr); \
+    g_pSource2ModTranslations    = (ISource2ModTranslations*)(api)->Source2ModFactory(SOURCE2MOD_TRANSLATIONS_INTERFACE, nullptr, nullptr); \
+    g_pSource2ModUtils           = (ISource2ModUtils*)(api)->Source2ModFactory(SOURCE2MOD_UTILS_INTERFACE, nullptr, nullptr); \
     g_pSource2ModTransmit        = (ISource2ModTransmit*)       (api)->Source2ModFactory(SOURCE2MOD_TRANSMIT_INTERFACE,        nullptr, nullptr);
 
 /**

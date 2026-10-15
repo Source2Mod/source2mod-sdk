@@ -113,7 +113,7 @@ class ISource2ModEvents;
 class ISource2ModListener;
 class ISource2ModMenus;
 class ISource2ModModule;
-class ISource2ModMySQL;
+class ISource2ModSQL;
 class ISource2ModNetworkMessages;
 class ISource2ModPlugin;
 class ISource2ModScheduler;
@@ -295,9 +295,9 @@ public:
 
     /**
 
-    * @brief Access mysql system.
+    * @brief Access the SQL system (MySQL and SQLite).
       */
-    virtual ISource2ModMySQL* MySQL() = 0;
+    virtual ISource2ModSQL* SQL() = 0;
 
     /**
 

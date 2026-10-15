@@ -35,11 +35,13 @@
  */
 
 /**
- * @file ISource2ModMySQL.h
- * @brief Interfaces and utilities for MySQL database access.
+ * @file ISource2ModSQL.h
+ * @brief Interfaces and utilities for SQL database access: MySQL and SQLite
+ *        behind one interface.
  *
  * This module provides functionality for:
- * * MySQL connections
+ * * MySQL and SQLite connections (ESource2ModSQLDriver), or ones named in
+ *   configs/databases.json
  * * Query execution
  * * Transactions
  * * Result set handling
@@ -48,8 +50,8 @@
  * @note Commonly used for persistent storage and asynchronous database operations.
  */
 
-#ifndef _INCLUDE_ISOURCE2MOD_MYSQL_H
-#define _INCLUDE_ISOURCE2MOD_MYSQL_H
+#ifndef _INCLUDE_ISOURCE2MOD_SQL_H
+#define _INCLUDE_ISOURCE2MOD_SQL_H
 
 #pragma once
 #include "ISource2ModPlugin.h"
@@ -62,63 +64,77 @@
 Forward declarations
 ========================= */
 
-class ISource2ModMySQLQuery;
+class ISource2ModSQLQuery;
 
 /* =========================
 Callback typedefs
 ========================= */
 
-typedef std::function<void(bool)> Source2ModMySQLConnectCallbackFunc;
-typedef std::function<void(ISource2ModMySQLQuery*)> Source2ModMySQLQueryCallbackFunc;
-typedef std::function<void(std::vector<ISource2ModMySQLQuery*>)> Source2ModMySQLTransactionSuccessCallbackFunc;
-typedef std::function<void(std::string, int)> Source2ModMySQLTransactionFailureCallbackFunc;
+typedef std::function<void(bool)> Source2ModSQLConnectCallbackFunc;
+typedef std::function<void(ISource2ModSQLQuery*)> Source2ModSQLQueryCallbackFunc;
+typedef std::function<void(std::vector<ISource2ModSQLQuery*>)> Source2ModSQLTransactionSuccessCallbackFunc;
+typedef std::function<void(std::string, int)> Source2ModSQLTransactionFailureCallbackFunc;
 
 /* =========================
-MySQL field types
+Drivers
 ========================= */
 
-typedef enum ESource2ModMySQLType
+enum ESource2ModSQLDriver
 {
-    SOURCE2MOD_MYSQL_TYPE_DECIMAL,
-    SOURCE2MOD_MYSQL_TYPE_TINY,
-    SOURCE2MOD_MYSQL_TYPE_SHORT,
-    SOURCE2MOD_MYSQL_TYPE_LONG,
-    SOURCE2MOD_MYSQL_TYPE_FLOAT,
-    SOURCE2MOD_MYSQL_TYPE_DOUBLE,
-    SOURCE2MOD_MYSQL_TYPE_NULL,
-    SOURCE2MOD_MYSQL_TYPE_TIMESTAMP,
-    SOURCE2MOD_MYSQL_TYPE_LONGLONG,
-    SOURCE2MOD_MYSQL_TYPE_INT24,
-    SOURCE2MOD_MYSQL_TYPE_DATE,
-    SOURCE2MOD_MYSQL_TYPE_TIME,
-    SOURCE2MOD_MYSQL_TYPE_DATETIME,
-    SOURCE2MOD_MYSQL_TYPE_YEAR,
-    SOURCE2MOD_MYSQL_TYPE_NEWDATE,
-    SOURCE2MOD_MYSQL_TYPE_VARCHAR,
-    SOURCE2MOD_MYSQL_TYPE_BIT,
-    SOURCE2MOD_MYSQL_TYPE_TIMESTAMP2,
-    SOURCE2MOD_MYSQL_TYPE_DATETIME2,
-    SOURCE2MOD_MYSQL_TYPE_TIME2,
-    SOURCE2MOD_MYSQL_TYPE_UNKNOWN,
+    /// A MySQL / MariaDB server: host, user, pass, database, port.
+    SOURCE2MOD_SQL_DRIVER_MYSQL = 0,
+    /// An SQLite file: database is its path (a relative one is under
+    /// addons/source2mod/data, made when missing); host, user and pass unused.
+    SOURCE2MOD_SQL_DRIVER_SQLITE = 1,
+};
 
-    SOURCE2MOD_MYSQL_TYPE_JSON = 245,
-    SOURCE2MOD_MYSQL_TYPE_NEWDECIMAL = 246,
-    SOURCE2MOD_MYSQL_TYPE_ENUM = 247,
-    SOURCE2MOD_MYSQL_TYPE_SET = 248,
-    SOURCE2MOD_MYSQL_TYPE_TINY_BLOB = 249,
-    SOURCE2MOD_MYSQL_TYPE_MEDIUM_BLOB = 250,
-    SOURCE2MOD_MYSQL_TYPE_LONG_BLOB = 251,
-    SOURCE2MOD_MYSQL_TYPE_BLOB = 252,
-    SOURCE2MOD_MYSQL_TYPE_VAR_STRING = 253,
-    SOURCE2MOD_MYSQL_TYPE_STRING = 254,
-    SOURCE2MOD_MYSQL_TYPE_GEOMETRY = 255
-} ESource2ModMySQLType;
+/* =========================
+Field types: MySQL's numbering. An SQLite column reports INTEGER as LONGLONG,
+REAL as DOUBLE, TEXT as STRING, BLOB as BLOB and NULL as NULL.
+========================= */
+
+typedef enum ESource2ModSQLType
+{
+    SOURCE2MOD_SQL_TYPE_DECIMAL,
+    SOURCE2MOD_SQL_TYPE_TINY,
+    SOURCE2MOD_SQL_TYPE_SHORT,
+    SOURCE2MOD_SQL_TYPE_LONG,
+    SOURCE2MOD_SQL_TYPE_FLOAT,
+    SOURCE2MOD_SQL_TYPE_DOUBLE,
+    SOURCE2MOD_SQL_TYPE_NULL,
+    SOURCE2MOD_SQL_TYPE_TIMESTAMP,
+    SOURCE2MOD_SQL_TYPE_LONGLONG,
+    SOURCE2MOD_SQL_TYPE_INT24,
+    SOURCE2MOD_SQL_TYPE_DATE,
+    SOURCE2MOD_SQL_TYPE_TIME,
+    SOURCE2MOD_SQL_TYPE_DATETIME,
+    SOURCE2MOD_SQL_TYPE_YEAR,
+    SOURCE2MOD_SQL_TYPE_NEWDATE,
+    SOURCE2MOD_SQL_TYPE_VARCHAR,
+    SOURCE2MOD_SQL_TYPE_BIT,
+    SOURCE2MOD_SQL_TYPE_TIMESTAMP2,
+    SOURCE2MOD_SQL_TYPE_DATETIME2,
+    SOURCE2MOD_SQL_TYPE_TIME2,
+    SOURCE2MOD_SQL_TYPE_UNKNOWN,
+
+    SOURCE2MOD_SQL_TYPE_JSON = 245,
+    SOURCE2MOD_SQL_TYPE_NEWDECIMAL = 246,
+    SOURCE2MOD_SQL_TYPE_ENUM = 247,
+    SOURCE2MOD_SQL_TYPE_SET = 248,
+    SOURCE2MOD_SQL_TYPE_TINY_BLOB = 249,
+    SOURCE2MOD_SQL_TYPE_MEDIUM_BLOB = 250,
+    SOURCE2MOD_SQL_TYPE_LONG_BLOB = 251,
+    SOURCE2MOD_SQL_TYPE_BLOB = 252,
+    SOURCE2MOD_SQL_TYPE_VAR_STRING = 253,
+    SOURCE2MOD_SQL_TYPE_STRING = 254,
+    SOURCE2MOD_SQL_TYPE_GEOMETRY = 255
+} ESource2ModSQLType;
 
 /* =========================
 Transaction
 ========================= */
 
-struct Source2ModMySQLTransaction
+struct Source2ModSQLTransaction
 {
     std::vector<std::string> queries;
 };
@@ -127,7 +143,7 @@ struct Source2ModMySQLTransaction
 Connection info
 ========================= */
 
-struct Source2ModMySQLConnectionInfo
+struct Source2ModSQLConnectionInfo
 {
     const char* host;
     const char* user;
@@ -136,26 +152,29 @@ struct Source2ModMySQLConnectionInfo
 
     int port = 3306;
     int timeout = 60;
+
+    /// Which server this is; MySQL unless said otherwise.
+    ESource2ModSQLDriver driver = SOURCE2MOD_SQL_DRIVER_MYSQL;
 };
 
 /* =========================
 Result row
 ========================= */
 
-class ISource2ModMySQLRow
+class ISource2ModSQLRow
 {
 public:
-    virtual ~ISource2ModMySQLRow() = default;
+    virtual ~ISource2ModSQLRow() = default;
 };
 
 /* =========================
 Result set
 ========================= */
 
-class ISource2ModMySQLResult
+class ISource2ModSQLResult
 {
 public:
-    virtual ~ISource2ModMySQLResult() = default;
+    virtual ~ISource2ModSQLResult() = default;
 
     /**
      * @brief Returns the total number of rows in the result set.
@@ -196,14 +215,14 @@ public:
      *
      * @return Pointer to the fetched row.
      */
-    virtual ISource2ModMySQLRow* FetchRow() = 0;
+    virtual ISource2ModSQLRow* FetchRow() = 0;
 
     /**
      * @brief Returns the currently active row.
      *
      * @return Pointer to the current row.
      */
-    virtual ISource2ModMySQLRow* CurrentRow() = 0;
+    virtual ISource2ModSQLRow* CurrentRow() = 0;
 
     /**
      * @brief Rewinds the internal row cursor to the beginning.
@@ -213,7 +232,7 @@ public:
     virtual bool Rewind() = 0;
 
     /**
-     * @brief Returns the MySQL field type of a column.
+     * @brief Returns the field type of a column (ESource2ModSQLType numbering).
      *
      * @param field Column index.
      * @return Field type identifier.
@@ -274,17 +293,17 @@ public:
 Query
 ========================= */
 
-class ISource2ModMySQLQuery
+class ISource2ModSQLQuery
 {
 public:
-    virtual ~ISource2ModMySQLQuery() = default;
+    virtual ~ISource2ModSQLQuery() = default;
 
     /**
      * @brief Returns the current result set.
      *
      * @return Pointer to the result set.
      */
-    virtual ISource2ModMySQLResult* GetResultSet() = 0;
+    virtual ISource2ModSQLResult* GetResultSet() = 0;
 
     /**
      * @brief Advances to the next available result set.
@@ -312,17 +331,17 @@ public:
 Connection
 ========================= */
 
-class ISource2ModMySQLConnection
+class ISource2ModSQLConnection
 {
 public:
-    virtual ~ISource2ModMySQLConnection() = default;
+    virtual ~ISource2ModSQLConnection() = default;
 
     /**
-     * @brief Establishes a connection to the MySQL server.
+     * @brief Establishes the connection (opens the file, for SQLite).
      *
      * @param callback Callback invoked after connection attempt.
      */
-    virtual void Connect(Source2ModMySQLConnectCallbackFunc callback) = 0;
+    virtual void Connect(Source2ModSQLConnectCallbackFunc callback) = 0;
 
     /**
      * @brief Executes a raw SQL query.
@@ -337,7 +356,7 @@ public:
      *       reported true yet, or it failed) or the server rejected the
      *       query. The reason is written to the server log.
      */
-    virtual void Query(char* query, Source2ModMySQLQueryCallbackFunc callback) = 0;
+    virtual void Query(char* query, Source2ModSQLQueryCallbackFunc callback) = 0;
 
     /**
      * @brief Executes a formatted SQL query.
@@ -348,7 +367,7 @@ public:
      * @note Same callback contract as the overload above: nullptr on failure,
      *       otherwise a source2mod-owned query valid only during the callback.
      */
-    virtual void Query(const char* query, Source2ModMySQLQueryCallbackFunc callback, ...) = 0;
+    virtual void Query(const char* query, Source2ModSQLQueryCallbackFunc callback, ...) = 0;
 
     /**
      * @brief Executes multiple queries as a transaction.
@@ -365,13 +384,18 @@ public:
      *                query that failed -- or -1 when it was not one of them
      *                (not connected, BEGIN or COMMIT failed).
      */
-    virtual void ExecuteTransaction(Source2ModMySQLTransaction txn, Source2ModMySQLTransactionSuccessCallbackFunc success,
-                                    Source2ModMySQLTransactionFailureCallbackFunc failure) = 0;
+    virtual void ExecuteTransaction(Source2ModSQLTransaction txn, Source2ModSQLTransactionSuccessCallbackFunc success,
+                                    Source2ModSQLTransactionFailureCallbackFunc failure) = 0;
 
     /**
      * @brief Destroys and releases the connection instance.
      */
     virtual void Destroy() = 0;
+
+    /**
+     * @brief The driver this connection talks to.
+     */
+    virtual ESource2ModSQLDriver GetDriver() = 0;
 
     /**
      * @brief Escapes a mutable string for safe SQL usage.
@@ -401,24 +425,25 @@ Serverless queries
  *       nothing is a success with an empty result set. A query that failed has
  *       m_bSuccess false, m_sError filled in and m_pQuery null.
  */
-struct Source2ModMySQLServerlessResult
+struct Source2ModSQLServerlessResult
 {
     bool m_bSuccess = false;
 
-    /// MySQL's own error number, or 0 when the query never reached the server.
+    /// The driver's own error number (MySQL's, or SQLite's result code), or 0
+    /// when the query never reached the database.
     unsigned int m_nErrorCode = 0;
     std::string m_sError;
 
     /// Rows, insert id and affected rows, read off the connection before it
     /// was closed again. Owned by Source2Mod and valid only for the duration
     /// of the callback -- copy anything you keep. Null when the query failed.
-    ISource2ModMySQLQuery* m_pQuery = nullptr;
+    ISource2ModSQLQuery* m_pQuery = nullptr;
 };
 
 /**
  * @brief Callback for a completed serverless query. Runs on the main thread.
  */
-typedef std::function<void(const Source2ModMySQLServerlessResult&)> Source2ModMySQLServerlessCallbackFunc;
+typedef std::function<void(const Source2ModSQLServerlessResult&)> Source2ModSQLServerlessCallbackFunc;
 
 /**
  * @brief A set of connection details that queries are run against one at a time.
@@ -426,27 +451,27 @@ typedef std::function<void(const Source2ModMySQLServerlessResult&)> Source2ModMy
  * Every query opens its own connection, runs, reads its rows out and closes
  * again -- there is nothing to keep alive, nothing to reconnect, and nothing
  * that can go stale over a map change. None of it happens on the main thread:
- * queries go through Source2Mod's shared MySQL worker, one thread for all of
+ * queries go through Source2Mod's shared SQL worker, one thread for all of
  * them however many plugins are using it, and land back in a callback on the
  * main thread.
  *
  * Meant for the occasional query -- loading a player on connect, writing their
  * stats on disconnect. A connection costs a handshake and a login every single
  * time, so for anything that runs per tick or per shot, keep an
- * ISource2ModMySQLConnection open instead.
+ * ISource2ModSQLConnection open instead.
  *
  * @code
  * // once, when your plugin loads
- * m_pDb = api->MySQL()->CreateServerless(g_PLID, { "127.0.0.1", "user", "pass", "db" });
+ * m_pDb = api->SQL()->CreateServerless(g_PLID, { "127.0.0.1", "user", "pass", "db" });
  *
  * // wherever you need it
  * m_pDb->Query("SELECT name, kills FROM players WHERE steamid = ?", { steamid },
- *     [](const Source2ModMySQLServerlessResult& r)
+ *     [](const Source2ModSQLServerlessResult& r)
  * {
  *     if (!r.m_bSuccess)
  *         return; // r.m_sError says what went wrong
  *
- *     ISource2ModMySQLResult* pSet = r.m_pQuery->GetResultSet();
+ *     ISource2ModSQLResult* pSet = r.m_pQuery->GetResultSet();
  *     while (pSet && pSet->MoreRows() && pSet->FetchRow())
  *     {
  *         // pSet->GetString(0), pSet->GetInt(1) -- copy anything you keep.
@@ -454,10 +479,10 @@ typedef std::function<void(const Source2ModMySQLServerlessResult&)> Source2ModMy
  * });
  * @endcode
  */
-class ISource2ModMySQLServerless
+class ISource2ModSQLServerless
 {
 public:
-    virtual ~ISource2ModMySQLServerless() = default;
+    virtual ~ISource2ModSQLServerless() = default;
 
     /**
      * @brief Runs one query on a connection of its own.
@@ -465,7 +490,7 @@ public:
      * @param query SQL to run.
      * @param callback Callback invoked with the result, on the main thread.
      */
-    virtual void Query(const char* query, Source2ModMySQLServerlessCallbackFunc callback) = 0;
+    virtual void Query(const char* query, Source2ModSQLServerlessCallbackFunc callback) = 0;
 
     /**
      * @brief Runs one parameterised query on a connection of its own.
@@ -481,7 +506,7 @@ public:
      * @param callback Callback invoked with the result, on the main thread.
      */
     virtual void Query(const char* query, std::vector<std::string> params,
-                       Source2ModMySQLServerlessCallbackFunc callback) = 0;
+                       Source2ModSQLServerlessCallbackFunc callback) = 0;
 
     /**
      * @brief Drops these details and cancels what they still have queued. A
@@ -492,28 +517,28 @@ public:
 };
 
 /* =========================
-MySQL client
+SQL client
 ========================= */
 
-#define SOURCE2MOD_MYSQL_INTERFACE "ISource2ModMySQL003"
+#define SOURCE2MOD_SQL_INTERFACE "ISource2ModSQL001"
 
-class ISource2ModMySQL
+class ISource2ModSQL
 {
 public:
-    virtual ~ISource2ModMySQL() = default;
+    virtual ~ISource2ModSQL() = default;
 
     /**
-     * @brief Creates a new MySQL connection instance.
+     * @brief Creates a new connection instance (MySQL or SQLite, by info.driver).
      *
      * @param owner Plugin the connection belongs to.
      * @param info Connection configuration data.
-     * @return Newly created MySQL connection.
+     * @return Newly created connection.
      *
      * @note Destroyed for you if the owning plugin unloads without calling
      *       Destroy(): the worker thread runs code, and the query callbacks
      *       are std::functions holding code, inside that plugin's library.
      */
-    virtual ISource2ModMySQLConnection* CreateConnection(PluginId owner, Source2ModMySQLConnectionInfo info) = 0;
+    virtual ISource2ModSQLConnection* CreateConnection(PluginId owner, Source2ModSQLConnectionInfo info) = 0;
 
     /**
      * @brief Creates a handle that runs each of its queries on a connection of
@@ -529,9 +554,19 @@ public:
      *       pending callback is a std::function holding code inside that
      *       plugin's library.
      */
-    virtual ISource2ModMySQLServerless* CreateServerless(PluginId owner, Source2ModMySQLConnectionInfo info) = 0;
+    virtual ISource2ModSQLServerless* CreateServerless(PluginId owner, Source2ModSQLConnectionInfo info) = 0;
+    /**
+     * @brief The connection details named @p name in configs/databases.json
+     *        ({"name": {"driver": "mysql"|"sqlite", "host", "user", "pass",
+     *        "database", "port", "timeout"}}), or "default" for an empty name.
+     *
+     * @param info Filled in when found; its strings stay valid until the
+     *             config is read again (map change).
+     * @return false when there is no such entry.
+     */
+    virtual bool GetNamedConnection(const char* name, Source2ModSQLConnectionInfo& info) = 0;
 };
 
-#define MYSQL_CREATE_CONNECTION(info)    g_pSource2ModMySQL->CreateConnection(g_PluginID, info)
+#define SQL_CREATE_CONNECTION(info)    g_pSource2ModSQL->CreateConnection(g_PluginID, info)
 
-#endif //_INCLUDE_ISOURCE2MOD_MYSQL_H
+#endif //_INCLUDE_ISOURCE2MOD_SQL_H
