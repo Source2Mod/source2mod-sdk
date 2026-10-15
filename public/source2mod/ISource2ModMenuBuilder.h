@@ -125,7 +125,7 @@ public:
     virtual void RemoveItem(int item) = 0;
     virtual void ClearItems() = 0;
 
-    /// Items per page (1-7, default 5).
+    /// Items per page (1-6, default 5): keys 7, 8, 9 are Back, Next, Exit.
     virtual ISource2ModMenu* SetItemsPerPage(int count) = 0;
     virtual ISource2ModMenu* SetExitButton(bool exit) = 0;
     /// What happens after an item without CLOSE/STAY is picked (default Reset: page 1).
