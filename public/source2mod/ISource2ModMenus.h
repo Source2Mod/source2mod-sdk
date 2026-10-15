@@ -42,6 +42,29 @@
  *  * Defining menus and menu options
  *  * Handling per-player menu instances
  *  * Processing menu navigation and input
+ *
+ * A menu is an object of the plugin's: a CenterHtmlMenu filled with options,
+ * or a class derived from it that overrides the handlers (DisplayTitle,
+ * OnOptionSelected, OnMenuEnd). Options can be fixed or worked out per player
+ * (text, disabled, visible), open a submenu (Back returns), or be plain text
+ * lines. Keys: the numbered options of the page, 7 Back (previous page, else
+ * the parent menu), 8 Next, 9 Exit -- so 1-6 options a page.
+ *
+ * @code
+ * class ShopMenu : public CenterHtmlMenu
+ * {
+ * public:
+ *     ShopMenu() : CenterHtmlMenu("Shop")
+ *     {
+ *         AddSubmenu("Weapons", &m_weapons);
+ *         AddDynamicOption([](CCSPlayerController* p) { return "Credits: " + std::to_string(Credits(p)); }, {})
+ *             .Disabled = true;
+ *     }
+ *     void OnMenuEnd(CCSPlayerController* player, MenuEndReason reason) override { ... }
+ * private:
+ *     CenterHtmlMenu m_weapons{"Weapons"};
+ * };
+ * @endcode
  */
 
 #ifndef _INCLUDE_ISOURCE2MOD_MENUS_H
@@ -70,6 +93,7 @@ Forward declarations
 ========================= */
 
 class CCSPlayerController;
+class IBaseMenu;
 
 /* =========================
 Post select behavior
@@ -88,6 +112,30 @@ enum class PostSelectAction
 
     /// Do nothing
     Nothing
+};
+
+/**
+ * @brief Why a menu went away for a player (IBaseMenu::OnMenuEnd).
+ */
+enum class MenuEndReason
+{
+    /// An option closed it (CloseOnSelect, or PostSelectAction::Close)
+    Selected,
+
+    /// The player pressed Exit
+    Exit,
+
+    /// Another menu was opened over it
+    Replaced,
+
+    /// CloseActiveMenu / CloseMenu
+    Closed,
+
+    /// The player left
+    Disconnected,
+
+    /// The menu's timeout ran out
+    Timeout
 };
 
 /* =========================
@@ -110,8 +158,33 @@ struct ChatMenuOption
     /// Callback executed on select
     std::function<void(CCSPlayerController*, ChatMenuOption&)> OnSelect;
 
-    /// Optional dynamic disabled evaluator
-    std::function<bool()> DisabledEvaluator;
+    /// Optional dynamic disabled evaluator, asked for the player it is shown to
+    std::function<bool(CCSPlayerController*)> DisabledEvaluator;
+
+    /* =========================
+    ISource2ModMenus006
+    ========================= */
+
+    /// Text worked out for the player it is shown to (replaces Text)
+    std::function<std::string(CCSPlayerController*)> TextEvaluator;
+
+    /// Whether it shows for the player; not shown (and takes no number) when false
+    std::function<bool(CCSPlayerController*)> VisibleEvaluator;
+
+    /// Opens this menu when picked; its Back button comes back
+    IBaseMenu* Submenu{nullptr};
+
+    /// A line of text: never picked, takes no number
+    bool IsText{false};
+
+    /// Not shown at all
+    bool Hidden{false};
+
+    /// Close the menu after it is picked (MenuEndReason::Selected)
+    bool CloseOnSelect{false};
+
+    /// Keep the page after it is picked, whatever the PostSelectAction
+    bool StayOnPage{false};
 };
 
 /* =========================
@@ -233,6 +306,83 @@ public:
      */
     void SetExitButton(bool v) override { exitButton_ = v; }
 
+    /* =========================
+    ISource2ModMenus006
+    ========================= */
+
+    /// Options a page, 1-6 (keys 7, 8, 9 are Back, Next, Exit); default 5.
+    int GetItemsPerPage() const { return itemsPerPage_; }
+    void SetItemsPerPage(int count) { itemsPerPage_ = count < 1 ? 1 : (count > 6 ? 6 : count); }
+
+    /// Seconds after which the menu closes (MenuEndReason::Timeout); 0 = never.
+    int GetTimeout() const { return timeout_; }
+    void SetTimeout(int seconds) { timeout_ = seconds > 0 ? seconds : 0; }
+
+    /// A title worked out per player (what the default DisplayTitle shows).
+    void SetDynamicTitle(std::function<std::string(CCSPlayerController*)> title) { dynamicTitle_ = std::move(title); }
+
+    /// What the default OnMenuEnd calls.
+    void SetEndHandler(std::function<void(CCSPlayerController*, MenuEndReason)> handler) { endHandler_ = std::move(handler); }
+
+    /**
+     * @brief The title shown to a player. Override for a title of your own;
+     *        the default is the dynamic title if set, else Title().
+     */
+    virtual std::string DisplayTitle(CCSPlayerController* player)
+    {
+        return dynamicTitle_ ? dynamicTitle_(player) : title_;
+    }
+
+    /**
+     * @brief An option was picked (not a submenu, not text). The default runs
+     *        its OnSelect. @p index is its index in Options().
+     */
+    virtual void OnOptionSelected(CCSPlayerController* player, ChatMenuOption& option, int index)
+    {
+        if (option.OnSelect)
+            option.OnSelect(player, option);
+    }
+
+    /**
+     * @brief The menu (opened as the root) went away for a player. The default
+     *        calls the end handler. Not called when the owning plugin unloads.
+     */
+    virtual void OnMenuEnd(CCSPlayerController* player, MenuEndReason reason)
+    {
+        if (endHandler_)
+            endHandler_(player, reason);
+    }
+
+    /// An option that opens @p submenu.
+    ChatMenuOption& AddSubmenu(std::string display, IBaseMenu* submenu, bool disabled = false)
+    {
+        ChatMenuOption& opt = AddMenuOption(std::move(display), nullptr, disabled);
+        opt.Submenu = submenu;
+        return opt;
+    }
+
+    /// A line of text that cannot be picked and takes no number.
+    ChatMenuOption& AddText(std::string text)
+    {
+        ChatMenuOption& opt = AddMenuOption(std::move(text), nullptr);
+        opt.IsText = true;
+        return opt;
+    }
+
+    /// An option whose text, and optionally disabled / visible state, is worked out per player.
+    ChatMenuOption& AddDynamicOption(
+        std::function<std::string(CCSPlayerController*)> text,
+        std::function<void(CCSPlayerController*, ChatMenuOption&)> onSelect,
+        std::function<bool(CCSPlayerController*)> disabledEvaluator = nullptr,
+        std::function<bool(CCSPlayerController*)> visibleEvaluator = nullptr)
+    {
+        ChatMenuOption& opt = AddMenuOption(std::string(), std::move(onSelect));
+        opt.TextEvaluator = std::move(text);
+        opt.DisabledEvaluator = std::move(disabledEvaluator);
+        opt.VisibleEvaluator = std::move(visibleEvaluator);
+        return opt;
+    }
+
     /**
      * @brief Adds a menu option.
      *
@@ -271,7 +421,7 @@ public:
         std::function<void(CCSPlayerController*, ChatMenuOption&)> action,
         bool disabled = false,
         bool close = true,
-        std::function<bool()> disabledEvaluator = nullptr);
+        std::function<bool(CCSPlayerController*)> disabledEvaluator = nullptr);
 
     /**
      * @brief Sets global cooldown handlers.
@@ -299,6 +449,11 @@ private:
 
     PostSelectAction postSelect_{PostSelectAction::Reset};
     bool exitButton_{true};
+
+    int itemsPerPage_{5};
+    int timeout_{0};
+    std::function<std::string(CCSPlayerController*)> dynamicTitle_;
+    std::function<void(CCSPlayerController*, MenuEndReason)> endHandler_;
 };
 
 /* =========================
@@ -329,7 +484,7 @@ public:
     /**
      * @brief Resets menu state.
      */
-    void Reset()
+    virtual void Reset()
     {
         while (!prevPageOffsets_.empty()) prevPageOffsets_.pop();
         page_ = 0;
@@ -370,6 +525,12 @@ public:
      * freed by the library that allocated it.
      */
     virtual void Destroy() { delete this; }
+
+    /**
+     * @brief The menu is going away for this player, just before Destroy();
+     *        not called when the owning plugin unloads. (ISource2ModMenus006)
+     */
+    virtual void OnEnd(MenuEndReason reason) {}
 
     /**
      * @brief Gets underlying menu.
@@ -505,7 +666,7 @@ Core Source2Mod Menus
 /**
  * @brief Interface for menu system management.
  */
-#define SOURCE2MOD_MENUS_INTERFACE "ISource2ModMenus005"
+#define SOURCE2MOD_MENUS_INTERFACE "ISource2ModMenus006"
 
 class ISource2ModMenus
 {
@@ -563,6 +724,23 @@ public:
      * @param instance Built with new by the caller; the core owns it from here
      */
     virtual void OpenMenu(PluginId owner, CCSPlayerController* player, IMenuInstance* instance) = 0;
+
+    /* =========================
+    ISource2ModMenus006
+    ========================= */
+
+    /**
+     * @brief Closes a menu for everyone who has it open, also where it is a
+     *        submenu they are in (MenuEndReason::Closed). Call it before
+     *        destroying a menu that may be open.
+     */
+    virtual void CloseMenu(IMenu* menu) = 0;
+
+    /// Whether @p player has @p menu open, as the root or as the submenu they are in or came through.
+    virtual bool IsMenuOpen(CCSPlayerController* player, IMenu* menu) = 0;
+
+    /// The menu @p player is looking at (the submenu they are in), or nullptr.
+    virtual IMenu* GetOpenMenu(CCSPlayerController* player) = 0;
 };
 
 #define OPEN_CENTER_HTML_MENU(player, menu)  g_pSource2ModMenus->OpenCenterHtmlMenu(g_PluginID, player, menu)

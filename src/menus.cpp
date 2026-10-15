@@ -22,7 +22,7 @@ ChatMenuOption& IBaseMenu::AddMenuOptionWithCooldown(
     std::function<void(CCSPlayerController*, ChatMenuOption&)> action,
     bool disabled,
     bool close,
-    std::function<bool()> disabledEvaluator)
+    std::function<bool(CCSPlayerController*)> disabledEvaluator)
 {
     ChatMenuOption& opt = AddMenuOption(
         std::move(optionText),

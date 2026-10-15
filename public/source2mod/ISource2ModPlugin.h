@@ -85,7 +85,6 @@ class ISource2ModAPI;
 class ISource2ModAddresses;
 class ISource2ModClients;
 class ISource2ModFiles;
-class ISource2ModMenuBuilder;
 class ISource2ModTargeting;
 class ISource2ModTranslations;
 class ISource2ModUtils;
@@ -139,8 +138,6 @@ class ISource2ModTransmit;
 #include "ISource2ModTargeting.h"
 #include "ISource2ModTranslations.h"
 #include "ISource2ModUtils.h"
-// After ISource2ModMenus.h: it uses PostSelectAction.
-#include "ISource2ModMenuBuilder.h"
 
 /* =========================
 Interface status
@@ -584,7 +581,6 @@ Globals
     ISource2ModTrace*           g_pSource2ModTrace           = nullptr; \
     ISource2ModClients*         g_pSource2ModClients         = nullptr; \
     ISource2ModFiles*           g_pSource2ModFiles           = nullptr; \
-    ISource2ModMenuBuilder*     g_pSource2ModMenuBuilder     = nullptr; \
     ISource2ModTargeting*       g_pSource2ModTargeting       = nullptr; \
     ISource2ModTranslations*    g_pSource2ModTranslations    = nullptr; \
     ISource2ModUtils*           g_pSource2ModUtils           = nullptr; \
@@ -639,7 +635,6 @@ Globals
     extern ISource2ModTrace*           g_pSource2ModTrace; \
     extern ISource2ModClients*         g_pSource2ModClients; \
     extern ISource2ModFiles*           g_pSource2ModFiles; \
-    extern ISource2ModMenuBuilder*     g_pSource2ModMenuBuilder; \
     extern ISource2ModTargeting*       g_pSource2ModTargeting; \
     extern ISource2ModTranslations*    g_pSource2ModTranslations; \
     extern ISource2ModUtils*           g_pSource2ModUtils; \
@@ -680,7 +675,6 @@ Globals
     g_pSource2ModTrace           = (ISource2ModTrace*)          (api)->Source2ModFactory(SOURCE2MOD_TRACE_INTERFACE,           nullptr, nullptr); \
     g_pSource2ModClients         = (ISource2ModClients*)(api)->Source2ModFactory(SOURCE2MOD_CLIENTS_INTERFACE, nullptr, nullptr); \
     g_pSource2ModFiles           = (ISource2ModFiles*)(api)->Source2ModFactory(SOURCE2MOD_FILES_INTERFACE, nullptr, nullptr); \
-    g_pSource2ModMenuBuilder     = (ISource2ModMenuBuilder*)(api)->Source2ModFactory(SOURCE2MOD_MENUBUILDER_INTERFACE, nullptr, nullptr); \
     g_pSource2ModTargeting       = (ISource2ModTargeting*)(api)->Source2ModFactory(SOURCE2MOD_TARGETING_INTERFACE, nullptr, nullptr); \
     g_pSource2ModTranslations    = (ISource2ModTranslations*)(api)->Source2ModFactory(SOURCE2MOD_TRANSLATIONS_INTERFACE, nullptr, nullptr); \
     g_pSource2ModUtils           = (ISource2ModUtils*)(api)->Source2ModFactory(SOURCE2MOD_UTILS_INTERFACE, nullptr, nullptr); \
