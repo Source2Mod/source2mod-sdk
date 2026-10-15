@@ -112,14 +112,18 @@ class ISource2ModTransmit;
 #include "ISource2ModAddresses.h"
 #include "ISource2ModCommands.h"
 #include "ISource2ModConVars.h"
+#include "ISource2ModCookies.h"
 #include "ISource2ModCustomHud.h"
 #include "ISource2ModEntities.h"
 #include "ISource2ModEvents.h"
+#include "ISource2ModFeatures.h"
 #include "ISource2ModGameConfig.h"
 #include "ISource2ModGameHooks.h"
 #include "ISource2ModGameSystems.h"
+#include "ISource2ModGeoIP.h"
 #include "ISource2ModHTTP.h"
 #include "ISource2ModJSON.h"
+#include "ISource2ModMaps.h"
 #include "ISource2ModMenus.h"
 #include "ISource2ModSQL.h"
 #include "ISource2ModNetworkMessages.h"
@@ -557,14 +561,18 @@ Globals
     ISource2ModAddresses*       g_pSource2ModAddresses       = nullptr; \
     ISource2ModCommands*        g_pSource2ModCommands        = nullptr; \
     ISource2ModConVars*         g_pSource2ModConVars         = nullptr; \
+    ISource2ModCookies*         g_pSource2ModCookies         = nullptr; \
     ISource2ModCustomHud*       g_pSource2ModCustomHud       = nullptr; \
     ISource2ModEntities*        g_pSource2ModEntities        = nullptr; \
     ISource2ModEvents*          g_pSource2ModEvents          = nullptr; \
+    ISource2ModFeatures*        g_pSource2ModFeatures        = nullptr; \
     ISource2ModGameConfig*      g_pSource2ModGameConfig      = nullptr; \
     ISource2ModGameHooks*       g_pSource2ModGameHooks       = nullptr; \
     ISource2ModGameSystems*     g_pSource2ModGameSystems     = nullptr; \
+    ISource2ModGeoIP*           g_pSource2ModGeoIP           = nullptr; \
     ISource2ModHTTP*            g_pSource2ModHTTP            = nullptr; \
     ISource2ModJSON*            g_pSource2ModJSON            = nullptr; \
+    ISource2ModMaps*            g_pSource2ModMaps            = nullptr; \
     ISource2ModMenus*           g_pSource2ModMenus           = nullptr; \
     ISource2ModSQL*             g_pSource2ModSQL             = nullptr; \
     ISource2ModNetworkMessages* g_pSource2ModNetworkMessages = nullptr; \
@@ -608,14 +616,18 @@ Globals
     extern ISource2ModAddresses*       g_pSource2ModAddresses; \
     extern ISource2ModCommands*        g_pSource2ModCommands; \
     extern ISource2ModConVars*         g_pSource2ModConVars; \
+    extern ISource2ModCookies*         g_pSource2ModCookies; \
     extern ISource2ModCustomHud*       g_pSource2ModCustomHud; \
     extern ISource2ModEntities*        g_pSource2ModEntities; \
     extern ISource2ModEvents*          g_pSource2ModEvents; \
+    extern ISource2ModFeatures*        g_pSource2ModFeatures; \
     extern ISource2ModGameConfig*      g_pSource2ModGameConfig; \
     extern ISource2ModGameHooks*       g_pSource2ModGameHooks; \
     extern ISource2ModGameSystems*     g_pSource2ModGameSystems; \
+    extern ISource2ModGeoIP*           g_pSource2ModGeoIP; \
     extern ISource2ModHTTP*            g_pSource2ModHTTP; \
     extern ISource2ModJSON*            g_pSource2ModJSON; \
+    extern ISource2ModMaps*            g_pSource2ModMaps; \
     extern ISource2ModMenus*           g_pSource2ModMenus; \
     extern ISource2ModSQL*             g_pSource2ModSQL; \
     extern ISource2ModNetworkMessages* g_pSource2ModNetworkMessages; \
@@ -645,12 +657,15 @@ Globals
     g_pSource2ModAddresses       = (ISource2ModAddresses*)      (api)->Source2ModFactory(SOURCE2MOD_ADDRESSES_INTERFACE,       nullptr, nullptr); \
     g_pSource2ModCommands        = (ISource2ModCommands*)       (api)->Source2ModFactory(SOURCE2MOD_COMMANDS_INTERFACE,        nullptr, nullptr); \
     g_pSource2ModConVars         = (ISource2ModConVars*)        (api)->Source2ModFactory(SOURCE2MOD_CONVARS_INTERFACE,         nullptr, nullptr); \
+    g_pSource2ModCookies         = (ISource2ModCookies*)        (api)->Source2ModFactory(SOURCE2MOD_COOKIES_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModCustomHud       = (ISource2ModCustomHud*)      (api)->Source2ModFactory(SOURCE2MOD_CUSTOMHUD_INTERFACE,       nullptr, nullptr); \
     g_pSource2ModEntities        = (ISource2ModEntities*)       (api)->Source2ModFactory(SOURCE2MOD_ENTITIES_INTERFACE,        nullptr, nullptr); \
     g_pSource2ModEvents          = (ISource2ModEvents*)         (api)->Source2ModFactory(SOURCE2MOD_EVENTS_INTERFACE,          nullptr, nullptr); \
+    g_pSource2ModFeatures        = (ISource2ModFeatures*)       (api)->Source2ModFactory(SOURCE2MOD_FEATURES_INTERFACE,        nullptr, nullptr); \
     g_pSource2ModGameConfig      = (ISource2ModGameConfig*)     (api)->Source2ModFactory(SOURCE2MOD_GAMECONFIG_INTERFACE,      nullptr, nullptr); \
     g_pSource2ModGameHooks       = (ISource2ModGameHooks*)      (api)->Source2ModFactory(SOURCE2MOD_GAMEHOOKS_INTERFACE,       nullptr, nullptr); \
     g_pSource2ModGameSystems     = (ISource2ModGameSystems*)    (api)->Source2ModFactory(SOURCE2MOD_GAMESYSTEMS_INTERFACE,     nullptr, nullptr); \
+    g_pSource2ModGeoIP           = (ISource2ModGeoIP*)          (api)->Source2ModFactory(SOURCE2MOD_GEOIP_INTERFACE,           nullptr, nullptr); \
     g_pSource2ModHTTP            = (ISource2ModHTTP*)           (api)->Source2ModFactory(SOURCE2MOD_HTTP_INTERFACE,            nullptr, nullptr); \
     g_pSource2ModMenus           = (ISource2ModMenus*)          (api)->Source2ModFactory(SOURCE2MOD_MENUS_INTERFACE,           nullptr, nullptr); \
     g_pSource2ModSQL             = (ISource2ModSQL*)            (api)->Source2ModFactory(SOURCE2MOD_SQL_INTERFACE,             nullptr, nullptr); \
@@ -658,6 +673,7 @@ Globals
     g_pSource2ModPaths           = (ISource2ModPaths*)          (api)->Source2ModFactory(SOURCE2MOD_PATHS_INTERFACE,           nullptr, nullptr); \
     g_pSource2ModPermissions     = (ISource2ModPermissions*)    (api)->Source2ModFactory(SOURCE2MOD_PERMISSIONS_INTERFACE,     nullptr, nullptr); \
     g_pSource2ModJSON            = (ISource2ModJSON*)           (api)->Source2ModFactory(SOURCE2MOD_JSON_INTERFACE,            nullptr, nullptr); \
+    g_pSource2ModMaps            = (ISource2ModMaps*)           (api)->Source2ModFactory(SOURCE2MOD_MAPS_INTERFACE,            nullptr, nullptr); \
     g_pSource2ModScheduler       = (ISource2ModScheduler*)      (api)->Source2ModFactory(SOURCE2MOD_SCHEDULER_INTERFACE,       nullptr, nullptr); \
     g_pSource2ModScripts         = (ISource2ModScripts*)        (api)->Source2ModFactory(SOURCE2MOD_SCRIPTS_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModSounds          = (ISource2ModSounds*)         (api)->Source2ModFactory(SOURCE2MOD_SOUNDS_INTERFACE,          nullptr, nullptr); \
