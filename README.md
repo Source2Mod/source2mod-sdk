@@ -1,6 +1,7 @@
 # Source2Mod SDK
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![Website](https://img.shields.io/badge/Website-source2mod.net-blue)](https://source2mod.net)
 [![Discord](https://img.shields.io/badge/Discord-join-7289da?logo=discord&logoColor=white)](https://discord.gg/4Ck56eDNXj)
 
 **Source2Mod SDK** is what [Source2Mod](https://github.com/SlynxCZ/source2mod)
@@ -184,6 +185,9 @@ Automatically:
 
 ## Documentation
 
+- [source2mod.net](https://source2mod.net): guides with every example in C++
+  and SourcePawn, and the [API reference](https://source2mod.net/docs/core-api)
+  generated from these headers.
 - The headers themselves: every interface in `public/source2mod` is documented
   where it is declared, and the include set in `public/scripting` says the same
   for scripts.
