@@ -60,9 +60,11 @@ CCSPlayerController *CCSPlayerController::FromPawn(CCSPlayerPawn* pPawn)
 
 CCSPlayerController *CCSPlayerController::FromSlot(int iSlot)
 {
-    // maxClients is 0 before the first map, when there are no players either.
-    CGlobalVars* globals = GetGlobalVars();
-    if (iSlot < 0 || iSlot >= ABSOLUTE_PLAYER_LIMIT || !globals || iSlot >= globals->maxClients || !GetEntitySystem())
+    // Not bounded by maxClients: some servers report 0 there with players in
+    // game (a Windows DS started through metamod-launcher). The class check
+    // below is what keeps a slot past the players from handing out another
+    // entity as a controller.
+    if (iSlot < 0 || iSlot >= ABSOLUTE_PLAYER_LIMIT || !GetEntitySystem())
         return nullptr;
 
     CBaseEntity* entity = FromIndex(iSlot + 1);
