@@ -60,7 +60,9 @@ CCSPlayerController *CCSPlayerController::FromPawn(CCSPlayerPawn* pPawn)
 
 CCSPlayerController *CCSPlayerController::FromSlot(int iSlot)
 {
-    if (iSlot < 0 || iSlot >= ABSOLUTE_PLAYER_LIMIT || iSlot >= GetGlobalVars()->maxClients || !GetEntitySystem())
+    // maxClients is 0 before the first map, when there are no players either.
+    CGlobalVars* globals = GetGlobalVars();
+    if (iSlot < 0 || iSlot >= ABSOLUTE_PLAYER_LIMIT || !globals || iSlot >= globals->maxClients || !GetEntitySystem())
         return nullptr;
 
     CBaseEntity* entity = FromIndex(iSlot + 1);
