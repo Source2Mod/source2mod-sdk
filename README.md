@@ -4,7 +4,7 @@
 [![Website](https://img.shields.io/badge/Website-source2mod.net-blue)](https://source2mod.net)
 [![Discord](https://img.shields.io/badge/Discord-join-7289da?logo=discord&logoColor=white)](https://discord.gg/4Ck56eDNXj)
 
-**Source2Mod SDK** is what [Source2Mod](https://github.com/SlynxCZ/source2mod)
+**Source2Mod SDK** is what [Source2Mod](https://github.com/Source2Mod/source2mod)
 plugins are built against -- in **C++** or in **SourcePawn**. Both kinds are
 first-class and use the same API: the C++ headers live in `public/source2mod`,
 the SourcePawn include set that mirrors them name for name in
@@ -45,7 +45,7 @@ No setup. No hunting dependencies. Just build.
 ### 1. Add SDK to your project
 
 ```bash
-git submodule add https://github.com/SlynxCZ/source2mod-sdk.git
+git submodule add https://github.com/Source2Mod/source2mod-sdk.git
 git submodule update --init --recursive
 ```
 
@@ -192,7 +192,7 @@ Automatically:
   where it is declared, and the include set in `public/scripting` says the same
   for scripts.
 - Samples: `samples/cs2/cpp_sample` and `samples/cs2/sp_sample` in the
-  [Source2Mod repository](https://github.com/SlynxCZ/source2mod) -- the same
+  [Source2Mod repository](https://github.com/Source2Mod/source2mod) -- the same
   plugin in C++ and in SourcePawn.
 
 ---

@@ -13,7 +13,7 @@ all welcome. Contributions go through pull requests from your own fork, against
 
 ## Workflow
 
-1. **Fork** [Source2Mod/source2mod-sdk](https://github.com/SlynxCZ/source2mod-sdk)
+1. **Fork** [Source2Mod/source2mod-sdk](https://github.com/Source2Mod/source2mod-sdk)
    on GitHub (the *Fork* button, top right).
 
 2. **Clone your fork** with its submodules, and set up the dependencies:
@@ -27,7 +27,7 @@ all welcome. Contributions go through pull requests from your own fork, against
 3. **Add the upstream remote**, so you can pull in what lands on `main`:
 
    ```bash
-   git remote add upstream https://github.com/SlynxCZ/source2mod-sdk.git
+   git remote add upstream https://github.com/Source2Mod/source2mod-sdk.git
    git fetch upstream
    ```
 
@@ -70,7 +70,7 @@ all welcome. Contributions go through pull requests from your own fork, against
 - **Interfaces are versioned.** A change to an existing `ISource2Mod*` interface's
   layout (a method added, removed, reordered or retyped) is a new revision
   (`ISource2ModX002` -> `003`), and the core has to serve both. That needs a matching
-  pull request in [source2mod](https://github.com/SlynxCZ/source2mod);
+  pull request in [source2mod](https://github.com/Source2Mod/source2mod);
   link the two. See [Compatibility](https://www.source2toolkit.net/docs/development/compatibility).
 - **No STL or other complex types across a new interface boundary** unless the
   interface already does so.
