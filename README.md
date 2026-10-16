@@ -120,6 +120,7 @@ my_plugin.smx
 - **KHook** (virtual, vtable & function hooks) -- as the `vendor/khook` submodule, headers only    
 - **Tier0 / Tier1 / Mathlib**  
 - **Schema system headers**  
+- **SourcePawn include set** -- `public/scripting` (`#include <source2mod/api>`), shipped by the core in `addons/source2mod/scripting/include`  
 - **Preconfigured compiler flags & linking**  
 
 ---

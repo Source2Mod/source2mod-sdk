@@ -51,6 +51,14 @@ core runs (vendor/sourcepawn in Source2Mod) with their license headers. They
 are what ISource2ModNatives.h hands a native plugin to write natives for
 `.smx` scripts with.
 
+## SourceMod
+
+`public/scripting` is the SourcePawn include set of Source2Mod's script
+plugin API (`#include <source2mod/api>`); the core ships it next to spcomp in
+`addons/source2mod/scripting/include`. It builds on SourceMod's, AlliedModders
+LLC's server modification for Source 1 games, renamed to Source2Mod; every
+file taken from it keeps its AlliedModders LLC license header unchanged.
+
 ## KHook
 
 Detouring library Source2Mod and its plugins hook with -- virtual, vtable and
