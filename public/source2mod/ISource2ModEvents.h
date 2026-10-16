@@ -106,7 +106,8 @@ public:
      * @param handler A function, an object and a method, or a lambda
      * @param post false to be called before the engine processes the event,
      *             true to be called after
-     * @return The id UnhookGameEvent(id) takes
+     * @return The id UnhookGameEvent(id) takes; 0 for an event the game does
+     *         not have
      */
     virtual Source2ModHookId HookGameEvent(const char* pchName, GameEventHandler handler, bool post) = 0;
 

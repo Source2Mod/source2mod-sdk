@@ -261,7 +261,8 @@ public:
     virtual bool HasRecipient(CPlayerSlot slot) const = 0;
 
     /**
-     * @brief Every player connected at the moment of the call.
+     * @brief Every player connected at the moment of the call -- the ones
+     * with a net channel, so bots are left out (a sound cannot reach them).
      */
     virtual void AddAllRecipients() = 0;
     virtual void ClearRecipients() = 0;
