@@ -71,9 +71,9 @@
 #define _INCLUDE_ISOURCE2MOD_MENUS_H
 
 #pragma once
-// Only the types: ISource2ModPlugin.h includes this header, and so does the
-// CustomhudManager_s2t plugin's header (its HudMenu builds on IBaseMenu),
-// so it must not include the plugin header back.
+// Only the types: ISource2ModPlugin.h includes this header, and so do plugin
+// headers whose menus build on IBaseMenu, so it must not include the plugin
+// header back.
 #include "ISource2ModTypes.h"
 
 #include <engine2/isource2server.h>
@@ -724,9 +724,8 @@ public:
      *
      * The instance is drawn, refreshed (OnFrame) and fed the keys by the
      * core like its own, and Destroy()ed when closed, replaced, the player
-     * leaves or `owner` unloads. This is how the CustomhudManager_s2t plugin serves its
-     * HudMenu (ICustomhudManager::OpenMenu); a plugin with a screen of its own
-     * can do the same.
+     * leaves or `owner` unloads. A plugin that draws menus somewhere of its
+     * own (a HUD menu, say) serves them this way.
      *
      * @param owner    Plugin the menu belongs to (whose unload closes it)
      * @param player   Target player

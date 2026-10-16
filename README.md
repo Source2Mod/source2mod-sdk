@@ -1,14 +1,17 @@
 # Source2Mod SDK
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Website](https://img.shields.io/badge/Website-source2toolkit.net-blue)](https://www.source2toolkit.net)
-[![Discord](https://img.shields.io/discord/1178027657594687608?color=7289da&logo=discord&logoColor=white)](https://source2toolkit.dev/discord)
+[![Discord](https://img.shields.io/badge/Discord-join-7289da?logo=discord&logoColor=white)](https://discord.gg/4Ck56eDNXj)
 
-**Source2Mod SDK** is the core development kit required for building plugins for Source2Mod.
+**Source2Mod SDK** is what [Source2Mod](https://github.com/SlynxCZ/source2mod)
+plugins are built against -- in **C++** or in **SourcePawn**. Both kinds are
+first-class and use the same API: the C++ headers live in `public/source2mod`,
+the SourcePawn include set that mirrors them name for name in
+`public/scripting`.
 
-It bundles everything you need — headers, SDK, hooking system and build helpers — so you can focus purely on writing your plugin.
-
-👉 **Docs & guides:** https://www.source2toolkit.net
+It bundles everything a native plugin needs -- headers, s2sdk, the hooking
+system and build helpers -- and the includes a script needs, so you can focus
+purely on writing your plugin.
 
 ---
 
@@ -36,9 +39,7 @@ No setup. No hunting dependencies. Just build.
 
 ---
 
-## Quick Start
-
-👉 Full docs: https://www.source2toolkit.net
+## Quick Start (C++)
 
 ### 1. Add SDK to your project
 
@@ -113,6 +114,37 @@ my_plugin.smx
 
 ---
 
+## Quick Start (SourcePawn)
+
+A script needs no build system: `#include <source2mod/api>` and compile it with
+`spcomp`. Every Source2Mod build ships both in `addons/source2mod/scripting`
+(`spcomp` and `include/`, copied from this SDK's `public/scripting`).
+
+```sourcepawn
+#include <source2mod/api>
+
+public void OnPluginStart()
+{
+    Source2ModCommands.RegisterConCommand("hello", Cmd_Hello);
+}
+
+public void Cmd_Hello(Source2ModCommandContext context, Source2ModCommandArgs args, bool post)
+{
+    Source2ModCommands.ReplyToCommand(context, "Hello!");
+}
+```
+
+```bash
+cd addons/source2mod/scripting
+./spcomp -i include hello.sp -o ../plugins/hello.smx
+```
+
+The script API mirrors the C++ one: `ISource2ModCommands::RegisterConCommand`
+is `Source2ModCommands.RegisterConCommand`, a schema class is a methodmap of
+the same name with its fields as properties.
+
+---
+
 ## What's Included
 
 - **s2sdk (CS2)** -- the `vendor/s2sdk` submodule, or your own checkout  
@@ -120,6 +152,7 @@ my_plugin.smx
 - **KHook** (virtual, vtable & function hooks) -- as the `vendor/khook` submodule, headers only    
 - **Tier0 / Tier1 / Mathlib**  
 - **Schema system headers**  
+- **C++ headers** -- `public/source2mod`: every `ISource2Mod*` interface and the generated schema classes  
 - **SourcePawn include set** -- `public/scripting` (`#include <source2mod/api>`), shipped by the core in `addons/source2mod/scripting/include`  
 - **Preconfigured compiler flags & linking**  
 
@@ -151,9 +184,12 @@ Automatically:
 
 ## Documentation
 
-- Docs: https://www.source2toolkit.net  
-- Getting Started: https://www.source2toolkit.net/docs
-- API Reference: https://www.source2toolkit.net/docs/core-api
+- The headers themselves: every interface in `public/source2mod` is documented
+  where it is declared, and the include set in `public/scripting` says the same
+  for scripts.
+- Samples: `samples/cs2/cpp_sample` and `samples/cs2/sp_sample` in the
+  [Source2Mod repository](https://github.com/SlynxCZ/source2mod) -- the same
+  plugin in C++ and in SourcePawn.
 
 ---
 
@@ -174,12 +210,14 @@ and [LICENSE](LICENSE) for the full GPLv3 text.
 ### Do I have to open-source my plugins?
 
 No. The GPLv3 license carries an explicit MIT exception for derivative works:
-your plugins, or anything built against the SDK, can stay closed-source or
-commercial. The exception covers what you build on Source2Mod, not the
-source2mod itself -- a modified Source2Mod or SDK stays under the GPLv3.
+your plugins, C++ or SourcePawn, or anything built against the SDK, can stay
+closed-source or commercial. The exception covers what you build on
+Source2Mod, not Source2Mod itself -- a modified Source2Mod or SDK stays under
+the GPLv3. The parts of the include set that come from SourceMod keep
+AlliedModders LLC's own license terms.
 
 ---
 
 <div align="center">
-  <strong>Everything you need to build Source2Mod plugins. Nothing more.</strong>
+  <strong>C++ or SourcePawn -- everything you need to build Source2Mod plugins.</strong>
 </div>
