@@ -30,7 +30,7 @@ Authors:
 
 Project: Source2Mod
 
-API reference generator for source2toolkit.net.
+API reference generator for the Source2Mod website.
 
     python generator.py <sdk>/public <website>/content/docs
 
@@ -54,7 +54,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SOURCE_DIR = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else os.path.join(SCRIPT_DIR, '../../public'))
 DEST_DIR = os.path.abspath(sys.argv[2] if len(sys.argv) > 2 else os.path.join(SCRIPT_DIR, '../../docs'))
 
-REPO_BLOB = 'https://github.com/SlynxCZ/Source2Mod-sdk/blob/main/public/'
+REPO_BLOB = 'https://github.com/SlynxCZ/source2mod-sdk/blob/main/public/'
 
 # --------------------------------------------------------------------------- #
 # Where every header goes
@@ -74,13 +74,15 @@ SCHEMA_TITLES = {
 
 # The API sidebar, grouped. Anything not listed lands at the end.
 API_GROUPS = [
-    ('Plugin', ['ISource2ModPlugin', 'ISource2ModApi', 'ISource2ModTypes']),
+    ('Plugin', ['ISource2ModPlugin', 'ISource2ModApi', 'ISource2ModTypes', 'ISource2ModNatives']),
     ('Gameplay', ['ISource2ModCommands', 'ISource2ModPermissions', 'ISource2ModConVars', 'ISource2ModEvents', 'ISource2ModEntities',
-                  'ISource2ModMenus', 'ISource2ModCustomHud', 'ISource2ModNetworkMessages', 'ISource2ModSounds',
-                  'ISource2ModTransmit', 'ISource2ModTrace', 'ISource2ModScheduler', 'ISource2ModScripts']),
+                  'ISource2ModClients', 'ISource2ModTargeting', 'ISource2ModMenus', 'ISource2ModCustomHud', 'ISource2ModTranslations',
+                  'ISource2ModNetworkMessages', 'ISource2ModSounds', 'ISource2ModTransmit', 'ISource2ModTrace', 'ISource2ModScheduler',
+                  'ISource2ModScripts', 'ISource2ModMaps', 'ISource2ModFeatures']),
     ('Engine', ['ISource2ModGameHooks', 'ISource2ModAddresses', 'ISource2ModHooks', 'ISource2ModKHook', 'ISource2ModGameConfig', 'ISource2ModGameSystems',
                 'ISource2ModMemory', 'ISource2ModModule', 'Schema']),
-    ('Services', ['ISource2ModHTTP', 'ISource2ModJSON', 'ISource2ModMySQL', 'ISource2ModPaths']),
+    ('Services', ['ISource2ModHTTP', 'ISource2ModJSON', 'ISource2ModSQL', 'ISource2ModCookies', 'ISource2ModGeoIP',
+                  'ISource2ModFiles', 'ISource2ModPaths', 'ISource2ModUtils']),
 ]
 
 

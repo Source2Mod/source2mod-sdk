@@ -58,7 +58,7 @@ public:
     const char* GetAuthor() override { return "Source2Mod"; }
     const char* GetName() override { return "SchemaDumpRunner"; }
     const char* GetDescription() override { return "Runs dump_schema at load and exits"; }
-    const char* GetURL() override { return "https://github.com/SlynxCZ/Source2Mod-sdk"; }
+    const char* GetURL() override { return "https://github.com/SlynxCZ/source2mod-sdk"; }
     const char* GetLicense() override { return "GPLv3"; }
     const char* GetVersion() override { return "1.0"; }
     const char* GetDate() override { return __DATE__; }
