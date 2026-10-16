@@ -31,6 +31,6 @@ methodmap Source2ModPaths
 	/** addons/source2mod/shared */
 	public static native void SharedDirectory(char[] buffer, int maxlen);
 
-	/** The calling plugin's own config folder (made when missing). */
+	/** The calling plugin's own config folder (configs/<plugin name>); not created for you. */
 	public static native void PluginConfigDirectory(char[] buffer, int maxlen);
 }
