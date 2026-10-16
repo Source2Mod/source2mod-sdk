@@ -66,7 +66,7 @@
  * original and post after it; in post, `result` holds what the original
  * returned.
  *
- * HookX() returns a GameHookId for UnhookX(); a plugin may have several
+ * HookX() returns a Source2ModGameHookId for UnhookX(); a plugin may have several
  * handlers on one function. The handlers are the plugin's until it unhooks
  * them or unloads, whichever comes first; nothing to undo in Unload().
  */
@@ -435,7 +435,7 @@ using GameHookHandler = Source2ModCallback<GameHookReturn<typename CONTEXT::Retu
 /// What HookX() returns and UnhookX() takes: one registered handler. A plugin
 /// may register several handlers on the same function and drop any one of
 /// them; whatever it still holds at unload the core drops for it.
-using GameHookId = int;
+using Source2ModGameHookId = Source2ModHookId;
 
 /// The hooks, for IsAvailable().
 enum class GameHook : int
@@ -494,114 +494,114 @@ public:
     virtual ~ISource2ModGameHooks() = default;
 
 
-    virtual GameHookId HookTakeDamage(GameHookHandler<TakeDamageContext> handler, bool post) = 0;
-    virtual GameHookId HookCanAcquire(GameHookHandler<CanAcquireContext> handler, bool post) = 0;
-    virtual GameHookId HookCanMove(GameHookHandler<CanMoveContext> handler, bool post) = 0;
-    virtual GameHookId HookCanUse(GameHookHandler<CanUseContext> handler, bool post) = 0;
-    virtual GameHookId HookPostThink(GameHookHandler<PostThinkContext> handler, bool post) = 0;
-    virtual GameHookId HookProcessUsercmds(GameHookHandler<ProcessUsercmdsContext> handler, bool post) = 0;
-    virtual GameHookId HookSimulateUserCommands(GameHookHandler<SimulateUserCommandsContext> handler, bool post) = 0;
-    virtual GameHookId HookRunCommand(GameHookHandler<RunCommandContext> handler, bool post) = 0;
-    virtual GameHookId HookAcceptInput(GameHookHandler<AcceptInputContext> handler, bool post) = 0;
-    virtual GameHookId HookTouch(GameHookHandler<TouchContext> handler, bool post) = 0;
-    virtual GameHookId HookDropWeapon(GameHookHandler<DropWeaponContext> handler, bool post) = 0;
-    virtual GameHookId HookAirAccelerate(GameHookHandler<AirAccelerateContext> handler, bool post) = 0;
-    virtual GameHookId HookAirMove(GameHookHandler<MovementContext> handler, bool post) = 0;
-    virtual GameHookId HookCanUnduck(GameHookHandler<MovementContext> handler, bool post) = 0;
-    virtual GameHookId HookCategorizePosition(GameHookHandler<CategorizePositionContext> handler, bool post) = 0;
-    virtual GameHookId HookCheckFalling(GameHookHandler<MovementContext> handler, bool post) = 0;
-    virtual GameHookId HookCheckParameters(GameHookHandler<MovementContext> handler, bool post) = 0;
-    virtual GameHookId HookCheckVelocity(GameHookHandler<CheckVelocityContext> handler, bool post) = 0;
-    virtual GameHookId HookCheckWater(GameHookHandler<MovementContext> handler, bool post) = 0;
-    virtual GameHookId HookDuck(GameHookHandler<MovementContext> handler, bool post) = 0;
-    virtual GameHookId HookFriction(GameHookHandler<MovementContext> handler, bool post) = 0;
-    virtual GameHookId HookFullWalkMove(GameHookHandler<FullWalkMoveContext> handler, bool post) = 0;
-    virtual GameHookId HookGroundAccelerate(GameHookHandler<GroundAccelerateContext> handler, bool post) = 0;
-    virtual GameHookId HookLadderMove(GameHookHandler<MovementContext> handler, bool post) = 0;
-    virtual GameHookId HookMoveInit(GameHookHandler<MovementContext> handler, bool post) = 0;
-    virtual GameHookId HookPlayerMove(GameHookHandler<MovementContext> handler, bool post) = 0;
-    virtual GameHookId HookProcessMovement(GameHookHandler<MovementContext> handler, bool post) = 0;
-    virtual GameHookId HookSetupMove(GameHookHandler<SetupMoveContext> handler, bool post) = 0;
-    virtual GameHookId HookTryPlayerMove(GameHookHandler<TryPlayerMoveContext> handler, bool post) = 0;
-    virtual GameHookId HookWalkMove(GameHookHandler<MovementContext> handler, bool post) = 0;
-    virtual GameHookId HookWaterMove(GameHookHandler<MovementContext> handler, bool post) = 0;
-    virtual GameHookId HookOnJumpLegacy(GameHookHandler<LegacyJumpContext> handler, bool post) = 0;
-    virtual GameHookId HookOnJumpModern(GameHookHandler<ModernJumpContext> handler, bool post) = 0;
-    virtual GameHookId HookCheckJumpButtonLegacy(GameHookHandler<LegacyJumpContext> handler, bool post) = 0;
-    virtual GameHookId HookCheckJumpButtonModern(GameHookHandler<ModernJumpContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookTakeDamage(GameHookHandler<TakeDamageContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookCanAcquire(GameHookHandler<CanAcquireContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookCanMove(GameHookHandler<CanMoveContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookCanUse(GameHookHandler<CanUseContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookPostThink(GameHookHandler<PostThinkContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookProcessUsercmds(GameHookHandler<ProcessUsercmdsContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookSimulateUserCommands(GameHookHandler<SimulateUserCommandsContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookRunCommand(GameHookHandler<RunCommandContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookAcceptInput(GameHookHandler<AcceptInputContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookTouch(GameHookHandler<TouchContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookDropWeapon(GameHookHandler<DropWeaponContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookAirAccelerate(GameHookHandler<AirAccelerateContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookAirMove(GameHookHandler<MovementContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookCanUnduck(GameHookHandler<MovementContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookCategorizePosition(GameHookHandler<CategorizePositionContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookCheckFalling(GameHookHandler<MovementContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookCheckParameters(GameHookHandler<MovementContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookCheckVelocity(GameHookHandler<CheckVelocityContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookCheckWater(GameHookHandler<MovementContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookDuck(GameHookHandler<MovementContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookFriction(GameHookHandler<MovementContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookFullWalkMove(GameHookHandler<FullWalkMoveContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookGroundAccelerate(GameHookHandler<GroundAccelerateContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookLadderMove(GameHookHandler<MovementContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookMoveInit(GameHookHandler<MovementContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookPlayerMove(GameHookHandler<MovementContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookProcessMovement(GameHookHandler<MovementContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookSetupMove(GameHookHandler<SetupMoveContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookTryPlayerMove(GameHookHandler<TryPlayerMoveContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookWalkMove(GameHookHandler<MovementContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookWaterMove(GameHookHandler<MovementContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookOnJumpLegacy(GameHookHandler<LegacyJumpContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookOnJumpModern(GameHookHandler<ModernJumpContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookCheckJumpButtonLegacy(GameHookHandler<LegacyJumpContext> handler, bool post) = 0;
+    virtual Source2ModGameHookId HookCheckJumpButtonModern(GameHookHandler<ModernJumpContext> handler, bool post) = 0;
 
     /// Drops a handler: the one HookX() returned the id for, or the one that is
     /// this function or object and method (a lambda goes by its id). True
     /// when it was found.
-    virtual bool UnhookTakeDamage(GameHookId id) = 0;
+    virtual bool UnhookTakeDamage(Source2ModGameHookId id) = 0;
     virtual bool UnhookTakeDamage(const GameHookHandler<TakeDamageContext>& handler, bool post) = 0;
-    virtual bool UnhookCanAcquire(GameHookId id) = 0;
+    virtual bool UnhookCanAcquire(Source2ModGameHookId id) = 0;
     virtual bool UnhookCanAcquire(const GameHookHandler<CanAcquireContext>& handler, bool post) = 0;
-    virtual bool UnhookCanMove(GameHookId id) = 0;
+    virtual bool UnhookCanMove(Source2ModGameHookId id) = 0;
     virtual bool UnhookCanMove(const GameHookHandler<CanMoveContext>& handler, bool post) = 0;
-    virtual bool UnhookCanUse(GameHookId id) = 0;
+    virtual bool UnhookCanUse(Source2ModGameHookId id) = 0;
     virtual bool UnhookCanUse(const GameHookHandler<CanUseContext>& handler, bool post) = 0;
-    virtual bool UnhookPostThink(GameHookId id) = 0;
+    virtual bool UnhookPostThink(Source2ModGameHookId id) = 0;
     virtual bool UnhookPostThink(const GameHookHandler<PostThinkContext>& handler, bool post) = 0;
-    virtual bool UnhookProcessUsercmds(GameHookId id) = 0;
+    virtual bool UnhookProcessUsercmds(Source2ModGameHookId id) = 0;
     virtual bool UnhookProcessUsercmds(const GameHookHandler<ProcessUsercmdsContext>& handler, bool post) = 0;
-    virtual bool UnhookSimulateUserCommands(GameHookId id) = 0;
+    virtual bool UnhookSimulateUserCommands(Source2ModGameHookId id) = 0;
     virtual bool UnhookSimulateUserCommands(const GameHookHandler<SimulateUserCommandsContext>& handler, bool post) = 0;
-    virtual bool UnhookRunCommand(GameHookId id) = 0;
+    virtual bool UnhookRunCommand(Source2ModGameHookId id) = 0;
     virtual bool UnhookRunCommand(const GameHookHandler<RunCommandContext>& handler, bool post) = 0;
-    virtual bool UnhookAcceptInput(GameHookId id) = 0;
+    virtual bool UnhookAcceptInput(Source2ModGameHookId id) = 0;
     virtual bool UnhookAcceptInput(const GameHookHandler<AcceptInputContext>& handler, bool post) = 0;
-    virtual bool UnhookTouch(GameHookId id) = 0;
+    virtual bool UnhookTouch(Source2ModGameHookId id) = 0;
     virtual bool UnhookTouch(const GameHookHandler<TouchContext>& handler, bool post) = 0;
-    virtual bool UnhookDropWeapon(GameHookId id) = 0;
+    virtual bool UnhookDropWeapon(Source2ModGameHookId id) = 0;
     virtual bool UnhookDropWeapon(const GameHookHandler<DropWeaponContext>& handler, bool post) = 0;
-    virtual bool UnhookAirAccelerate(GameHookId id) = 0;
+    virtual bool UnhookAirAccelerate(Source2ModGameHookId id) = 0;
     virtual bool UnhookAirAccelerate(const GameHookHandler<AirAccelerateContext>& handler, bool post) = 0;
-    virtual bool UnhookAirMove(GameHookId id) = 0;
+    virtual bool UnhookAirMove(Source2ModGameHookId id) = 0;
     virtual bool UnhookAirMove(const GameHookHandler<MovementContext>& handler, bool post) = 0;
-    virtual bool UnhookCanUnduck(GameHookId id) = 0;
+    virtual bool UnhookCanUnduck(Source2ModGameHookId id) = 0;
     virtual bool UnhookCanUnduck(const GameHookHandler<MovementContext>& handler, bool post) = 0;
-    virtual bool UnhookCategorizePosition(GameHookId id) = 0;
+    virtual bool UnhookCategorizePosition(Source2ModGameHookId id) = 0;
     virtual bool UnhookCategorizePosition(const GameHookHandler<CategorizePositionContext>& handler, bool post) = 0;
-    virtual bool UnhookCheckFalling(GameHookId id) = 0;
+    virtual bool UnhookCheckFalling(Source2ModGameHookId id) = 0;
     virtual bool UnhookCheckFalling(const GameHookHandler<MovementContext>& handler, bool post) = 0;
-    virtual bool UnhookCheckParameters(GameHookId id) = 0;
+    virtual bool UnhookCheckParameters(Source2ModGameHookId id) = 0;
     virtual bool UnhookCheckParameters(const GameHookHandler<MovementContext>& handler, bool post) = 0;
-    virtual bool UnhookCheckVelocity(GameHookId id) = 0;
+    virtual bool UnhookCheckVelocity(Source2ModGameHookId id) = 0;
     virtual bool UnhookCheckVelocity(const GameHookHandler<CheckVelocityContext>& handler, bool post) = 0;
-    virtual bool UnhookCheckWater(GameHookId id) = 0;
+    virtual bool UnhookCheckWater(Source2ModGameHookId id) = 0;
     virtual bool UnhookCheckWater(const GameHookHandler<MovementContext>& handler, bool post) = 0;
-    virtual bool UnhookDuck(GameHookId id) = 0;
+    virtual bool UnhookDuck(Source2ModGameHookId id) = 0;
     virtual bool UnhookDuck(const GameHookHandler<MovementContext>& handler, bool post) = 0;
-    virtual bool UnhookFriction(GameHookId id) = 0;
+    virtual bool UnhookFriction(Source2ModGameHookId id) = 0;
     virtual bool UnhookFriction(const GameHookHandler<MovementContext>& handler, bool post) = 0;
-    virtual bool UnhookFullWalkMove(GameHookId id) = 0;
+    virtual bool UnhookFullWalkMove(Source2ModGameHookId id) = 0;
     virtual bool UnhookFullWalkMove(const GameHookHandler<FullWalkMoveContext>& handler, bool post) = 0;
-    virtual bool UnhookGroundAccelerate(GameHookId id) = 0;
+    virtual bool UnhookGroundAccelerate(Source2ModGameHookId id) = 0;
     virtual bool UnhookGroundAccelerate(const GameHookHandler<GroundAccelerateContext>& handler, bool post) = 0;
-    virtual bool UnhookLadderMove(GameHookId id) = 0;
+    virtual bool UnhookLadderMove(Source2ModGameHookId id) = 0;
     virtual bool UnhookLadderMove(const GameHookHandler<MovementContext>& handler, bool post) = 0;
-    virtual bool UnhookMoveInit(GameHookId id) = 0;
+    virtual bool UnhookMoveInit(Source2ModGameHookId id) = 0;
     virtual bool UnhookMoveInit(const GameHookHandler<MovementContext>& handler, bool post) = 0;
-    virtual bool UnhookPlayerMove(GameHookId id) = 0;
+    virtual bool UnhookPlayerMove(Source2ModGameHookId id) = 0;
     virtual bool UnhookPlayerMove(const GameHookHandler<MovementContext>& handler, bool post) = 0;
-    virtual bool UnhookProcessMovement(GameHookId id) = 0;
+    virtual bool UnhookProcessMovement(Source2ModGameHookId id) = 0;
     virtual bool UnhookProcessMovement(const GameHookHandler<MovementContext>& handler, bool post) = 0;
-    virtual bool UnhookSetupMove(GameHookId id) = 0;
+    virtual bool UnhookSetupMove(Source2ModGameHookId id) = 0;
     virtual bool UnhookSetupMove(const GameHookHandler<SetupMoveContext>& handler, bool post) = 0;
-    virtual bool UnhookTryPlayerMove(GameHookId id) = 0;
+    virtual bool UnhookTryPlayerMove(Source2ModGameHookId id) = 0;
     virtual bool UnhookTryPlayerMove(const GameHookHandler<TryPlayerMoveContext>& handler, bool post) = 0;
-    virtual bool UnhookWalkMove(GameHookId id) = 0;
+    virtual bool UnhookWalkMove(Source2ModGameHookId id) = 0;
     virtual bool UnhookWalkMove(const GameHookHandler<MovementContext>& handler, bool post) = 0;
-    virtual bool UnhookWaterMove(GameHookId id) = 0;
+    virtual bool UnhookWaterMove(Source2ModGameHookId id) = 0;
     virtual bool UnhookWaterMove(const GameHookHandler<MovementContext>& handler, bool post) = 0;
-    virtual bool UnhookOnJumpLegacy(GameHookId id) = 0;
+    virtual bool UnhookOnJumpLegacy(Source2ModGameHookId id) = 0;
     virtual bool UnhookOnJumpLegacy(const GameHookHandler<LegacyJumpContext>& handler, bool post) = 0;
-    virtual bool UnhookOnJumpModern(GameHookId id) = 0;
+    virtual bool UnhookOnJumpModern(Source2ModGameHookId id) = 0;
     virtual bool UnhookOnJumpModern(const GameHookHandler<ModernJumpContext>& handler, bool post) = 0;
-    virtual bool UnhookCheckJumpButtonLegacy(GameHookId id) = 0;
+    virtual bool UnhookCheckJumpButtonLegacy(Source2ModGameHookId id) = 0;
     virtual bool UnhookCheckJumpButtonLegacy(const GameHookHandler<LegacyJumpContext>& handler, bool post) = 0;
-    virtual bool UnhookCheckJumpButtonModern(GameHookId id) = 0;
+    virtual bool UnhookCheckJumpButtonModern(Source2ModGameHookId id) = 0;
     virtual bool UnhookCheckJumpButtonModern(const GameHookHandler<ModernJumpContext>& handler, bool post) = 0;
 
     /// False when the core's gamedata has no entry for the function on this

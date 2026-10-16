@@ -67,6 +67,9 @@
 #include <string>
 #include <vector>
 
+/// A target filter (AddTargetFilter).
+using Source2ModTargetFilterId = Source2ModHookId;
+
 /* -------- filters (SourceMod's COMMAND_FILTER_* values) -------- */
 
 #define SOURCE2MOD_TARGET_ALIVE        (1 << 0)   ///< only alive players
@@ -136,8 +139,8 @@ public:
      * @brief Adds "@<name>". @p phrase names the targets ("all admins").
      * @return An id for RemoveTargetFilter, 0 when the name is taken.
      */
-    virtual Source2ModHookId AddTargetFilter(const char* name, Source2ModTargetFilter filter, const char* phrase, bool phraseIsTranslation) = 0;
-    virtual bool RemoveTargetFilter(Source2ModHookId id) = 0;
+    virtual Source2ModTargetFilterId AddTargetFilter(const char* name, Source2ModTargetFilter filter, const char* phrase, bool phraseIsTranslation) = 0;
+    virtual bool RemoveTargetFilter(Source2ModTargetFilterId id) = 0;
 };
 
 #endif //_INCLUDE_ISOURCE2MOD_TARGETING_H

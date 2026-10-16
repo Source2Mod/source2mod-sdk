@@ -82,6 +82,9 @@
 #include <cstdint>
 #include <functional>
 
+/// A CheckTransmit hook (HookCheckTransmit).
+using Source2ModTransmitHookId = Source2ModHookId;
+
 /* =========================
 Forward declarations
 ========================= */
@@ -309,7 +312,7 @@ public:
      * @param handler A function, an object and a method, or a lambda
      * @return The id UnhookCheckTransmit(id) takes
      */
-    virtual Source2ModHookId HookCheckTransmit(CheckTransmitHook handler) = 0;
+    virtual Source2ModTransmitHookId HookCheckTransmit(CheckTransmitHook handler) = 0;
 
     /**
      * @brief Drops the hook with this handler -- a function or an object and
@@ -324,7 +327,7 @@ public:
      *
      * @return true when it was still there
      */
-    virtual bool UnhookCheckTransmit(Source2ModHookId id) = 0;
+    virtual bool UnhookCheckTransmit(Source2ModTransmitHookId id) = 0;
 };
 
 /* =========================

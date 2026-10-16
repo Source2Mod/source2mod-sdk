@@ -61,6 +61,9 @@
 #include <string>
 #include <type_traits>
 
+/// A ConVar change hook (HookConVarChange).
+using Source2ModConVarHookId = Source2ModHookId;
+
 /* =========================
 Forward declarations
 ========================= */
@@ -218,7 +221,7 @@ public:
      * @param handler A function, an object and a method, or a lambda
      * @return The id UnhookConVarChange(id) takes
      */
-    virtual Source2ModHookId HookConVarChange(ConVarChangeHandler handler) = 0;
+    virtual Source2ModConVarHookId HookConVarChange(ConVarChangeHandler handler) = 0;
 
     /**
      * @brief Drops the change listener with this handler -- a function or an
@@ -233,7 +236,7 @@ public:
      *
      * @return true when it was still there
      */
-    virtual bool UnhookConVarChange(Source2ModHookId id) = 0;
+    virtual bool UnhookConVarChange(Source2ModConVarHookId id) = 0;
 
     /**
 

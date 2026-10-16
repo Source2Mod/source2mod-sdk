@@ -70,6 +70,9 @@
 #include <cstdint>
 #include <functional>
 
+/// A sound hook (HookSound).
+using Source2ModSoundHookId = Source2ModHookId;
+
 /* =========================
 Forward declarations
 ========================= */
@@ -477,7 +480,7 @@ public:
      * @param handler A function, an object and a method, or a lambda
      * @return The id UnhookSound(id) takes
      */
-    virtual Source2ModHookId HookSound(SoundHook handler) = 0;
+    virtual Source2ModSoundHookId HookSound(SoundHook handler) = 0;
 
     /**
      * @brief Drops the hook with this handler -- a function or an object and
@@ -492,7 +495,7 @@ public:
      *
      * @return true when it was still there
      */
-    virtual bool UnhookSound(Source2ModHookId id) = 0;
+    virtual bool UnhookSound(Source2ModSoundHookId id) = 0;
 };
 
 /* =========================

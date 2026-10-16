@@ -60,6 +60,9 @@
 #include <cstdint>
 #include <functional>
 
+/// A net message hook (HookServerMessage / HookClientMessage / HookServerInternalMessage).
+using Source2ModNetMessageHookId = Source2ModHookId;
+
 /* =========================
 Windows macro collisions
 ========================= */
@@ -359,7 +362,7 @@ public:
      * @param handler A function, an object and a method, or a lambda
      * @return The id UnhookServerMessage(id) takes
      */
-    virtual Source2ModHookId HookServerMessage(NetMessageServerHook handler) = 0;
+    virtual Source2ModNetMessageHookId HookServerMessage(NetMessageServerHook handler) = 0;
 
     /**
      * @brief Drops the hook with this handler -- a function or an object and
@@ -374,14 +377,14 @@ public:
      *
      * @return true when it was still there
      */
-    virtual bool UnhookServerMessage(Source2ModHookId id) = 0;
+    virtual bool UnhookServerMessage(Source2ModNetMessageHookId id) = 0;
 
     /**
      * @brief Hooks incoming client-to-server messages (as HookServerMessage()).
      *
      * @return The id UnhookClientMessage(id) takes
      */
-    virtual Source2ModHookId HookClientMessage(NetMessageClientHook handler) = 0;
+    virtual Source2ModNetMessageHookId HookClientMessage(NetMessageClientHook handler) = 0;
 
     /**
      * @brief Drops the hook with this handler -- a function or an object and
@@ -396,7 +399,7 @@ public:
      *
      * @return true when it was still there
      */
-    virtual bool UnhookClientMessage(Source2ModHookId id) = 0;
+    virtual bool UnhookClientMessage(Source2ModNetMessageHookId id) = 0;
 
     /**
      * @brief Hooks internal server-side message sends, per client (as
@@ -404,7 +407,7 @@ public:
      *
      * @return The id UnhookServerInternalMessage(id) takes
      */
-    virtual Source2ModHookId HookServerInternalMessage(NetMessageClientHook handler) = 0;
+    virtual Source2ModNetMessageHookId HookServerInternalMessage(NetMessageClientHook handler) = 0;
 
     /**
      * @brief Drops the hook with this handler -- a function or an object and
@@ -419,7 +422,7 @@ public:
      *
      * @return true when it was still there
      */
-    virtual bool UnhookServerInternalMessage(Source2ModHookId id) = 0;
+    virtual bool UnhookServerInternalMessage(Source2ModNetMessageHookId id) = 0;
 };
 
 /**

@@ -77,6 +77,9 @@
 #pragma once
 #include "ISource2ModPlugin.h"
 
+/// An access-denied handler (SetAccessDeniedHandler).
+using Source2ModAccessDeniedHandlerId = Source2ModHookId;
+
 // ISource2ModCommands.h may be the header that pulled this one in (through
 // ISource2ModPlugin.h) before it got to these, so they are only declared here;
 // a reference to them is all the handler type needs.
@@ -220,10 +223,10 @@ public:
      *
      * @return The id ClearAccessDeniedHandler() takes
      */
-    virtual Source2ModHookId SetAccessDeniedHandler(AccessDeniedHandler handler) = 0;
+    virtual Source2ModAccessDeniedHandlerId SetAccessDeniedHandler(AccessDeniedHandler handler) = 0;
 
     /// Drops a handler SetAccessDeniedHandler() returned the id for.
-    virtual bool ClearAccessDeniedHandler(Source2ModHookId id) = 0;
+    virtual bool ClearAccessDeniedHandler(Source2ModAccessDeniedHandlerId id) = 0;
 };
 
 #define PERMISSIONS_HAS(steamId, permission)              g_pSource2ModPermissions->HasPermission(steamId, permission)

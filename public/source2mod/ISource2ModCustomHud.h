@@ -55,6 +55,9 @@
 #pragma once
 #include "ISource2ModPlugin.h"
 
+/// A custom HUD click hook (HookCustomHudClick).
+using Source2ModCustomHudHookId = Source2ModHookId;
+
 /* =========================
 Forward declarations
 ========================= */
@@ -102,7 +105,7 @@ public:
      * @param handler A function, an object and a method, or a lambda
      * @return The id UnhookCustomHudClick(id) takes
      */
-    virtual Source2ModHookId HookCustomHudClick(CCSCustomHudLayout* pLayout, CustomHudClickHandler handler) = 0;
+    virtual Source2ModCustomHudHookId HookCustomHudClick(CCSCustomHudLayout* pLayout, CustomHudClickHandler handler) = 0;
 
     /**
      * @brief Drops the hook with this handler -- a function or an object and
@@ -117,7 +120,7 @@ public:
      *
      * @return true when it was still there
      */
-    virtual bool UnhookCustomHudClick(Source2ModHookId id) = 0;
+    virtual bool UnhookCustomHudClick(Source2ModCustomHudHookId id) = 0;
 
     /**
 

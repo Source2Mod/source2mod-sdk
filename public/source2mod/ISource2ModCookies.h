@@ -59,6 +59,9 @@
 #pragma once
 #include "ISource2ModPlugin.h"
 
+/// A cookies-cached listener (AddCookiesCachedListener).
+using Source2ModCookiesListenerId = Source2ModHookId;
+
 /// Who may see and change a cookie from the cookie commands. SourceMod's CookieAccess.
 enum Source2ModCookieAccess
 {
@@ -157,9 +160,9 @@ public:
     ========================= */
 
     /// Runs `callback` whenever a player's cookies were loaded. Goes with the plugin.
-    virtual Source2ModHookId AddCookiesCachedListener(CookiesCachedCallback callback) = 0;
+    virtual Source2ModCookiesListenerId AddCookiesCachedListener(CookiesCachedCallback callback) = 0;
 
-    virtual bool RemoveCookiesCachedListener(Source2ModHookId id) = 0;
+    virtual bool RemoveCookiesCachedListener(Source2ModCookiesListenerId id) = 0;
 };
 
 #endif //_INCLUDE_ISOURCE2MOD_COOKIES_H

@@ -58,6 +58,13 @@
 #include <engine2/isource2server.h>
 #include <engine2/ivengineserver2.h>
 
+/// A console command of the plugin's own (RegisterConCommand).
+using Source2ModCommandId = Source2ModHookId;
+/// A listener on a command somebody else owns (RegisterConListener).
+using Source2ModCommandHookId = Source2ModHookId;
+/// A chat-only listener (RegisterChatListener).
+using Source2ModChatListenerId = Source2ModHookId;
+
 /* =========================
 Forward declarations
 ========================= */
@@ -205,7 +212,7 @@ public:
      *        without it gets the access-denied answer instead.
      * @return The id UnregisterChatListener(id) takes
      */
-    virtual Source2ModHookId RegisterChatListener(const char* pchName, ChatHandler handler, const char* pchPermission = nullptr) = 0;
+    virtual Source2ModChatListenerId RegisterChatListener(const char* pchName, ChatHandler handler, const char* pchPermission = nullptr) = 0;
 
     /**
      * @brief Drops the chat command with this handler -- a function or an
@@ -220,7 +227,7 @@ public:
      *
      * @return true when it was still there
      */
-    virtual bool UnregisterChatListener(Source2ModHookId id) = 0;
+    virtual bool UnregisterChatListener(Source2ModChatListenerId id) = 0;
 
     /**
      * @brief Registers a console command, reachable from chat as "!name" and
@@ -237,7 +244,7 @@ public:
      *        "Overrides" in permissions.json.
      * @return The id UnregisterConCommand(id) takes
      */
-    virtual Source2ModHookId RegisterConCommand(const char* pchName, ChatHandler handler, const char* pchPermission = nullptr) = 0;
+    virtual Source2ModCommandId RegisterConCommand(const char* pchName, ChatHandler handler, const char* pchPermission = nullptr) = 0;
 
     /**
      * @brief Drops the console command handler -- a function or an object and
@@ -253,7 +260,7 @@ public:
      *
      * @return true when it was still there
      */
-    virtual bool UnregisterConCommand(Source2ModHookId id) = 0;
+    virtual bool UnregisterConCommand(Source2ModCommandId id) = 0;
 
     /**
      * @brief Registers a listener on an existing console command.
@@ -274,7 +281,7 @@ public:
      * @param post false to run before the original, true to run after
      * @return The id UnregisterConListener(id) takes
      */
-    virtual Source2ModHookId RegisterConListener(const char* pchName, CommandHandler handler, bool post) = 0;
+    virtual Source2ModCommandHookId RegisterConListener(const char* pchName, CommandHandler handler, bool post) = 0;
 
     /**
      * @brief Drops the console listener with this handler -- a function or an
@@ -289,7 +296,7 @@ public:
      *
      * @return true when it was still there
      */
-    virtual bool UnregisterConListener(Source2ModHookId id) = 0;
+    virtual bool UnregisterConListener(Source2ModCommandHookId id) = 0;
 
     /**
      * @brief Answers a command where it was typed: to the player's chat when

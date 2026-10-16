@@ -76,6 +76,9 @@
 
 #include <functional>
 
+/// A cs_script message hook (HookScriptMessage).
+using Source2ModScriptMessageHookId = Source2ModHookId;
+
 /* =========================
 Types
 ========================= */
@@ -200,7 +203,7 @@ public:
      *
      * @return The id UnhookScriptMessage(id) takes
      */
-    virtual Source2ModHookId HookScriptMessage(const char* pszChannel, ScriptMessageHandler handler) = 0;
+    virtual Source2ModScriptMessageHookId HookScriptMessage(const char* pszChannel, ScriptMessageHandler handler) = 0;
 
     /**
      * @brief Drops the hook with this handler -- a function or an object and
@@ -215,7 +218,7 @@ public:
      *
      * @return true when it was still there
      */
-    virtual bool UnhookScriptMessage(Source2ModHookId id) = 0;
+    virtual bool UnhookScriptMessage(Source2ModScriptMessageHookId id) = 0;
 };
 
 /**

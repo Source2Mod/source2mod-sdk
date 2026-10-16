@@ -56,6 +56,9 @@
 #include <engine2/ivengineserver2.h>
 #include <igameevents.h>
 
+/// A game event hook (HookGameEvent).
+using Source2ModEventHookId = Source2ModHookId;
+
 /* =========================
 Forward declarations
 ========================= */
@@ -109,7 +112,7 @@ public:
      * @return The id UnhookGameEvent(id) takes; 0 for an event the game does
      *         not have
      */
-    virtual Source2ModHookId HookGameEvent(const char* pchName, GameEventHandler handler, bool post) = 0;
+    virtual Source2ModEventHookId HookGameEvent(const char* pchName, GameEventHandler handler, bool post) = 0;
 
     /**
      * @brief Drops the hook with this handler -- a function or an object and
@@ -124,7 +127,7 @@ public:
      *
      * @return true when it was still there
      */
-    virtual bool UnhookGameEvent(Source2ModHookId id) = 0;
+    virtual bool UnhookGameEvent(Source2ModEventHookId id) = 0;
 };
 
 /**
