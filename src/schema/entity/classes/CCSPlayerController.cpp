@@ -60,7 +60,15 @@ CCSPlayerController *CCSPlayerController::FromPawn(CCSPlayerPawn* pPawn)
 
 CCSPlayerController *CCSPlayerController::FromSlot(int iSlot)
 {
-    return static_cast<CCSPlayerController*>(GetEntitySystem()->GetEntityInstance(CEntityIndex(iSlot + 1)));
+    if (iSlot < 0 || iSlot >= ABSOLUTE_PLAYER_LIMIT || iSlot >= GetGlobalVars()->maxClients || !GetEntitySystem())
+        return nullptr;
+
+    CBaseEntity* entity = FromIndex(iSlot + 1);
+    const char* classname = entity ? entity->GetClassname() : nullptr;
+    if (!classname || V_strcmp(classname, "cs_player_controller") != 0)
+        return nullptr;
+
+    return static_cast<CCSPlayerController*>(entity);
 }
 
 CCSPlayerController *CCSPlayerController::FromSlot(CPlayerSlot slot)
