@@ -78,7 +78,7 @@ and moves `vendor/s2sdk-manifests` to its latest. `deps.py status` shows what
 is checked out.
 
 What a binary needs from s2sdk -- include paths, defines, libraries with the
-Steam API, protoc -- comes from [s2sdk-manifests](https://github.com/FUNPLAY-pro-CS2/s2sdk-manifests),
+Steam API, protoc -- comes from [s2sdk-manifests](https://github.com/Source2Mod/s2sdk-manifests),
 for both build systems: CMake through s2sdk's `s2sdk::s2sdk`, AMBuild through
 its `SdkHelpers.ambuild`. Both use the `vendor/s2sdk-manifests` submodule;
 `S2SDK_MANIFESTS_DIR` (or AMBuild's `--s2sdk-manifests`) points them at another

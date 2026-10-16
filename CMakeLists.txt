@@ -248,7 +248,7 @@ if (NOT COMMAND s2sdk_manifest)
     if (NOT S2SDK_MANIFESTS_DIR OR NOT EXISTS "${S2SDK_MANIFESTS_DIR}/s2sdk-manifests.cmake")
         include(FetchContent)
         FetchContent_Declare(s2sdk_manifests
-                GIT_REPOSITORY https://github.com/FUNPLAY-pro-CS2/s2sdk-manifests.git
+                GIT_REPOSITORY https://github.com/Source2Mod/s2sdk-manifests.git
                 GIT_TAG master
                 GIT_SHALLOW TRUE
         )
