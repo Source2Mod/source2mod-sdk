@@ -533,6 +533,15 @@ public:
     virtual void OnEnd(MenuEndReason reason) {}
 
     /**
+     * @brief The number keys the menu does something with right now, as a
+     *        bit mask (bit 1 = key 1 ... bit 9 = key 9). A key outside it is
+     *        left to the game: with no binds, Source2Mod reads the keys from
+     *        the weapon slots, and only the keys in the mask are taken.
+     *        The default takes 1-9. (ISource2ModMenus007)
+     */
+    virtual uint32_t KeyMask() const { return 0x3FEu; }
+
+    /**
      * @brief Gets underlying menu.
      *
      * @return Pointer to menu
@@ -666,7 +675,7 @@ Core Source2Mod Menus
 /**
  * @brief Interface for menu system management.
  */
-#define SOURCE2MOD_MENUS_INTERFACE "ISource2ModMenus006"
+#define SOURCE2MOD_MENUS_INTERFACE "ISource2ModMenus007"
 
 class ISource2ModMenus
 {
