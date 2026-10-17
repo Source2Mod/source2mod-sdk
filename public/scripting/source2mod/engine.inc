@@ -127,6 +127,10 @@ methodmap Source2ModApi
 	/**
 	 * Formats with the calling function's own variadic arguments, starting
 	 * at its parameter varpos (1-based) (C++ FormatArgs, SourceMod's VFormat).
+	 * SourcePawn 1 plugins only: SourcePawn 2 boxes a function's variadic
+	 * arguments, so a plugin built with today's spcomp passes them on --
+	 * Source2ModApi.Format(buffer, maxlen, format, ...) -- and this raises
+	 * an error.
 	 * @return Bytes written
 	 */
 	public static native int FormatArgs(char[] buffer, int maxlen, const char[] format, int varpos);
