@@ -81,6 +81,8 @@ methodmap CBaseEntity < CEntityInstance
 		public get() { return Source2ModSchema.GetBool(this, "CBaseEntity", "m_bTakesDamage"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CBaseEntity", "m_bTakesDamage", value); }
 	}
+	public void m_nTakeDamageFlags(int value[2]) { Source2ModSchema.GetInt64(this, "CBaseEntity", "m_nTakeDamageFlags", value); }
+	public void Set_m_nTakeDamageFlags(const int value[2]) { Source2ModSchema.SetInt64(this, "CBaseEntity", "m_nTakeDamageFlags", value); }
 	property int m_nPlatformType {
 		public get() { return Source2ModSchema.GetInt(this, "CBaseEntity", "m_nPlatformType"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBaseEntity", "m_nPlatformType", value); }
@@ -123,6 +125,9 @@ methodmap CBaseEntity < CEntityInstance
 		public get() { return Source2ModSchema.GetFloat(this, "CBaseEntity", "m_flMoveDoneTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBaseEntity", "m_flMoveDoneTime", value); }
 	}
+	public int m_nSubclassID(int index) { return Source2ModSchema.GetArrayInt(this, "CBaseEntity", "m_nSubclassID", index); }
+	public void Set_m_nSubclassID(int index, int value) { Source2ModSchema.SetArrayInt(this, "CBaseEntity", "m_nSubclassID", index, value); }
+	public int m_nSubclassID_Count() { return Source2ModSchema.GetArraySize("CBaseEntity", "m_nSubclassID"); }
 	property float m_flAnimTime {
 		public get() { return Source2ModSchema.GetFloat(this, "CBaseEntity", "m_flAnimTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBaseEntity", "m_flAnimTime", value); }
@@ -467,6 +472,14 @@ methodmap CBaseModelEntity < CBaseEntity
 		public get() { return Source2ModSchema.GetFloat(this, "CBaseModelEntity", "m_flDissolveStartTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBaseModelEntity", "m_flDissolveStartTime", value); }
 	}
+	property int m_nRenderMode {
+		public get() { return Source2ModSchema.GetInt(this, "CBaseModelEntity", "m_nRenderMode"); }
+		public set(int value) { Source2ModSchema.SetInt(this, "CBaseModelEntity", "m_nRenderMode", value); }
+	}
+	property int m_nRenderFX {
+		public get() { return Source2ModSchema.GetInt(this, "CBaseModelEntity", "m_nRenderFX"); }
+		public set(int value) { Source2ModSchema.SetInt(this, "CBaseModelEntity", "m_nRenderFX", value); }
+	}
 	property bool m_bAllowFadeInView {
 		public get() { return Source2ModSchema.GetBool(this, "CBaseModelEntity", "m_bAllowFadeInView"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CBaseModelEntity", "m_bAllowFadeInView", value); }
@@ -522,6 +535,9 @@ methodmap CBaseModelEntity < CBaseEntity
 	property CNetworkViewOffsetVector m_vecViewOffset {
 		public get() { return view_as<CNetworkViewOffsetVector>(Source2ModSchema.GetObject(this, "CBaseModelEntity", "m_vecViewOffset")); }
 	}
+	public int m_bvDisabledHitGroups(int index) { return Source2ModSchema.GetArrayInt(this, "CBaseModelEntity", "m_bvDisabledHitGroups", index); }
+	public void Set_m_bvDisabledHitGroups(int index, int value) { Source2ModSchema.SetArrayInt(this, "CBaseModelEntity", "m_bvDisabledHitGroups", index, value); }
+	public int m_bvDisabledHitGroups_Count() { return Source2ModSchema.GetArraySize("CBaseModelEntity", "m_bvDisabledHitGroups"); }
 	public native int GetModelName(char[] buffer, int maxlen);
 	public native void GetEyePosition(float position[3]);
 	public native void SetModel(const char[] model, Source2ModHookChain chain = HookChain_Default);
@@ -642,6 +658,9 @@ methodmap CBasePlayerWeapon < CEconEntity
 		public get() { return Source2ModSchema.GetInt(this, "CBasePlayerWeapon", "m_iClip2"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBasePlayerWeapon", "m_iClip2", value); }
 	}
+	public int m_pReserveAmmo(int index) { return Source2ModSchema.GetArrayInt(this, "CBasePlayerWeapon", "m_pReserveAmmo", index); }
+	public void Set_m_pReserveAmmo(int index, int value) { Source2ModSchema.SetArrayInt(this, "CBasePlayerWeapon", "m_pReserveAmmo", index, value); }
+	public int m_pReserveAmmo_Count() { return Source2ModSchema.GetArraySize("CBasePlayerWeapon", "m_pReserveAmmo"); }
 	public native CCSWeaponBaseVData GetWeaponVData();
 	public native int GetWeaponClassname(char[] buffer, int maxlen);
 }
@@ -1794,6 +1813,9 @@ methodmap CBaseModelEntity__BodyGroupRequest_t < SchemaObject
 		public get() { return Source2ModSchema.GetInt(this, "CBaseModelEntity__BodyGroupRequest_t", "m_uRequestID"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBaseModelEntity__BodyGroupRequest_t", "m_uRequestID", value); }
 	}
+	public int m_nGroupName(int index) { return Source2ModSchema.GetArrayInt(this, "CBaseModelEntity__BodyGroupRequest_t", "m_nGroupName", index); }
+	public void Set_m_nGroupName(int index, int value) { Source2ModSchema.SetArrayInt(this, "CBaseModelEntity__BodyGroupRequest_t", "m_nGroupName", index, value); }
+	public int m_nGroupName_Count() { return Source2ModSchema.GetArraySize("CBaseModelEntity__BodyGroupRequest_t", "m_nGroupName"); }
 	public int m_sChoiceName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseModelEntity__BodyGroupRequest_t", "m_sChoiceName", buffer, maxlen); }
 	property int m_nGroup {
 		public get() { return Source2ModSchema.GetInt(this, "CBaseModelEntity__BodyGroupRequest_t", "m_nGroup"); }
@@ -1847,10 +1869,8 @@ methodmap CBasePlatTrain < CBaseToggle
 
 methodmap CBasePlayerController < CBaseEntity
 {
-	property int m_nInButtonsWhichAreToggles {
-		public get() { return Source2ModSchema.GetInt(this, "CBasePlayerController", "m_nInButtonsWhichAreToggles"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CBasePlayerController", "m_nInButtonsWhichAreToggles", value); }
-	}
+	public void m_nInButtonsWhichAreToggles(int value[2]) { Source2ModSchema.GetInt64(this, "CBasePlayerController", "m_nInButtonsWhichAreToggles", value); }
+	public void Set_m_nInButtonsWhichAreToggles(const int value[2]) { Source2ModSchema.SetInt64(this, "CBasePlayerController", "m_nInButtonsWhichAreToggles", value); }
 	property int m_nTickBase {
 		public get() { return Source2ModSchema.GetInt(this, "CBasePlayerController", "m_nTickBase"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBasePlayerController", "m_nTickBase", value); }
@@ -1926,10 +1946,8 @@ methodmap CBasePlayerController < CBaseEntity
 		public get() { return Source2ModSchema.GetBool(this, "CBasePlayerController", "m_bHasAnySteadyStateEnts"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CBasePlayerController", "m_bHasAnySteadyStateEnts", value); }
 	}
-	property int m_steamID {
-		public get() { return Source2ModSchema.GetInt(this, "CBasePlayerController", "m_steamID"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CBasePlayerController", "m_steamID", value); }
-	}
+	public void m_steamID(int value[2]) { Source2ModSchema.GetInt64(this, "CBasePlayerController", "m_steamID", value); }
+	public void Set_m_steamID(const int value[2]) { Source2ModSchema.SetInt64(this, "CBasePlayerController", "m_steamID", value); }
 	property bool m_bNoClipEnabled {
 		public get() { return Source2ModSchema.GetBool(this, "CBasePlayerController", "m_bNoClipEnabled"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CBasePlayerController", "m_bNoClipEnabled", value); }
@@ -2130,6 +2148,10 @@ methodmap CBasePlayerWeaponVData < CEntitySubclassVDataBase
 	property bool m_bLinkedCooldowns {
 		public get() { return Source2ModSchema.GetBool(this, "CBasePlayerWeaponVData", "m_bLinkedCooldowns"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CBasePlayerWeaponVData", "m_bLinkedCooldowns", value); }
+	}
+	property int m_iFlags {
+		public get() { return Source2ModSchema.GetInt(this, "CBasePlayerWeaponVData", "m_iFlags"); }
+		public set(int value) { Source2ModSchema.SetInt(this, "CBasePlayerWeaponVData", "m_iFlags", value); }
 	}
 	property int m_iWeight {
 		public get() { return Source2ModSchema.GetInt(this, "CBasePlayerWeaponVData", "m_iWeight"); }
@@ -2435,6 +2457,9 @@ methodmap CBasePropDoor < CDynamicProp
 		public get() { return Source2ModSchema.GetInt(this, "CBasePropDoor", "m_numCloseAttempts"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBasePropDoor", "m_numCloseAttempts", value); }
 	}
+	public int m_nPhysicsMaterial(int index) { return Source2ModSchema.GetArrayInt(this, "CBasePropDoor", "m_nPhysicsMaterial", index); }
+	public void Set_m_nPhysicsMaterial(int index, int value) { Source2ModSchema.SetArrayInt(this, "CBasePropDoor", "m_nPhysicsMaterial", index, value); }
+	public int m_nPhysicsMaterial_Count() { return Source2ModSchema.GetArraySize("CBasePropDoor", "m_nPhysicsMaterial"); }
 	public int m_SlaveName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBasePropDoor", "m_SlaveName", buffer, maxlen); }
 	property CBasePropDoor m_hMaster {
 		public get() { return view_as<CBasePropDoor>(Source2ModSchema.GetHandle(this, "CBasePropDoor", "m_hMaster")); }
@@ -2493,6 +2518,9 @@ methodmap CBeam < CBaseModelEntity
 		public get() { return Source2ModSchema.GetInt(this, "CBeam", "m_nBeamFlags"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBeam", "m_nBeamFlags", value); }
 	}
+	public CBaseEntity m_hAttachEntity(int index) { return view_as<CBaseEntity>(Source2ModSchema.GetArrayHandle(this, "CBeam", "m_hAttachEntity", index)); }
+	public void Set_m_hAttachEntity(int index, CEntityInstance value) { Source2ModSchema.SetArrayHandle(this, "CBeam", "m_hAttachEntity", index, value); }
+	public int m_hAttachEntity_Count() { return Source2ModSchema.GetArraySize("CBeam", "m_hAttachEntity"); }
 	property float m_fWidth {
 		public get() { return Source2ModSchema.GetFloat(this, "CBeam", "m_fWidth"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBeam", "m_fWidth", value); }
@@ -2650,10 +2678,8 @@ methodmap CBot < SchemaObject
 		public get() { return Source2ModSchema.GetFloat(this, "CBot", "m_verticalSpeed"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBot", "m_verticalSpeed", value); }
 	}
-	property int m_buttonFlags {
-		public get() { return Source2ModSchema.GetInt(this, "CBot", "m_buttonFlags"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CBot", "m_buttonFlags", value); }
-	}
+	public void m_buttonFlags(int value[2]) { Source2ModSchema.GetInt64(this, "CBot", "m_buttonFlags", value); }
+	public void Set_m_buttonFlags(const int value[2]) { Source2ModSchema.SetInt64(this, "CBot", "m_buttonFlags", value); }
 	property float m_jumpTimestamp {
 		public get() { return Source2ModSchema.GetFloat(this, "CBot", "m_jumpTimestamp"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBot", "m_jumpTimestamp", value); }
@@ -2724,6 +2750,9 @@ methodmap CBuoyancyHelper < SchemaObject
 	property IPhysicsMotionController m_pController {
 		public get() { return view_as<IPhysicsMotionController>(Source2ModSchema.GetObject(this, "CBuoyancyHelper", "m_pController")); }
 	}
+	public int m_nFluidType(int index) { return Source2ModSchema.GetArrayInt(this, "CBuoyancyHelper", "m_nFluidType", index); }
+	public void Set_m_nFluidType(int index, int value) { Source2ModSchema.SetArrayInt(this, "CBuoyancyHelper", "m_nFluidType", index, value); }
+	public int m_nFluidType_Count() { return Source2ModSchema.GetArraySize("CBuoyancyHelper", "m_nFluidType"); }
 	property float m_flFluidDensity {
 		public get() { return Source2ModSchema.GetFloat(this, "CBuoyancyHelper", "m_flFluidDensity"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBuoyancyHelper", "m_flFluidDensity", value); }
@@ -2787,6 +2816,9 @@ methodmap CC4 < CCSWeaponBase
 		public get() { return Source2ModSchema.GetInt(this, "CC4", "m_nSpotRules"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CC4", "m_nSpotRules", value); }
 	}
+	public bool m_bPlayedArmingBeeps(int index) { return Source2ModSchema.GetArrayInt(this, "CC4", "m_bPlayedArmingBeeps", index) != 0; }
+	public void Set_m_bPlayedArmingBeeps(int index, bool value) { Source2ModSchema.SetArrayInt(this, "CC4", "m_bPlayedArmingBeeps", index, value); }
+	public int m_bPlayedArmingBeeps_Count() { return Source2ModSchema.GetArraySize("CC4", "m_bPlayedArmingBeeps"); }
 	property bool m_bBombPlanted {
 		public get() { return Source2ModSchema.GetBool(this, "CC4", "m_bBombPlanted"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CC4", "m_bBombPlanted", value); }
@@ -2960,6 +2992,9 @@ methodmap CCSBot < CBot
 	property CountdownTimer m_updateTravelDistanceTimer {
 		public get() { return view_as<CountdownTimer>(Source2ModSchema.GetObject(this, "CCSBot", "m_updateTravelDistanceTimer")); }
 	}
+	public float m_playerTravelDistance(int index) { return Source2ModSchema.GetArrayFloat(this, "CCSBot", "m_playerTravelDistance", index); }
+	public void Set_m_playerTravelDistance(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CCSBot", "m_playerTravelDistance", index, value); }
+	public int m_playerTravelDistance_Count() { return Source2ModSchema.GetArraySize("CCSBot", "m_playerTravelDistance"); }
 	property int m_travelDistancePhase {
 		public get() { return Source2ModSchema.GetInt(this, "CCSBot", "m_travelDistancePhase"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSBot", "m_travelDistancePhase", value); }
@@ -3266,6 +3301,9 @@ methodmap CCSBot < CBot
 		public get() { return Source2ModSchema.GetFloat(this, "CCSBot", "m_nextCleanupCheckTimestamp"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CCSBot", "m_nextCleanupCheckTimestamp", value); }
 	}
+	public float m_avgVel(int index) { return Source2ModSchema.GetArrayFloat(this, "CCSBot", "m_avgVel", index); }
+	public void Set_m_avgVel(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CCSBot", "m_avgVel", index, value); }
+	public int m_avgVel_Count() { return Source2ModSchema.GetArraySize("CCSBot", "m_avgVel"); }
 	property int m_avgVelIndex {
 		public get() { return Source2ModSchema.GetInt(this, "CCSBot", "m_avgVelIndex"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSBot", "m_avgVelIndex", value); }
@@ -3390,10 +3428,8 @@ methodmap CCSGO_TeamPreviewCharacterPosition < CBaseEntity
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSGO_TeamPreviewCharacterPosition", "m_nOrdinal", value); }
 	}
 	public int m_sWeaponName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CCSGO_TeamPreviewCharacterPosition", "m_sWeaponName", buffer, maxlen); }
-	property int m_xuid {
-		public get() { return Source2ModSchema.GetInt(this, "CCSGO_TeamPreviewCharacterPosition", "m_xuid"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CCSGO_TeamPreviewCharacterPosition", "m_xuid", value); }
-	}
+	public void m_xuid(int value[2]) { Source2ModSchema.GetInt64(this, "CCSGO_TeamPreviewCharacterPosition", "m_xuid", value); }
+	public void Set_m_xuid(const int value[2]) { Source2ModSchema.SetInt64(this, "CCSGO_TeamPreviewCharacterPosition", "m_xuid", value); }
 	property CEconItemView m_agentItem {
 		public get() { return view_as<CEconItemView>(Source2ModSchema.GetObject(this, "CCSGO_TeamPreviewCharacterPosition", "m_agentItem")); }
 	}
@@ -3493,10 +3529,8 @@ methodmap CGameRules < SchemaObject
 		public get() { return Source2ModSchema.GetInt(this, "CGameRules", "m_nLastMatchTime"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CGameRules", "m_nLastMatchTime", value); }
 	}
-	property int m_nLastMatchTime_MatchID64 {
-		public get() { return Source2ModSchema.GetInt(this, "CGameRules", "m_nLastMatchTime_MatchID64"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CGameRules", "m_nLastMatchTime_MatchID64", value); }
-	}
+	public void m_nLastMatchTime_MatchID64(int value[2]) { Source2ModSchema.GetInt64(this, "CGameRules", "m_nLastMatchTime_MatchID64", value); }
+	public void Set_m_nLastMatchTime_MatchID64(const int value[2]) { Source2ModSchema.SetInt64(this, "CGameRules", "m_nLastMatchTime_MatchID64", value); }
 	property int m_nTotalPausedTicks {
 		public get() { return Source2ModSchema.GetInt(this, "CGameRules", "m_nTotalPausedTicks"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CGameRules", "m_nTotalPausedTicks", value); }
@@ -3709,6 +3743,12 @@ methodmap CCSGameRules < CTeamplayRules
 		public get() { return Source2ModSchema.GetBool(this, "CCSGameRules", "m_bBombPlanted"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSGameRules", "m_bBombPlanted", value); }
 	}
+	public int m_arrProhibitedItemIndices(int index) { return Source2ModSchema.GetArrayInt(this, "CCSGameRules", "m_arrProhibitedItemIndices", index); }
+	public void Set_m_arrProhibitedItemIndices(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSGameRules", "m_arrProhibitedItemIndices", index, value); }
+	public int m_arrProhibitedItemIndices_Count() { return Source2ModSchema.GetArraySize("CCSGameRules", "m_arrProhibitedItemIndices"); }
+	public int m_arrTournamentActiveCasterAccounts(int index) { return Source2ModSchema.GetArrayInt(this, "CCSGameRules", "m_arrTournamentActiveCasterAccounts", index); }
+	public void Set_m_arrTournamentActiveCasterAccounts(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSGameRules", "m_arrTournamentActiveCasterAccounts", index, value); }
+	public int m_arrTournamentActiveCasterAccounts_Count() { return Source2ModSchema.GetArraySize("CCSGameRules", "m_arrTournamentActiveCasterAccounts"); }
 	property int m_numBestOfMaps {
 		public get() { return Source2ModSchema.GetInt(this, "CCSGameRules", "m_numBestOfMaps"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSGameRules", "m_numBestOfMaps", value); }
@@ -3737,14 +3777,36 @@ methodmap CCSGameRules < CTeamplayRules
 		public get() { return Source2ModSchema.GetBool(this, "CCSGameRules", "m_bCTCantBuy"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSGameRules", "m_bCTCantBuy", value); }
 	}
+	public int m_iMatchStats_RoundResults(int index) { return Source2ModSchema.GetArrayInt(this, "CCSGameRules", "m_iMatchStats_RoundResults", index); }
+	public void Set_m_iMatchStats_RoundResults(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSGameRules", "m_iMatchStats_RoundResults", index, value); }
+	public int m_iMatchStats_RoundResults_Count() { return Source2ModSchema.GetArraySize("CCSGameRules", "m_iMatchStats_RoundResults"); }
+	public int m_iMatchStats_PlayersAlive_CT(int index) { return Source2ModSchema.GetArrayInt(this, "CCSGameRules", "m_iMatchStats_PlayersAlive_CT", index); }
+	public void Set_m_iMatchStats_PlayersAlive_CT(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSGameRules", "m_iMatchStats_PlayersAlive_CT", index, value); }
+	public int m_iMatchStats_PlayersAlive_CT_Count() { return Source2ModSchema.GetArraySize("CCSGameRules", "m_iMatchStats_PlayersAlive_CT"); }
+	public int m_iMatchStats_PlayersAlive_T(int index) { return Source2ModSchema.GetArrayInt(this, "CCSGameRules", "m_iMatchStats_PlayersAlive_T", index); }
+	public void Set_m_iMatchStats_PlayersAlive_T(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSGameRules", "m_iMatchStats_PlayersAlive_T", index, value); }
+	public int m_iMatchStats_PlayersAlive_T_Count() { return Source2ModSchema.GetArraySize("CCSGameRules", "m_iMatchStats_PlayersAlive_T"); }
+	public float m_TeamRespawnWaveTimes(int index) { return Source2ModSchema.GetArrayFloat(this, "CCSGameRules", "m_TeamRespawnWaveTimes", index); }
+	public void Set_m_TeamRespawnWaveTimes(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CCSGameRules", "m_TeamRespawnWaveTimes", index, value); }
+	public int m_TeamRespawnWaveTimes_Count() { return Source2ModSchema.GetArraySize("CCSGameRules", "m_TeamRespawnWaveTimes"); }
+	public float m_flNextRespawnWave(int index) { return Source2ModSchema.GetArrayFloat(this, "CCSGameRules", "m_flNextRespawnWave", index); }
+	public void Set_m_flNextRespawnWave(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CCSGameRules", "m_flNextRespawnWave", index, value); }
+	public int m_flNextRespawnWave_Count() { return Source2ModSchema.GetArraySize("CCSGameRules", "m_flNextRespawnWave"); }
 	public void m_vMinimapMins(float vec[3]) { Source2ModSchema.GetVector(this, "CCSGameRules", "m_vMinimapMins", vec); }
 	public void Set_m_vMinimapMins(const float vec[3]) { Source2ModSchema.SetVector(this, "CCSGameRules", "m_vMinimapMins", vec); }
 	public void m_vMinimapMaxs(float vec[3]) { Source2ModSchema.GetVector(this, "CCSGameRules", "m_vMinimapMaxs", vec); }
 	public void Set_m_vMinimapMaxs(const float vec[3]) { Source2ModSchema.SetVector(this, "CCSGameRules", "m_vMinimapMaxs", vec); }
-	property int m_ullLocalMatchID {
-		public get() { return Source2ModSchema.GetInt(this, "CCSGameRules", "m_ullLocalMatchID"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CCSGameRules", "m_ullLocalMatchID", value); }
-	}
+	public float m_MinimapVerticalSectionHeights(int index) { return Source2ModSchema.GetArrayFloat(this, "CCSGameRules", "m_MinimapVerticalSectionHeights", index); }
+	public void Set_m_MinimapVerticalSectionHeights(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CCSGameRules", "m_MinimapVerticalSectionHeights", index, value); }
+	public int m_MinimapVerticalSectionHeights_Count() { return Source2ModSchema.GetArraySize("CCSGameRules", "m_MinimapVerticalSectionHeights"); }
+	public void m_ullLocalMatchID(int value[2]) { Source2ModSchema.GetInt64(this, "CCSGameRules", "m_ullLocalMatchID", value); }
+	public void Set_m_ullLocalMatchID(const int value[2]) { Source2ModSchema.SetInt64(this, "CCSGameRules", "m_ullLocalMatchID", value); }
+	public int m_nEndMatchMapGroupVoteTypes(int index) { return Source2ModSchema.GetArrayInt(this, "CCSGameRules", "m_nEndMatchMapGroupVoteTypes", index); }
+	public void Set_m_nEndMatchMapGroupVoteTypes(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSGameRules", "m_nEndMatchMapGroupVoteTypes", index, value); }
+	public int m_nEndMatchMapGroupVoteTypes_Count() { return Source2ModSchema.GetArraySize("CCSGameRules", "m_nEndMatchMapGroupVoteTypes"); }
+	public int m_nEndMatchMapGroupVoteOptions(int index) { return Source2ModSchema.GetArrayInt(this, "CCSGameRules", "m_nEndMatchMapGroupVoteOptions", index); }
+	public void Set_m_nEndMatchMapGroupVoteOptions(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSGameRules", "m_nEndMatchMapGroupVoteOptions", index, value); }
+	public int m_nEndMatchMapGroupVoteOptions_Count() { return Source2ModSchema.GetArraySize("CCSGameRules", "m_nEndMatchMapGroupVoteOptions"); }
 	property int m_nEndMatchMapVoteWinner {
 		public get() { return Source2ModSchema.GetInt(this, "CCSGameRules", "m_nEndMatchMapVoteWinner"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSGameRules", "m_nEndMatchMapVoteWinner", value); }
@@ -4089,6 +4151,9 @@ methodmap CCSGameRules < CTeamplayRules
 	property CRetakeGameRules m_RetakeRules {
 		public get() { return view_as<CRetakeGameRules>(Source2ModSchema.GetObject(this, "CCSGameRules", "m_RetakeRules")); }
 	}
+	public bool m_bTeamLastKillUsedUniqueWeaponMatch(int index) { return Source2ModSchema.GetArrayInt(this, "CCSGameRules", "m_bTeamLastKillUsedUniqueWeaponMatch", index) != 0; }
+	public void Set_m_bTeamLastKillUsedUniqueWeaponMatch(int index, bool value) { Source2ModSchema.SetArrayInt(this, "CCSGameRules", "m_bTeamLastKillUsedUniqueWeaponMatch", index, value); }
+	public int m_bTeamLastKillUsedUniqueWeaponMatch_Count() { return Source2ModSchema.GetArraySize("CCSGameRules", "m_bTeamLastKillUsedUniqueWeaponMatch"); }
 	property int m_nMatchEndCount {
 		public get() { return Source2ModSchema.GetInt(this, "CCSGameRules", "m_nMatchEndCount"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSGameRules", "m_nMatchEndCount", value); }
@@ -4366,26 +4431,21 @@ methodmap CPlayer_MovementServices < CPlayerPawnComponent
 	property CInButtonState m_nButtons {
 		public get() { return view_as<CInButtonState>(Source2ModSchema.GetObject(this, "CPlayer_MovementServices", "m_nButtons")); }
 	}
-	property int m_nQueuedButtonDownMask {
-		public get() { return Source2ModSchema.GetInt(this, "CPlayer_MovementServices", "m_nQueuedButtonDownMask"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CPlayer_MovementServices", "m_nQueuedButtonDownMask", value); }
-	}
-	property int m_nQueuedButtonChangeMask {
-		public get() { return Source2ModSchema.GetInt(this, "CPlayer_MovementServices", "m_nQueuedButtonChangeMask"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CPlayer_MovementServices", "m_nQueuedButtonChangeMask", value); }
-	}
-	property int m_nButtonDoublePressed {
-		public get() { return Source2ModSchema.GetInt(this, "CPlayer_MovementServices", "m_nButtonDoublePressed"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CPlayer_MovementServices", "m_nButtonDoublePressed", value); }
-	}
+	public void m_nQueuedButtonDownMask(int value[2]) { Source2ModSchema.GetInt64(this, "CPlayer_MovementServices", "m_nQueuedButtonDownMask", value); }
+	public void Set_m_nQueuedButtonDownMask(const int value[2]) { Source2ModSchema.SetInt64(this, "CPlayer_MovementServices", "m_nQueuedButtonDownMask", value); }
+	public void m_nQueuedButtonChangeMask(int value[2]) { Source2ModSchema.GetInt64(this, "CPlayer_MovementServices", "m_nQueuedButtonChangeMask", value); }
+	public void Set_m_nQueuedButtonChangeMask(const int value[2]) { Source2ModSchema.SetInt64(this, "CPlayer_MovementServices", "m_nQueuedButtonChangeMask", value); }
+	public void m_nButtonDoublePressed(int value[2]) { Source2ModSchema.GetInt64(this, "CPlayer_MovementServices", "m_nButtonDoublePressed", value); }
+	public void Set_m_nButtonDoublePressed(const int value[2]) { Source2ModSchema.SetInt64(this, "CPlayer_MovementServices", "m_nButtonDoublePressed", value); }
+	public int m_pButtonPressedCmdNumber(int index) { return Source2ModSchema.GetArrayInt(this, "CPlayer_MovementServices", "m_pButtonPressedCmdNumber", index); }
+	public void Set_m_pButtonPressedCmdNumber(int index, int value) { Source2ModSchema.SetArrayInt(this, "CPlayer_MovementServices", "m_pButtonPressedCmdNumber", index, value); }
+	public int m_pButtonPressedCmdNumber_Count() { return Source2ModSchema.GetArraySize("CPlayer_MovementServices", "m_pButtonPressedCmdNumber"); }
 	property int m_nLastCommandNumberProcessed {
 		public get() { return Source2ModSchema.GetInt(this, "CPlayer_MovementServices", "m_nLastCommandNumberProcessed"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CPlayer_MovementServices", "m_nLastCommandNumberProcessed", value); }
 	}
-	property int m_nToggleButtonDownMask {
-		public get() { return Source2ModSchema.GetInt(this, "CPlayer_MovementServices", "m_nToggleButtonDownMask"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CPlayer_MovementServices", "m_nToggleButtonDownMask", value); }
-	}
+	public void m_nToggleButtonDownMask(int value[2]) { Source2ModSchema.GetInt64(this, "CPlayer_MovementServices", "m_nToggleButtonDownMask", value); }
+	public void Set_m_nToggleButtonDownMask(const int value[2]) { Source2ModSchema.SetInt64(this, "CPlayer_MovementServices", "m_nToggleButtonDownMask", value); }
 	property float m_flCmdForwardMove {
 		public get() { return Source2ModSchema.GetFloat(this, "CPlayer_MovementServices", "m_flCmdForwardMove"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CPlayer_MovementServices", "m_flCmdForwardMove", value); }
@@ -4402,6 +4462,9 @@ methodmap CPlayer_MovementServices < CPlayerPawnComponent
 		public get() { return Source2ModSchema.GetFloat(this, "CPlayer_MovementServices", "m_flMaxspeed"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CPlayer_MovementServices", "m_flMaxspeed", value); }
 	}
+	public float m_arrForceSubtickMoveWhen(int index) { return Source2ModSchema.GetArrayFloat(this, "CPlayer_MovementServices", "m_arrForceSubtickMoveWhen", index); }
+	public void Set_m_arrForceSubtickMoveWhen(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CPlayer_MovementServices", "m_arrForceSubtickMoveWhen", index, value); }
+	public int m_arrForceSubtickMoveWhen_Count() { return Source2ModSchema.GetArraySize("CPlayer_MovementServices", "m_arrForceSubtickMoveWhen"); }
 	property float m_flForwardMove {
 		public get() { return Source2ModSchema.GetFloat(this, "CPlayer_MovementServices", "m_flForwardMove"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CPlayer_MovementServices", "m_flForwardMove", value); }
@@ -4433,6 +4496,10 @@ methodmap CPlayer_ObserverServices < CPlayerPawnComponent
 	property CBaseEntity m_hObserverTarget {
 		public get() { return view_as<CBaseEntity>(Source2ModSchema.GetHandle(this, "CPlayer_ObserverServices", "m_hObserverTarget")); }
 		public set(CBaseEntity value) { Source2ModSchema.SetHandle(this, "CPlayer_ObserverServices", "m_hObserverTarget", value); }
+	}
+	property int m_iObserverLastMode {
+		public get() { return Source2ModSchema.GetInt(this, "CPlayer_ObserverServices", "m_iObserverLastMode"); }
+		public set(int value) { Source2ModSchema.SetInt(this, "CPlayer_ObserverServices", "m_iObserverLastMode", value); }
 	}
 	property bool m_bForcedObserverMode {
 		public get() { return Source2ModSchema.GetBool(this, "CPlayer_ObserverServices", "m_bForcedObserverMode"); }
@@ -4621,14 +4688,10 @@ methodmap CCSPlayerController < CBasePlayerController
 		public get() { return Source2ModSchema.GetInt(this, "CCSPlayerController", "m_iCoachingTeam"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSPlayerController", "m_iCoachingTeam", value); }
 	}
-	property int m_nPlayerDominated {
-		public get() { return Source2ModSchema.GetInt(this, "CCSPlayerController", "m_nPlayerDominated"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CCSPlayerController", "m_nPlayerDominated", value); }
-	}
-	property int m_nPlayerDominatingMe {
-		public get() { return Source2ModSchema.GetInt(this, "CCSPlayerController", "m_nPlayerDominatingMe"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CCSPlayerController", "m_nPlayerDominatingMe", value); }
-	}
+	public void m_nPlayerDominated(int value[2]) { Source2ModSchema.GetInt64(this, "CCSPlayerController", "m_nPlayerDominated", value); }
+	public void Set_m_nPlayerDominated(const int value[2]) { Source2ModSchema.SetInt64(this, "CCSPlayerController", "m_nPlayerDominated", value); }
+	public void m_nPlayerDominatingMe(int value[2]) { Source2ModSchema.GetInt64(this, "CCSPlayerController", "m_nPlayerDominatingMe", value); }
+	public void Set_m_nPlayerDominatingMe(const int value[2]) { Source2ModSchema.SetInt64(this, "CCSPlayerController", "m_nPlayerDominatingMe", value); }
 	property int m_iCompetitiveRanking {
 		public get() { return Source2ModSchema.GetInt(this, "CCSPlayerController", "m_iCompetitiveRanking"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSPlayerController", "m_iCompetitiveRanking", value); }
@@ -4805,6 +4868,9 @@ methodmap CCSPlayerController < CBasePlayerController
 		public get() { return Source2ModSchema.GetInt(this, "CCSPlayerController", "m_iRoundsWon"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSPlayerController", "m_iRoundsWon", value); }
 	}
+	public int m_recentKillQueue(int index) { return Source2ModSchema.GetArrayInt(this, "CCSPlayerController", "m_recentKillQueue", index); }
+	public void Set_m_recentKillQueue(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSPlayerController", "m_recentKillQueue", index, value); }
+	public int m_recentKillQueue_Count() { return Source2ModSchema.GetArraySize("CCSPlayerController", "m_recentKillQueue"); }
 	property int m_nFirstKill {
 		public get() { return Source2ModSchema.GetInt(this, "CCSPlayerController", "m_nFirstKill"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSPlayerController", "m_nFirstKill", value); }
@@ -4971,6 +5037,9 @@ methodmap CCSPlayerController_InventoryServices < CPlayerControllerComponent
 		public get() { return Source2ModSchema.GetInt(this, "CCSPlayerController_InventoryServices", "m_unMusicID"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSPlayerController_InventoryServices", "m_unMusicID", value); }
 	}
+	public int m_rank(int index) { return Source2ModSchema.GetArrayInt(this, "CCSPlayerController_InventoryServices", "m_rank", index); }
+	public void Set_m_rank(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSPlayerController_InventoryServices", "m_rank", index, value); }
+	public int m_rank_Count() { return Source2ModSchema.GetArraySize("CCSPlayerController_InventoryServices", "m_rank"); }
 	property int m_nPersonaDataPublicLevel {
 		public get() { return Source2ModSchema.GetInt(this, "CCSPlayerController_InventoryServices", "m_nPersonaDataPublicLevel"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSPlayerController_InventoryServices", "m_nPersonaDataPublicLevel", value); }
@@ -4991,10 +5060,11 @@ methodmap CCSPlayerController_InventoryServices < CPlayerControllerComponent
 		public get() { return Source2ModSchema.GetInt(this, "CCSPlayerController_InventoryServices", "m_nPersonaDataXpTrailLevel"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSPlayerController_InventoryServices", "m_nPersonaDataXpTrailLevel", value); }
 	}
-	property int m_unCurrentLoadoutHash {
-		public get() { return Source2ModSchema.GetInt(this, "CCSPlayerController_InventoryServices", "m_unCurrentLoadoutHash"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CCSPlayerController_InventoryServices", "m_unCurrentLoadoutHash", value); }
-	}
+	public int m_unEquippedPlayerSprayIDs(int index) { return Source2ModSchema.GetArrayInt(this, "CCSPlayerController_InventoryServices", "m_unEquippedPlayerSprayIDs", index); }
+	public void Set_m_unEquippedPlayerSprayIDs(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSPlayerController_InventoryServices", "m_unEquippedPlayerSprayIDs", index, value); }
+	public int m_unEquippedPlayerSprayIDs_Count() { return Source2ModSchema.GetArraySize("CCSPlayerController_InventoryServices", "m_unEquippedPlayerSprayIDs"); }
+	public void m_unCurrentLoadoutHash(int value[2]) { Source2ModSchema.GetInt64(this, "CCSPlayerController_InventoryServices", "m_unCurrentLoadoutHash", value); }
+	public void Set_m_unCurrentLoadoutHash(const int value[2]) { Source2ModSchema.SetInt64(this, "CCSPlayerController_InventoryServices", "m_unCurrentLoadoutHash", value); }
 }
 
 methodmap CCSPlayerLegacyJump < SchemaObject
@@ -5388,6 +5458,9 @@ methodmap CCSPlayerPawn < CCSPlayerPawnBase
 	}
 	public void m_vecDeathInfoOrigin(float vec[3]) { Source2ModSchema.GetVector(this, "CCSPlayerPawn", "m_vecDeathInfoOrigin", vec); }
 	public void Set_m_vecDeathInfoOrigin(const float vec[3]) { Source2ModSchema.SetVector(this, "CCSPlayerPawn", "m_vecDeathInfoOrigin", vec); }
+	public int m_vecPlayerPatchEconIndices(int index) { return Source2ModSchema.GetArrayInt(this, "CCSPlayerPawn", "m_vecPlayerPatchEconIndices", index); }
+	public void Set_m_vecPlayerPatchEconIndices(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSPlayerPawn", "m_vecPlayerPatchEconIndices", index, value); }
+	public int m_vecPlayerPatchEconIndices_Count() { return Source2ModSchema.GetArraySize("CCSPlayerPawn", "m_vecPlayerPatchEconIndices"); }
 	public void m_GunGameImmunityColor(int color[4]) { Source2ModSchema.GetColor(this, "CCSPlayerPawn", "m_GunGameImmunityColor", color); }
 	public void Set_m_GunGameImmunityColor(const int color[4]) { Source2ModSchema.SetColor(this, "CCSPlayerPawn", "m_GunGameImmunityColor", color); }
 	property float m_grenadeParameterStashTime {
@@ -5434,10 +5507,28 @@ methodmap CCSPlayerPawn < CCSPlayerPawnBase
 
 methodmap CCSPlayerResource < CBaseEntity
 {
+	public bool m_bHostageAlive(int index) { return Source2ModSchema.GetArrayInt(this, "CCSPlayerResource", "m_bHostageAlive", index) != 0; }
+	public void Set_m_bHostageAlive(int index, bool value) { Source2ModSchema.SetArrayInt(this, "CCSPlayerResource", "m_bHostageAlive", index, value); }
+	public int m_bHostageAlive_Count() { return Source2ModSchema.GetArraySize("CCSPlayerResource", "m_bHostageAlive"); }
+	public bool m_isHostageFollowingSomeone(int index) { return Source2ModSchema.GetArrayInt(this, "CCSPlayerResource", "m_isHostageFollowingSomeone", index) != 0; }
+	public void Set_m_isHostageFollowingSomeone(int index, bool value) { Source2ModSchema.SetArrayInt(this, "CCSPlayerResource", "m_isHostageFollowingSomeone", index, value); }
+	public int m_isHostageFollowingSomeone_Count() { return Source2ModSchema.GetArraySize("CCSPlayerResource", "m_isHostageFollowingSomeone"); }
+	public int m_iHostageEntityIDs(int index) { return Source2ModSchema.GetArrayInt(this, "CCSPlayerResource", "m_iHostageEntityIDs", index); }
+	public void Set_m_iHostageEntityIDs(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSPlayerResource", "m_iHostageEntityIDs", index, value); }
+	public int m_iHostageEntityIDs_Count() { return Source2ModSchema.GetArraySize("CCSPlayerResource", "m_iHostageEntityIDs"); }
 	public void m_bombsiteCenterA(float vec[3]) { Source2ModSchema.GetVector(this, "CCSPlayerResource", "m_bombsiteCenterA", vec); }
 	public void Set_m_bombsiteCenterA(const float vec[3]) { Source2ModSchema.SetVector(this, "CCSPlayerResource", "m_bombsiteCenterA", vec); }
 	public void m_bombsiteCenterB(float vec[3]) { Source2ModSchema.GetVector(this, "CCSPlayerResource", "m_bombsiteCenterB", vec); }
 	public void Set_m_bombsiteCenterB(const float vec[3]) { Source2ModSchema.SetVector(this, "CCSPlayerResource", "m_bombsiteCenterB", vec); }
+	public int m_hostageRescueX(int index) { return Source2ModSchema.GetArrayInt(this, "CCSPlayerResource", "m_hostageRescueX", index); }
+	public void Set_m_hostageRescueX(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSPlayerResource", "m_hostageRescueX", index, value); }
+	public int m_hostageRescueX_Count() { return Source2ModSchema.GetArraySize("CCSPlayerResource", "m_hostageRescueX"); }
+	public int m_hostageRescueY(int index) { return Source2ModSchema.GetArrayInt(this, "CCSPlayerResource", "m_hostageRescueY", index); }
+	public void Set_m_hostageRescueY(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSPlayerResource", "m_hostageRescueY", index, value); }
+	public int m_hostageRescueY_Count() { return Source2ModSchema.GetArraySize("CCSPlayerResource", "m_hostageRescueY"); }
+	public int m_hostageRescueZ(int index) { return Source2ModSchema.GetArrayInt(this, "CCSPlayerResource", "m_hostageRescueZ", index); }
+	public void Set_m_hostageRescueZ(int index, int value) { Source2ModSchema.SetArrayInt(this, "CCSPlayerResource", "m_hostageRescueZ", index, value); }
+	public int m_hostageRescueZ_Count() { return Source2ModSchema.GetArraySize("CCSPlayerResource", "m_hostageRescueZ"); }
 	property bool m_bEndMatchNextMapAllVoted {
 		public get() { return Source2ModSchema.GetBool(this, "CCSPlayerResource", "m_bEndMatchNextMapAllVoted"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSPlayerResource", "m_bEndMatchNextMapAllVoted", value); }
@@ -5558,6 +5649,9 @@ methodmap CPlayer_MovementServices_Humanoid < CPlayer_MovementServices
 		public get() { return Source2ModSchema.GetFloat(this, "CPlayer_MovementServices_Humanoid", "m_flSurfaceFriction"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CPlayer_MovementServices_Humanoid", "m_flSurfaceFriction", value); }
 	}
+	public int m_surfaceProps(int index) { return Source2ModSchema.GetArrayInt(this, "CPlayer_MovementServices_Humanoid", "m_surfaceProps", index); }
+	public void Set_m_surfaceProps(int index, int value) { Source2ModSchema.SetArrayInt(this, "CPlayer_MovementServices_Humanoid", "m_surfaceProps", index, value); }
+	public int m_surfaceProps_Count() { return Source2ModSchema.GetArraySize("CPlayer_MovementServices_Humanoid", "m_surfaceProps"); }
 	property int m_nStepside {
 		public get() { return Source2ModSchema.GetInt(this, "CPlayer_MovementServices_Humanoid", "m_nStepside"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CPlayer_MovementServices_Humanoid", "m_nStepside", value); }
@@ -5753,6 +5847,9 @@ methodmap CCSPlayer_MovementServices < CPlayer_MovementServices_Humanoid
 
 methodmap CCSPlayer_PingServices < CPlayerPawnComponent
 {
+	public float m_flPlayerPingTokens(int index) { return Source2ModSchema.GetArrayFloat(this, "CCSPlayer_PingServices", "m_flPlayerPingTokens", index); }
+	public void Set_m_flPlayerPingTokens(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CCSPlayer_PingServices", "m_flPlayerPingTokens", index, value); }
+	public int m_flPlayerPingTokens_Count() { return Source2ModSchema.GetArraySize("CCSPlayer_PingServices", "m_flPlayerPingTokens"); }
 	property CPlayerPing m_hPlayerPing {
 		public get() { return view_as<CPlayerPing>(Source2ModSchema.GetHandle(this, "CCSPlayer_PingServices", "m_hPlayerPing")); }
 		public set(CPlayerPing value) { Source2ModSchema.SetHandle(this, "CCSPlayer_PingServices", "m_hPlayerPing", value); }
@@ -5773,6 +5870,9 @@ methodmap CCSPlayer_RadioServices < CPlayerPawnComponent
 		public get() { return Source2ModSchema.GetFloat(this, "CCSPlayer_RadioServices", "m_flC4PlantTalkTimer"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CCSPlayer_RadioServices", "m_flC4PlantTalkTimer", value); }
 	}
+	public float m_flRadioTokenSlots(int index) { return Source2ModSchema.GetArrayFloat(this, "CCSPlayer_RadioServices", "m_flRadioTokenSlots", index); }
+	public void Set_m_flRadioTokenSlots(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CCSPlayer_RadioServices", "m_flRadioTokenSlots", index, value); }
+	public int m_flRadioTokenSlots_Count() { return Source2ModSchema.GetArraySize("CCSPlayer_RadioServices", "m_flRadioTokenSlots"); }
 	property bool m_bIgnoreRadio {
 		public get() { return Source2ModSchema.GetBool(this, "CCSPlayer_RadioServices", "m_bIgnoreRadio"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSPlayer_RadioServices", "m_bIgnoreRadio", value); }
@@ -5835,6 +5935,9 @@ methodmap CPlayer_WeaponServices < CPlayerPawnComponent
 		public get() { return view_as<CBasePlayerWeapon>(Source2ModSchema.GetHandle(this, "CPlayer_WeaponServices", "m_hLastWeapon")); }
 		public set(CBasePlayerWeapon value) { Source2ModSchema.SetHandle(this, "CPlayer_WeaponServices", "m_hLastWeapon", value); }
 	}
+	public int m_iAmmo(int index) { return Source2ModSchema.GetArrayInt(this, "CPlayer_WeaponServices", "m_iAmmo", index); }
+	public void Set_m_iAmmo(int index, int value) { Source2ModSchema.SetArrayInt(this, "CPlayer_WeaponServices", "m_iAmmo", index, value); }
+	public int m_iAmmo_Count() { return Source2ModSchema.GetArraySize("CPlayer_WeaponServices", "m_iAmmo"); }
 	property bool m_bPreventWeaponPickup {
 		public get() { return Source2ModSchema.GetBool(this, "CPlayer_WeaponServices", "m_bPreventWeaponPickup"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CPlayer_WeaponServices", "m_bPreventWeaponPickup", value); }
@@ -6759,14 +6862,10 @@ methodmap CDamageRecord < SchemaObject
 	}
 	public int m_szPlayerDamagerName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CDamageRecord", "m_szPlayerDamagerName", buffer, maxlen); }
 	public int m_szPlayerRecipientName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CDamageRecord", "m_szPlayerRecipientName", buffer, maxlen); }
-	property int m_DamagerXuid {
-		public get() { return Source2ModSchema.GetInt(this, "CDamageRecord", "m_DamagerXuid"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CDamageRecord", "m_DamagerXuid", value); }
-	}
-	property int m_RecipientXuid {
-		public get() { return Source2ModSchema.GetInt(this, "CDamageRecord", "m_RecipientXuid"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CDamageRecord", "m_RecipientXuid", value); }
-	}
+	public void m_DamagerXuid(int value[2]) { Source2ModSchema.GetInt64(this, "CDamageRecord", "m_DamagerXuid", value); }
+	public void Set_m_DamagerXuid(const int value[2]) { Source2ModSchema.SetInt64(this, "CDamageRecord", "m_DamagerXuid", value); }
+	public void m_RecipientXuid(int value[2]) { Source2ModSchema.GetInt64(this, "CDamageRecord", "m_RecipientXuid", value); }
+	public void Set_m_RecipientXuid(const int value[2]) { Source2ModSchema.SetInt64(this, "CDamageRecord", "m_RecipientXuid", value); }
 	property float m_flBulletsDamage {
 		public get() { return Source2ModSchema.GetFloat(this, "CDamageRecord", "m_flBulletsDamage"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CDamageRecord", "m_flBulletsDamage", value); }
@@ -6973,10 +7072,8 @@ methodmap CEconItemView < IEconItemInterface
 		public get() { return Source2ModSchema.GetInt(this, "CEconItemView", "m_iEntityLevel"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CEconItemView", "m_iEntityLevel", value); }
 	}
-	property int m_iItemID {
-		public get() { return Source2ModSchema.GetInt(this, "CEconItemView", "m_iItemID"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CEconItemView", "m_iItemID", value); }
-	}
+	public void m_iItemID(int value[2]) { Source2ModSchema.GetInt64(this, "CEconItemView", "m_iItemID", value); }
+	public void Set_m_iItemID(const int value[2]) { Source2ModSchema.SetInt64(this, "CEconItemView", "m_iItemID", value); }
 	property int m_iItemIDHigh {
 		public get() { return Source2ModSchema.GetInt(this, "CEconItemView", "m_iItemIDHigh"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CEconItemView", "m_iItemIDHigh", value); }
@@ -7070,6 +7167,10 @@ methodmap CEntityDissolve < CBaseModelEntity
 	property float m_flStartTime {
 		public get() { return Source2ModSchema.GetFloat(this, "CEntityDissolve", "m_flStartTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CEntityDissolve", "m_flStartTime", value); }
+	}
+	property int m_nDissolveType {
+		public get() { return Source2ModSchema.GetInt(this, "CEntityDissolve", "m_nDissolveType"); }
+		public set(int value) { Source2ModSchema.SetInt(this, "CEntityDissolve", "m_nDissolveType", value); }
 	}
 	public void m_vDissolverOrigin(float vec[3]) { Source2ModSchema.GetVector(this, "CEntityDissolve", "m_vDissolverOrigin", vec); }
 	public void Set_m_vDissolverOrigin(const float vec[3]) { Source2ModSchema.SetVector(this, "CEntityDissolve", "m_vDissolverOrigin", vec); }
@@ -7813,6 +7914,15 @@ methodmap CParticleSystem < CBaseModelEntity
 		public get() { return Source2ModSchema.GetFloat(this, "CParticleSystem", "m_flPreSimTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CParticleSystem", "m_flPreSimTime", value); }
 	}
+	public void m_vServerControlPoints(int index, float vec[3]) { Source2ModSchema.GetArrayVector(this, "CParticleSystem", "m_vServerControlPoints", index, vec); }
+	public void Set_m_vServerControlPoints(int index, const float vec[3]) { Source2ModSchema.SetArrayVector(this, "CParticleSystem", "m_vServerControlPoints", index, vec); }
+	public int m_vServerControlPoints_Count() { return Source2ModSchema.GetArraySize("CParticleSystem", "m_vServerControlPoints"); }
+	public int m_iServerControlPointAssignments(int index) { return Source2ModSchema.GetArrayInt(this, "CParticleSystem", "m_iServerControlPointAssignments", index); }
+	public void Set_m_iServerControlPointAssignments(int index, int value) { Source2ModSchema.SetArrayInt(this, "CParticleSystem", "m_iServerControlPointAssignments", index, value); }
+	public int m_iServerControlPointAssignments_Count() { return Source2ModSchema.GetArraySize("CParticleSystem", "m_iServerControlPointAssignments"); }
+	public CBaseEntity m_hControlPointEnts(int index) { return view_as<CBaseEntity>(Source2ModSchema.GetArrayHandle(this, "CParticleSystem", "m_hControlPointEnts", index)); }
+	public void Set_m_hControlPointEnts(int index, CEntityInstance value) { Source2ModSchema.SetArrayHandle(this, "CParticleSystem", "m_hControlPointEnts", index, value); }
+	public int m_hControlPointEnts_Count() { return Source2ModSchema.GetArraySize("CParticleSystem", "m_hControlPointEnts"); }
 	property bool m_bDataStringLocalized {
 		public get() { return Source2ModSchema.GetBool(this, "CParticleSystem", "m_bDataStringLocalized"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CParticleSystem", "m_bDataStringLocalized", value); }
@@ -7835,6 +7945,8 @@ methodmap CParticleSystem < CBaseModelEntity
 		public set(bool value) { Source2ModSchema.SetBool(this, "CParticleSystem", "m_bStartActive", value); }
 	}
 	public int m_iszEffectName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CParticleSystem", "m_iszEffectName", buffer, maxlen); }
+	public int m_iszControlPointNames(int index, char[] buffer, int maxlen) { return Source2ModSchema.GetArrayString(this, "CParticleSystem", "m_iszControlPointNames", index, buffer, maxlen); }
+	public int m_iszControlPointNames_Count() { return Source2ModSchema.GetArraySize("CParticleSystem", "m_iszControlPointNames"); }
 	property int m_nDataCP {
 		public get() { return Source2ModSchema.GetInt(this, "CParticleSystem", "m_nDataCP"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CParticleSystem", "m_nDataCP", value); }
@@ -7966,6 +8078,8 @@ methodmap CEnvSoundscape < CBaseEntity
 		public get() { return Source2ModSchema.GetInt(this, "CEnvSoundscape", "m_soundscapeEntityListId"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CEnvSoundscape", "m_soundscapeEntityListId", value); }
 	}
+	public int m_positionNames(int index, char[] buffer, int maxlen) { return Source2ModSchema.GetArrayString(this, "CEnvSoundscape", "m_positionNames", index, buffer, maxlen); }
+	public int m_positionNames_Count() { return Source2ModSchema.GetArraySize("CEnvSoundscape", "m_positionNames"); }
 	property CEnvSoundscape m_hProxySoundscape {
 		public get() { return view_as<CEnvSoundscape>(Source2ModSchema.GetHandle(this, "CEnvSoundscape", "m_hProxySoundscape")); }
 		public set(CEnvSoundscape value) { Source2ModSchema.SetHandle(this, "CEnvSoundscape", "m_hProxySoundscape", value); }
@@ -8429,6 +8543,11 @@ methodmap CFilterMultiple < CBaseFilter
 		public get() { return Source2ModSchema.GetInt(this, "CFilterMultiple", "m_nFilterType"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CFilterMultiple", "m_nFilterType", value); }
 	}
+	public int m_iFilterName(int index, char[] buffer, int maxlen) { return Source2ModSchema.GetArrayString(this, "CFilterMultiple", "m_iFilterName", index, buffer, maxlen); }
+	public int m_iFilterName_Count() { return Source2ModSchema.GetArraySize("CFilterMultiple", "m_iFilterName"); }
+	public CBaseEntity m_hFilter(int index) { return view_as<CBaseEntity>(Source2ModSchema.GetArrayHandle(this, "CFilterMultiple", "m_hFilter", index)); }
+	public void Set_m_hFilter(int index, CEntityInstance value) { Source2ModSchema.SetArrayHandle(this, "CFilterMultiple", "m_hFilter", index, value); }
+	public int m_hFilter_Count() { return Source2ModSchema.GetArraySize("CFilterMultiple", "m_hFilter"); }
 }
 
 methodmap CFilterName < CBaseFilter
@@ -8454,6 +8573,18 @@ methodmap CFilterTeam < CBaseFilter
 
 methodmap CInferno < CBaseModelEntity
 {
+	public void m_firePositions(int index, float vec[3]) { Source2ModSchema.GetArrayVector(this, "CInferno", "m_firePositions", index, vec); }
+	public void Set_m_firePositions(int index, const float vec[3]) { Source2ModSchema.SetArrayVector(this, "CInferno", "m_firePositions", index, vec); }
+	public int m_firePositions_Count() { return Source2ModSchema.GetArraySize("CInferno", "m_firePositions"); }
+	public void m_fireParentPositions(int index, float vec[3]) { Source2ModSchema.GetArrayVector(this, "CInferno", "m_fireParentPositions", index, vec); }
+	public void Set_m_fireParentPositions(int index, const float vec[3]) { Source2ModSchema.SetArrayVector(this, "CInferno", "m_fireParentPositions", index, vec); }
+	public int m_fireParentPositions_Count() { return Source2ModSchema.GetArraySize("CInferno", "m_fireParentPositions"); }
+	public bool m_bFireIsBurning(int index) { return Source2ModSchema.GetArrayInt(this, "CInferno", "m_bFireIsBurning", index) != 0; }
+	public void Set_m_bFireIsBurning(int index, bool value) { Source2ModSchema.SetArrayInt(this, "CInferno", "m_bFireIsBurning", index, value); }
+	public int m_bFireIsBurning_Count() { return Source2ModSchema.GetArraySize("CInferno", "m_bFireIsBurning"); }
+	public void m_BurnNormal(int index, float vec[3]) { Source2ModSchema.GetArrayVector(this, "CInferno", "m_BurnNormal", index, vec); }
+	public void Set_m_BurnNormal(int index, const float vec[3]) { Source2ModSchema.SetArrayVector(this, "CInferno", "m_BurnNormal", index, vec); }
+	public int m_BurnNormal_Count() { return Source2ModSchema.GetArraySize("CInferno", "m_BurnNormal"); }
 	property int m_fireCount {
 		public get() { return Source2ModSchema.GetInt(this, "CInferno", "m_fireCount"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CInferno", "m_fireCount", value); }
@@ -8528,10 +8659,16 @@ methodmap CFireCrackerBlast < CInferno
 
 methodmap CFiringModeFloat < SchemaObject
 {
+	public float m_flValues(int index) { return Source2ModSchema.GetArrayFloat(this, "CFiringModeFloat", "m_flValues", index); }
+	public void Set_m_flValues(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CFiringModeFloat", "m_flValues", index, value); }
+	public int m_flValues_Count() { return Source2ModSchema.GetArraySize("CFiringModeFloat", "m_flValues"); }
 }
 
 methodmap CFiringModeInt < SchemaObject
 {
+	public int m_nValues(int index) { return Source2ModSchema.GetArrayInt(this, "CFiringModeInt", "m_nValues", index); }
+	public void Set_m_nValues(int index, int value) { Source2ModSchema.SetArrayInt(this, "CFiringModeInt", "m_nValues", index, value); }
+	public int m_nValues_Count() { return Source2ModSchema.GetArraySize("CFiringModeInt", "m_nValues"); }
 }
 
 methodmap CFish < CBaseAnimGraph
@@ -9891,6 +10028,12 @@ methodmap CGameSceneNode < SchemaObject
 		public get() { return Source2ModSchema.GetInt(this, "CGameSceneNode", "m_nDoNotSetAnimTimeInInvalidatePhysicsCount"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CGameSceneNode", "m_nDoNotSetAnimTimeInInvalidatePhysicsCount", value); }
 	}
+	public int m_name(int index) { return Source2ModSchema.GetArrayInt(this, "CGameSceneNode", "m_name", index); }
+	public void Set_m_name(int index, int value) { Source2ModSchema.SetArrayInt(this, "CGameSceneNode", "m_name", index, value); }
+	public int m_name_Count() { return Source2ModSchema.GetArraySize("CGameSceneNode", "m_name"); }
+	public int m_hierarchyAttachName(int index) { return Source2ModSchema.GetArrayInt(this, "CGameSceneNode", "m_hierarchyAttachName", index); }
+	public void Set_m_hierarchyAttachName(int index, int value) { Source2ModSchema.SetArrayInt(this, "CGameSceneNode", "m_hierarchyAttachName", index, value); }
+	public int m_hierarchyAttachName_Count() { return Source2ModSchema.GetArraySize("CGameSceneNode", "m_hierarchyAttachName"); }
 	property float m_flClientLocalScale {
 		public get() { return Source2ModSchema.GetFloat(this, "CGameSceneNode", "m_flClientLocalScale"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CGameSceneNode", "m_flClientLocalScale", value); }
@@ -10447,6 +10590,9 @@ methodmap CHostageRescueZone < CHostageRescueZoneShim
 
 methodmap CInButtonState < SchemaObject
 {
+	public void m_pButtonStates(int index, int value[2]) { Source2ModSchema.GetArrayInt64(this, "CInButtonState", "m_pButtonStates", index, value); }
+	public void Set_m_pButtonStates(int index, const int value[2]) { Source2ModSchema.SetArrayInt64(this, "CInButtonState", "m_pButtonStates", index, value); }
+	public int m_pButtonStates_Count() { return Source2ModSchema.GetArraySize("CInButtonState", "m_pButtonStates"); }
 }
 
 methodmap CMolotovGrenade < CBaseCSGrenade
@@ -11523,6 +11669,8 @@ methodmap CLogicBranch < CLogicalEntity
 
 methodmap CLogicBranchList < CLogicalEntity
 {
+	public int m_nLogicBranchNames(int index, char[] buffer, int maxlen) { return Source2ModSchema.GetArrayString(this, "CLogicBranchList", "m_nLogicBranchNames", index, buffer, maxlen); }
+	public int m_nLogicBranchNames_Count() { return Source2ModSchema.GetArraySize("CLogicBranchList", "m_nLogicBranchNames"); }
 	property int m_eLastState {
 		public get() { return Source2ModSchema.GetInt(this, "CLogicBranchList", "m_eLastState"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CLogicBranchList", "m_eLastState", value); }
@@ -11531,6 +11679,8 @@ methodmap CLogicBranchList < CLogicalEntity
 
 methodmap CLogicCase < CLogicalEntity
 {
+	public int m_nCase(int index, char[] buffer, int maxlen) { return Source2ModSchema.GetArrayString(this, "CLogicCase", "m_nCase", index, buffer, maxlen); }
+	public int m_nCase_Count() { return Source2ModSchema.GetArraySize("CLogicCase", "m_nCase"); }
 	property int m_nShuffleCases {
 		public get() { return Source2ModSchema.GetInt(this, "CLogicCase", "m_nShuffleCases"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CLogicCase", "m_nShuffleCases", value); }
@@ -11539,6 +11689,9 @@ methodmap CLogicCase < CLogicalEntity
 		public get() { return Source2ModSchema.GetInt(this, "CLogicCase", "m_nLastShuffleCase"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CLogicCase", "m_nLastShuffleCase", value); }
 	}
+	public int m_uchShuffleCaseMap(int index) { return Source2ModSchema.GetArrayInt(this, "CLogicCase", "m_uchShuffleCaseMap", index); }
+	public void Set_m_uchShuffleCaseMap(int index, int value) { Source2ModSchema.SetArrayInt(this, "CLogicCase", "m_uchShuffleCaseMap", index, value); }
+	public int m_uchShuffleCaseMap_Count() { return Source2ModSchema.GetArraySize("CLogicCase", "m_uchShuffleCaseMap"); }
 }
 
 methodmap CLogicCollisionPair < CLogicalEntity
@@ -11973,6 +12126,36 @@ methodmap CMapVetoPickController < CBaseEntity
 		public get() { return Source2ModSchema.GetInt(this, "CMapVetoPickController", "m_nTeamWinningCoinToss"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CMapVetoPickController", "m_nTeamWinningCoinToss", value); }
 	}
+	public int m_nTeamWithFirstChoice(int index) { return Source2ModSchema.GetArrayInt(this, "CMapVetoPickController", "m_nTeamWithFirstChoice", index); }
+	public void Set_m_nTeamWithFirstChoice(int index, int value) { Source2ModSchema.SetArrayInt(this, "CMapVetoPickController", "m_nTeamWithFirstChoice", index, value); }
+	public int m_nTeamWithFirstChoice_Count() { return Source2ModSchema.GetArraySize("CMapVetoPickController", "m_nTeamWithFirstChoice"); }
+	public int m_nVoteMapIdsList(int index) { return Source2ModSchema.GetArrayInt(this, "CMapVetoPickController", "m_nVoteMapIdsList", index); }
+	public void Set_m_nVoteMapIdsList(int index, int value) { Source2ModSchema.SetArrayInt(this, "CMapVetoPickController", "m_nVoteMapIdsList", index, value); }
+	public int m_nVoteMapIdsList_Count() { return Source2ModSchema.GetArraySize("CMapVetoPickController", "m_nVoteMapIdsList"); }
+	public int m_nAccountIDs(int index) { return Source2ModSchema.GetArrayInt(this, "CMapVetoPickController", "m_nAccountIDs", index); }
+	public void Set_m_nAccountIDs(int index, int value) { Source2ModSchema.SetArrayInt(this, "CMapVetoPickController", "m_nAccountIDs", index, value); }
+	public int m_nAccountIDs_Count() { return Source2ModSchema.GetArraySize("CMapVetoPickController", "m_nAccountIDs"); }
+	public int m_nMapId0(int index) { return Source2ModSchema.GetArrayInt(this, "CMapVetoPickController", "m_nMapId0", index); }
+	public void Set_m_nMapId0(int index, int value) { Source2ModSchema.SetArrayInt(this, "CMapVetoPickController", "m_nMapId0", index, value); }
+	public int m_nMapId0_Count() { return Source2ModSchema.GetArraySize("CMapVetoPickController", "m_nMapId0"); }
+	public int m_nMapId1(int index) { return Source2ModSchema.GetArrayInt(this, "CMapVetoPickController", "m_nMapId1", index); }
+	public void Set_m_nMapId1(int index, int value) { Source2ModSchema.SetArrayInt(this, "CMapVetoPickController", "m_nMapId1", index, value); }
+	public int m_nMapId1_Count() { return Source2ModSchema.GetArraySize("CMapVetoPickController", "m_nMapId1"); }
+	public int m_nMapId2(int index) { return Source2ModSchema.GetArrayInt(this, "CMapVetoPickController", "m_nMapId2", index); }
+	public void Set_m_nMapId2(int index, int value) { Source2ModSchema.SetArrayInt(this, "CMapVetoPickController", "m_nMapId2", index, value); }
+	public int m_nMapId2_Count() { return Source2ModSchema.GetArraySize("CMapVetoPickController", "m_nMapId2"); }
+	public int m_nMapId3(int index) { return Source2ModSchema.GetArrayInt(this, "CMapVetoPickController", "m_nMapId3", index); }
+	public void Set_m_nMapId3(int index, int value) { Source2ModSchema.SetArrayInt(this, "CMapVetoPickController", "m_nMapId3", index, value); }
+	public int m_nMapId3_Count() { return Source2ModSchema.GetArraySize("CMapVetoPickController", "m_nMapId3"); }
+	public int m_nMapId4(int index) { return Source2ModSchema.GetArrayInt(this, "CMapVetoPickController", "m_nMapId4", index); }
+	public void Set_m_nMapId4(int index, int value) { Source2ModSchema.SetArrayInt(this, "CMapVetoPickController", "m_nMapId4", index, value); }
+	public int m_nMapId4_Count() { return Source2ModSchema.GetArraySize("CMapVetoPickController", "m_nMapId4"); }
+	public int m_nMapId5(int index) { return Source2ModSchema.GetArrayInt(this, "CMapVetoPickController", "m_nMapId5", index); }
+	public void Set_m_nMapId5(int index, int value) { Source2ModSchema.SetArrayInt(this, "CMapVetoPickController", "m_nMapId5", index, value); }
+	public int m_nMapId5_Count() { return Source2ModSchema.GetArraySize("CMapVetoPickController", "m_nMapId5"); }
+	public int m_nStartingSide0(int index) { return Source2ModSchema.GetArrayInt(this, "CMapVetoPickController", "m_nStartingSide0", index); }
+	public void Set_m_nStartingSide0(int index, int value) { Source2ModSchema.SetArrayInt(this, "CMapVetoPickController", "m_nStartingSide0", index, value); }
+	public int m_nStartingSide0_Count() { return Source2ModSchema.GetArraySize("CMapVetoPickController", "m_nStartingSide0"); }
 	property int m_nCurrentPhase {
 		public get() { return Source2ModSchema.GetInt(this, "CMapVetoPickController", "m_nCurrentPhase"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CMapVetoPickController", "m_nCurrentPhase", value); }
@@ -12195,10 +12378,8 @@ methodmap CModelState < SchemaObject
 		public get() { return Source2ModSchema.GetInt(this, "CModelState", "m_nAnimStateNoInterpSerialNumber"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CModelState", "m_nAnimStateNoInterpSerialNumber", value); }
 	}
-	property int m_MeshGroupMask {
-		public get() { return Source2ModSchema.GetInt(this, "CModelState", "m_MeshGroupMask"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "CModelState", "m_MeshGroupMask", value); }
-	}
+	public void m_MeshGroupMask(int value[2]) { Source2ModSchema.GetInt64(this, "CModelState", "m_MeshGroupMask", value); }
+	public void Set_m_MeshGroupMask(const int value[2]) { Source2ModSchema.SetInt64(this, "CModelState", "m_MeshGroupMask", value); }
 	property int m_nIdealMotionType {
 		public get() { return Source2ModSchema.GetInt(this, "CModelState", "m_nIdealMotionType"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CModelState", "m_nIdealMotionType", value); }
@@ -12349,6 +12530,12 @@ methodmap CMultiLightProxy < CLogicalEntity
 
 methodmap CMultiSource < CLogicalEntity
 {
+	public CBaseEntity m_rgEntities(int index) { return view_as<CBaseEntity>(Source2ModSchema.GetArrayHandle(this, "CMultiSource", "m_rgEntities", index)); }
+	public void Set_m_rgEntities(int index, CEntityInstance value) { Source2ModSchema.SetArrayHandle(this, "CMultiSource", "m_rgEntities", index, value); }
+	public int m_rgEntities_Count() { return Source2ModSchema.GetArraySize("CMultiSource", "m_rgEntities"); }
+	public int m_rgTriggered(int index) { return Source2ModSchema.GetArrayInt(this, "CMultiSource", "m_rgTriggered", index); }
+	public void Set_m_rgTriggered(int index, int value) { Source2ModSchema.SetArrayInt(this, "CMultiSource", "m_rgTriggered", index, value); }
+	public int m_rgTriggered_Count() { return Source2ModSchema.GetArraySize("CMultiSource", "m_rgTriggered"); }
 	property int m_iTotal {
 		public get() { return Source2ModSchema.GetInt(this, "CMultiSource", "m_iTotal"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CMultiSource", "m_iTotal", value); }
@@ -12679,6 +12866,14 @@ methodmap CPathMoverEntitySpawner < CLogicalEntity
 		public get() { return Source2ModSchema.GetInt(this, "CPathMoverEntitySpawner", "m_eTemplateChoiceStrategy"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CPathMoverEntitySpawner", "m_eTemplateChoiceStrategy", value); }
 	}
+	public int m_szSpawnTemplates(int index, char[] buffer, int maxlen) { return Source2ModSchema.GetArrayString(this, "CPathMoverEntitySpawner", "m_szSpawnTemplates", index, buffer, maxlen); }
+	public int m_szSpawnTemplates_Count() { return Source2ModSchema.GetArraySize("CPathMoverEntitySpawner", "m_szSpawnTemplates"); }
+	public int m_szSpawnTemplateParams(int index) { return Source2ModSchema.GetArrayInt(this, "CPathMoverEntitySpawner", "m_szSpawnTemplateParams", index); }
+	public void Set_m_szSpawnTemplateParams(int index, int value) { Source2ModSchema.SetArrayInt(this, "CPathMoverEntitySpawner", "m_szSpawnTemplateParams", index, value); }
+	public int m_szSpawnTemplateParams_Count() { return Source2ModSchema.GetArraySize("CPathMoverEntitySpawner", "m_szSpawnTemplateParams"); }
+	public int m_szSpawnTemplateCount(int index) { return Source2ModSchema.GetArrayInt(this, "CPathMoverEntitySpawner", "m_szSpawnTemplateCount", index); }
+	public void Set_m_szSpawnTemplateCount(int index, int value) { Source2ModSchema.SetArrayInt(this, "CPathMoverEntitySpawner", "m_szSpawnTemplateCount", index, value); }
+	public int m_szSpawnTemplateCount_Count() { return Source2ModSchema.GetArraySize("CPathMoverEntitySpawner", "m_szSpawnTemplateCount"); }
 	property int m_nSpawnIndex {
 		public get() { return Source2ModSchema.GetInt(this, "CPathMoverEntitySpawner", "m_nSpawnIndex"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CPathMoverEntitySpawner", "m_nSpawnIndex", value); }
@@ -13050,6 +13245,9 @@ methodmap CPhysImpact < CPointEntity
 
 methodmap CPhysLength < CPhysConstraint
 {
+	public void m_offset(int index, float vec[3]) { Source2ModSchema.GetArrayVector(this, "CPhysLength", "m_offset", index, vec); }
+	public void Set_m_offset(int index, const float vec[3]) { Source2ModSchema.SetArrayVector(this, "CPhysLength", "m_offset", index, vec); }
+	public int m_offset_Count() { return Source2ModSchema.GetArraySize("CPhysLength", "m_offset"); }
 	public void m_vecAttach(float vec[3]) { Source2ModSchema.GetVector(this, "CPhysLength", "m_vecAttach", vec); }
 	public void Set_m_vecAttach(const float vec[3]) { Source2ModSchema.SetVector(this, "CPhysLength", "m_vecAttach", vec); }
 	property float m_addLength {
@@ -13165,6 +13363,9 @@ methodmap CPhysPulley < CPhysConstraint
 {
 	public void m_position2(float vec[3]) { Source2ModSchema.GetVector(this, "CPhysPulley", "m_position2", vec); }
 	public void Set_m_position2(const float vec[3]) { Source2ModSchema.SetVector(this, "CPhysPulley", "m_position2", vec); }
+	public void m_offset(int index, float vec[3]) { Source2ModSchema.GetArrayVector(this, "CPhysPulley", "m_offset", index, vec); }
+	public void Set_m_offset(int index, const float vec[3]) { Source2ModSchema.SetArrayVector(this, "CPhysPulley", "m_offset", index, vec); }
+	public int m_offset_Count() { return Source2ModSchema.GetArraySize("CPhysPulley", "m_offset"); }
 	property float m_addLength {
 		public get() { return Source2ModSchema.GetFloat(this, "CPhysPulley", "m_addLength"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CPhysPulley", "m_addLength", value); }
@@ -13416,6 +13617,11 @@ methodmap CPhysicsProp < CBreakableProp
 		public get() { return Source2ModSchema.GetInt(this, "CPhysicsProp", "m_CrateType"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CPhysicsProp", "m_CrateType", value); }
 	}
+	public int m_strItemClass(int index, char[] buffer, int maxlen) { return Source2ModSchema.GetArrayString(this, "CPhysicsProp", "m_strItemClass", index, buffer, maxlen); }
+	public int m_strItemClass_Count() { return Source2ModSchema.GetArraySize("CPhysicsProp", "m_strItemClass"); }
+	public int m_nItemCount(int index) { return Source2ModSchema.GetArrayInt(this, "CPhysicsProp", "m_nItemCount", index); }
+	public void Set_m_nItemCount(int index, int value) { Source2ModSchema.SetArrayInt(this, "CPhysicsProp", "m_nItemCount", index, value); }
+	public int m_nItemCount_Count() { return Source2ModSchema.GetArraySize("CPhysicsProp", "m_nItemCount"); }
 	property bool m_bRemovableForAmmoBalancing {
 		public get() { return Source2ModSchema.GetBool(this, "CPhysicsProp", "m_bRemovableForAmmoBalancing"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CPhysicsProp", "m_bRemovableForAmmoBalancing", value); }
@@ -13577,6 +13783,9 @@ methodmap CPlantedC4 < CBaseAnimGraph
 		public get() { return Source2ModSchema.GetBool(this, "CPlantedC4", "m_bVoiceAlertFired"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CPlantedC4", "m_bVoiceAlertFired", value); }
 	}
+	public bool m_bVoiceAlertPlayed(int index) { return Source2ModSchema.GetArrayInt(this, "CPlantedC4", "m_bVoiceAlertPlayed", index) != 0; }
+	public void Set_m_bVoiceAlertPlayed(int index, bool value) { Source2ModSchema.SetArrayInt(this, "CPlantedC4", "m_bVoiceAlertPlayed", index, value); }
+	public int m_bVoiceAlertPlayed_Count() { return Source2ModSchema.GetArraySize("CPlantedC4", "m_bVoiceAlertPlayed"); }
 	property float m_flNextBotBeepTime {
 		public get() { return Source2ModSchema.GetFloat(this, "CPlantedC4", "m_flNextBotBeepTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CPlantedC4", "m_flNextBotBeepTime", value); }
@@ -13669,6 +13878,9 @@ methodmap CPlayerSprayDecal < CModelPointEntity
 		public get() { return Source2ModSchema.GetInt(this, "CPlayerSprayDecal", "m_nVersion"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CPlayerSprayDecal", "m_nVersion", value); }
 	}
+	public int m_ubSignature(int index) { return Source2ModSchema.GetArrayInt(this, "CPlayerSprayDecal", "m_ubSignature", index); }
+	public void Set_m_ubSignature(int index, int value) { Source2ModSchema.SetArrayInt(this, "CPlayerSprayDecal", "m_ubSignature", index, value); }
+	public int m_ubSignature_Count() { return Source2ModSchema.GetArraySize("CPlayerSprayDecal", "m_ubSignature"); }
 }
 
 methodmap CPlayerVisibility < CBaseEntity
@@ -14952,6 +15164,9 @@ methodmap CRagdollPropAttached < CRagdollProp
 
 methodmap CRangeFloat < SchemaObject
 {
+	public float m_pValue(int index) { return Source2ModSchema.GetArrayFloat(this, "CRangeFloat", "m_pValue", index); }
+	public void Set_m_pValue(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CRangeFloat", "m_pValue", index, value); }
+	public int m_pValue_Count() { return Source2ModSchema.GetArraySize("CRangeFloat", "m_pValue"); }
 }
 
 methodmap CRectLight < CBarnLight
@@ -15262,6 +15477,11 @@ methodmap CSceneEntityAlias_logic_choreographed_scene < CSceneEntity
 
 methodmap CSceneListManager < CLogicalEntity
 {
+	public int m_iszScenes(int index, char[] buffer, int maxlen) { return Source2ModSchema.GetArrayString(this, "CSceneListManager", "m_iszScenes", index, buffer, maxlen); }
+	public int m_iszScenes_Count() { return Source2ModSchema.GetArraySize("CSceneListManager", "m_iszScenes"); }
+	public CBaseEntity m_hScenes(int index) { return view_as<CBaseEntity>(Source2ModSchema.GetArrayHandle(this, "CSceneListManager", "m_hScenes", index)); }
+	public void Set_m_hScenes(int index, CEntityInstance value) { Source2ModSchema.SetArrayHandle(this, "CSceneListManager", "m_hScenes", index, value); }
+	public int m_hScenes_Count() { return Source2ModSchema.GetArraySize("CSceneListManager", "m_hScenes"); }
 }
 
 methodmap CScriptItem < CItem
@@ -15690,6 +15910,9 @@ methodmap CSkeletonInstance < CGameSceneNode
 		public get() { return Source2ModSchema.GetBool(this, "CSkeletonInstance", "m_bIsGeneratingLatchedParentSpaceState"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CSkeletonInstance", "m_bIsGeneratingLatchedParentSpaceState", value); }
 	}
+	public int m_materialGroup(int index) { return Source2ModSchema.GetArrayInt(this, "CSkeletonInstance", "m_materialGroup", index); }
+	public void Set_m_materialGroup(int index, int value) { Source2ModSchema.SetArrayInt(this, "CSkeletonInstance", "m_materialGroup", index, value); }
+	public int m_materialGroup_Count() { return Source2ModSchema.GetArraySize("CSkeletonInstance", "m_materialGroup"); }
 	property int m_nHitboxSet {
 		public get() { return Source2ModSchema.GetInt(this, "CSkeletonInstance", "m_nHitboxSet"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CSkeletonInstance", "m_nHitboxSet", value); }
@@ -15702,14 +15925,23 @@ methodmap CSkeletonInstance < CGameSceneNode
 
 methodmap CSkillFloat < SchemaObject
 {
+	public float m_pValue(int index) { return Source2ModSchema.GetArrayFloat(this, "CSkillFloat", "m_pValue", index); }
+	public void Set_m_pValue(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CSkillFloat", "m_pValue", index, value); }
+	public int m_pValue_Count() { return Source2ModSchema.GetArraySize("CSkillFloat", "m_pValue"); }
 }
 
 methodmap CSkillInt < SchemaObject
 {
+	public int m_pValue(int index) { return Source2ModSchema.GetArrayInt(this, "CSkillInt", "m_pValue", index); }
+	public void Set_m_pValue(int index, int value) { Source2ModSchema.SetArrayInt(this, "CSkillInt", "m_pValue", index, value); }
+	public int m_pValue_Count() { return Source2ModSchema.GetArraySize("CSkillInt", "m_pValue"); }
 }
 
 methodmap CSkyCamera < CBaseEntity
 {
+	public int m_skyboxSlotToken(int index) { return Source2ModSchema.GetArrayInt(this, "CSkyCamera", "m_skyboxSlotToken", index); }
+	public void Set_m_skyboxSlotToken(int index, int value) { Source2ModSchema.SetArrayInt(this, "CSkyCamera", "m_skyboxSlotToken", index, value); }
+	public int m_skyboxSlotToken_Count() { return Source2ModSchema.GetArraySize("CSkyCamera", "m_skyboxSlotToken"); }
 	property bool m_bUseAngles {
 		public get() { return Source2ModSchema.GetBool(this, "CSkyCamera", "m_bUseAngles"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CSkyCamera", "m_bUseAngles", value); }
@@ -15935,6 +16167,8 @@ methodmap CSoundEventMultiPointEntity < CSoundEventEntity
 
 methodmap CSoundEventBoxEntity < CSoundEventMultiPointEntity
 {
+	public int m_iszBoxEntities(int index, char[] buffer, int maxlen) { return Source2ModSchema.GetArrayString(this, "CSoundEventBoxEntity", "m_iszBoxEntities", index, buffer, maxlen); }
+	public int m_iszBoxEntities_Count() { return Source2ModSchema.GetArraySize("CSoundEventBoxEntity", "m_iszBoxEntities"); }
 }
 
 methodmap CSoundEventBoxHelper < CBaseEntity
@@ -16447,6 +16681,12 @@ methodmap CTestEffect < CBaseEntity
 		public get() { return Source2ModSchema.GetInt(this, "CTestEffect", "m_iBeam"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CTestEffect", "m_iBeam", value); }
 	}
+	public CBeam m_pBeam(int index) { return view_as<CBeam>(Source2ModSchema.GetArrayHandle(this, "CTestEffect", "m_pBeam", index)); }
+	public void Set_m_pBeam(int index, CEntityInstance value) { Source2ModSchema.SetArrayHandle(this, "CTestEffect", "m_pBeam", index, value); }
+	public int m_pBeam_Count() { return Source2ModSchema.GetArraySize("CTestEffect", "m_pBeam"); }
+	public float m_flBeamTime(int index) { return Source2ModSchema.GetArrayFloat(this, "CTestEffect", "m_flBeamTime", index); }
+	public void Set_m_flBeamTime(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CTestEffect", "m_flBeamTime", index, value); }
+	public int m_flBeamTime_Count() { return Source2ModSchema.GetArraySize("CTestEffect", "m_flBeamTime"); }
 	property float m_flStartTime {
 		public get() { return Source2ModSchema.GetFloat(this, "CTestEffect", "m_flStartTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CTestEffect", "m_flStartTime", value); }
@@ -17050,6 +17290,9 @@ methodmap CVoteController < CBaseEntity
 		public get() { return Source2ModSchema.GetInt(this, "CVoteController", "m_iOnlyTeamToVote"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CVoteController", "m_iOnlyTeamToVote", value); }
 	}
+	public int m_nVoteOptionCount(int index) { return Source2ModSchema.GetArrayInt(this, "CVoteController", "m_nVoteOptionCount", index); }
+	public void Set_m_nVoteOptionCount(int index, int value) { Source2ModSchema.SetArrayInt(this, "CVoteController", "m_nVoteOptionCount", index, value); }
+	public int m_nVoteOptionCount_Count() { return Source2ModSchema.GetArraySize("CVoteController", "m_nVoteOptionCount"); }
 	property int m_nPotentialVotes {
 		public get() { return Source2ModSchema.GetInt(this, "CVoteController", "m_nPotentialVotes"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CVoteController", "m_nPotentialVotes", value); }
@@ -17067,6 +17310,9 @@ methodmap CVoteController < CBaseEntity
 	property CountdownTimer m_resetVoteTimer {
 		public get() { return view_as<CountdownTimer>(Source2ModSchema.GetObject(this, "CVoteController", "m_resetVoteTimer")); }
 	}
+	public int m_nVotesCast(int index) { return Source2ModSchema.GetArrayInt(this, "CVoteController", "m_nVotesCast", index); }
+	public void Set_m_nVotesCast(int index, int value) { Source2ModSchema.SetArrayInt(this, "CVoteController", "m_nVotesCast", index, value); }
+	public int m_nVotesCast_Count() { return Source2ModSchema.GetArraySize("CVoteController", "m_nVotesCast"); }
 	property int m_playerHoldingVote {
 		public get() { return Source2ModSchema.GetInt(this, "CVoteController", "m_playerHoldingVote"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CVoteController", "m_playerHoldingVote", value); }
@@ -17373,6 +17619,9 @@ methodmap DynamicVolumeDef_t < SchemaObject
 
 methodmap EntityRenderAttribute_t < SchemaObject
 {
+	public int m_ID(int index) { return Source2ModSchema.GetArrayInt(this, "EntityRenderAttribute_t", "m_ID", index); }
+	public void Set_m_ID(int index, int value) { Source2ModSchema.SetArrayInt(this, "EntityRenderAttribute_t", "m_ID", index, value); }
+	public int m_ID_Count() { return Source2ModSchema.GetArraySize("EntityRenderAttribute_t", "m_ID"); }
 }
 
 methodmap EntitySpottedState_t < SchemaObject
@@ -17381,6 +17630,9 @@ methodmap EntitySpottedState_t < SchemaObject
 		public get() { return Source2ModSchema.GetBool(this, "EntitySpottedState_t", "m_bSpotted"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "EntitySpottedState_t", "m_bSpotted", value); }
 	}
+	public int m_bSpottedByMask(int index) { return Source2ModSchema.GetArrayInt(this, "EntitySpottedState_t", "m_bSpottedByMask", index); }
+	public void Set_m_bSpottedByMask(int index, int value) { Source2ModSchema.SetArrayInt(this, "EntitySpottedState_t", "m_bSpottedByMask", index, value); }
+	public int m_bSpottedByMask_Count() { return Source2ModSchema.GetArraySize("EntitySpottedState_t", "m_bSpottedByMask"); }
 }
 
 methodmap Extent < SchemaObject
@@ -17473,10 +17725,8 @@ methodmap FuncRotatorRotationSummary_t < SchemaObject
 
 methodmap INavObstacle < SchemaObject
 {
-	property int m_nId {
-		public get() { return Source2ModSchema.GetInt(this, "INavObstacle", "m_nId"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "INavObstacle", "m_nId", value); }
-	}
+	public void m_nId(int value[2]) { Source2ModSchema.GetInt64(this, "INavObstacle", "m_nId", value); }
+	public void Set_m_nId(const int value[2]) { Source2ModSchema.SetInt64(this, "INavObstacle", "m_nId", value); }
 }
 
 methodmap IPhysicsBodyList < SchemaObject
@@ -17605,10 +17855,8 @@ methodmap RelationshipOverride_t < Relationship_t
 
 methodmap ResourceId_t < SchemaObject
 {
-	property int m_Value {
-		public get() { return Source2ModSchema.GetInt(this, "ResourceId_t", "m_Value"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "ResourceId_t", "m_Value", value); }
-	}
+	public void m_Value(int value[2]) { Source2ModSchema.GetInt64(this, "ResourceId_t", "m_Value", value); }
+	public void Set_m_Value(const int value[2]) { Source2ModSchema.SetInt64(this, "ResourceId_t", "m_Value", value); }
 }
 
 methodmap ResponseContext_t < SchemaObject
@@ -17721,18 +17969,12 @@ methodmap SoundeventBoxHelperNetworked_t < SchemaObject
 
 methodmap VPhysicsCollisionAttribute_t < SchemaObject
 {
-	property int m_nInteractsAs {
-		public get() { return Source2ModSchema.GetInt(this, "VPhysicsCollisionAttribute_t", "m_nInteractsAs"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "VPhysicsCollisionAttribute_t", "m_nInteractsAs", value); }
-	}
-	property int m_nInteractsWith {
-		public get() { return Source2ModSchema.GetInt(this, "VPhysicsCollisionAttribute_t", "m_nInteractsWith"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "VPhysicsCollisionAttribute_t", "m_nInteractsWith", value); }
-	}
-	property int m_nInteractsExclude {
-		public get() { return Source2ModSchema.GetInt(this, "VPhysicsCollisionAttribute_t", "m_nInteractsExclude"); }
-		public set(int value) { Source2ModSchema.SetInt(this, "VPhysicsCollisionAttribute_t", "m_nInteractsExclude", value); }
-	}
+	public void m_nInteractsAs(int value[2]) { Source2ModSchema.GetInt64(this, "VPhysicsCollisionAttribute_t", "m_nInteractsAs", value); }
+	public void Set_m_nInteractsAs(const int value[2]) { Source2ModSchema.SetInt64(this, "VPhysicsCollisionAttribute_t", "m_nInteractsAs", value); }
+	public void m_nInteractsWith(int value[2]) { Source2ModSchema.GetInt64(this, "VPhysicsCollisionAttribute_t", "m_nInteractsWith", value); }
+	public void Set_m_nInteractsWith(const int value[2]) { Source2ModSchema.SetInt64(this, "VPhysicsCollisionAttribute_t", "m_nInteractsWith", value); }
+	public void m_nInteractsExclude(int value[2]) { Source2ModSchema.GetInt64(this, "VPhysicsCollisionAttribute_t", "m_nInteractsExclude", value); }
+	public void Set_m_nInteractsExclude(const int value[2]) { Source2ModSchema.SetInt64(this, "VPhysicsCollisionAttribute_t", "m_nInteractsExclude", value); }
 	property int m_nEntityId {
 		public get() { return Source2ModSchema.GetInt(this, "VPhysicsCollisionAttribute_t", "m_nEntityId"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "VPhysicsCollisionAttribute_t", "m_nEntityId", value); }

@@ -72,8 +72,12 @@ methodmap CEntityInstance
  */
 methodmap Source2ModSchema
 {
+	/** Integer fields up to 32 bits; a 64-bit one throws (GetInt64 / SetInt64). */
 	public static native int GetInt(any instance, const char[] className, const char[] field);
 	public static native void SetInt(any instance, const char[] className, const char[] field, int value);
+	/** A 64-bit integer field (uint64 SteamIDs, button masks, ...) as two cells, value[0] the low half. */
+	public static native void GetInt64(any instance, const char[] className, const char[] field, int value[2]);
+	public static native void SetInt64(any instance, const char[] className, const char[] field, const int value[2]);
 	public static native float GetFloat(any instance, const char[] className, const char[] field);
 	public static native void SetFloat(any instance, const char[] className, const char[] field, float value);
 	public static native bool GetBool(any instance, const char[] className, const char[] field);
@@ -97,6 +101,29 @@ methodmap Source2ModSchema
 	/** char arrays, CUtlSymbolLarge, CUtlString; only char arrays can be set. */
 	public static native int GetString(any instance, const char[] className, const char[] field, char[] buffer, int maxlen);
 	public static native void SetString(any instance, const char[] className, const char[] field, const char[] value);
+
+	/**
+	 * Fixed array fields (SCHEMA_FIELD_POINTER in C++: ammo, match stats,
+	 * ...), an element at a time. The index is checked against the array's
+	 * size in the running game's schema; the setters tell the clients.
+	 */
+	/** Elements of a fixed array field, 0 when the field is not one. */
+	public static native int GetArraySize(const char[] className, const char[] field);
+	/** An element of an integer, enum or bool array. */
+	public static native int GetArrayInt(any instance, const char[] className, const char[] field, int index);
+	public static native void SetArrayInt(any instance, const char[] className, const char[] field, int index, int value);
+	/** An element of a 64-bit integer array, as two cells. */
+	public static native void GetArrayInt64(any instance, const char[] className, const char[] field, int index, int value[2]);
+	public static native void SetArrayInt64(any instance, const char[] className, const char[] field, int index, const int value[2]);
+	public static native float GetArrayFloat(any instance, const char[] className, const char[] field, int index);
+	public static native void SetArrayFloat(any instance, const char[] className, const char[] field, int index, float value);
+	public static native void GetArrayVector(any instance, const char[] className, const char[] field, int index, float vec[3]);
+	public static native void SetArrayVector(any instance, const char[] className, const char[] field, int index, const float vec[3]);
+	/** An element of a CHandle array: the entity, NULL_ENTITY when empty or gone. */
+	public static native CEntityInstance GetArrayHandle(any instance, const char[] className, const char[] field, int index);
+	public static native void SetArrayHandle(any instance, const char[] className, const char[] field, int index, CEntityInstance entity);
+	/** An element of a CUtlSymbolLarge / CUtlString array. */
+	public static native int GetArrayString(any instance, const char[] className, const char[] field, int index, char[] buffer, int maxlen);
 
 	/** The field's offset in its class, -1 when the running game has no such field. */
 	public static native int GetOffset(const char[] className, const char[] field);
@@ -153,3 +180,4 @@ methodmap Source2ModSchema
 typedef Source2ModEntityOutputHandler = function Source2ModAction (const char[] output, CEntityInstance activator, CEntityInstance caller, float delay, bool post);
 
 #include <source2mod/schema/classes>
+#include <source2mod/schema/enums>

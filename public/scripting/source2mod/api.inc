@@ -15,6 +15,7 @@
 #include <source2mod/functions>
 #include <source2mod/engine>
 #include <source2mod/types>
+#include <source2mod/consts>
 #include <source2mod/schema>
 #include <source2mod/convars>
 #include <source2mod/commands>
