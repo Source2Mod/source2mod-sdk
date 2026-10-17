@@ -56,7 +56,6 @@
 
 #include <cstdint>
 
-
 class CGameRules
 {
 public:

@@ -34,34 +34,24 @@
  * Project: Source2Mod
  */
 
-#ifndef _INCLUDE_CSKILLINT_H
-#define _INCLUDE_CSKILLINT_H
+#ifndef _INCLUDE_COMPOSITEMATERIALINPUTTEXTURETYPE_T_H
+#define _INCLUDE_COMPOSITEMATERIALINPUTTEXTURETYPE_T_H
 #ifdef _WIN32
 #pragma once
 #endif
 
-#include "source2mod/ISource2ModPlugin.h"
-#include "source2mod/schema/entityio.h"
-#include "source2mod/schema/schema.h"
-
-#include <ehandle.h>
-#include <entityhandle.h>
-#include <igameevents.h>
-#include <utlbinaryblock.h>
-#include <utlstring.h>
-#include <utlstringtoken.h>
-#include <utlsymbol.h>
-#include <utlsymbollarge.h>
-#include <vector.h>
-
 #include <cstdint>
 
-class CSkillInt
+enum class CompositeMaterialInputTextureType_t : uint32_t
 {
-public:
-    DECLARE_SCHEMA_CLASS_INLINE(CSkillInt);
-
-    SCHEMA_FIELD_POINTER(int32_t, m_pValue);
+    INPUT_TEXTURE_TYPE_DEFAULT = 0,
+    INPUT_TEXTURE_TYPE_NORMALMAP = 1,
+    INPUT_TEXTURE_TYPE_COLOR = 2,
+    INPUT_TEXTURE_TYPE_MASKS = 3,
+    INPUT_TEXTURE_TYPE_ROUGHNESS = 4,
+    INPUT_TEXTURE_TYPE_PEARLESCENCE_MASK = 5,
+    INPUT_TEXTURE_TYPE_AO = 6,
+    INPUT_TEXTURE_TYPE_POSITION = 7,
 };
 
-#endif // _INCLUDE_CSKILLINT_H
+#endif // _INCLUDE_COMPOSITEMATERIALINPUTTEXTURETYPE_T_H

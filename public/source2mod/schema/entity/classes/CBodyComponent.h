@@ -56,7 +56,6 @@
 
 #include <cstdint>
 
-
 class CGameSceneNode;
 
 class CBodyComponent : public CEntityComponent

@@ -56,7 +56,6 @@
 
 #include <cstdint>
 
-
 class InfoForResourceTypeCTextureBase;
 
 class CLightComponent : public CEntityComponent

@@ -34,25 +34,33 @@
  * Project: Source2Mod
  */
 
-#ifndef _INCLUDE_EINITSYSTEMRESULT_H
-#define _INCLUDE_EINITSYSTEMRESULT_H
+#ifndef _INCLUDE_ESTYLENODETYPE_H
+#define _INCLUDE_ESTYLENODETYPE_H
 #ifdef _WIN32
 #pragma once
 #endif
 
 #include <cstdint>
 
-enum class EInitSystemResult : uint32_t
+enum class EStyleNodeType : uint32_t
 {
-    k_EInitSystemResult_Invalid = 0,
-    k_EInitSystemResult_Success = 1,
-    k_EInitSystemResult_None = 2,
-    k_EInitSystemResult_NotFound = 3,
-    k_EInitSystemResult_Existing = 4,
-    k_EInitSystemResult_FailedOpen = 5,
-    k_EInitSystemResult_Mismatch = 6,
-    k_EInitSystemResult_FailedInit = 7,
-    k_EInitSystemResult_Max = 8,
+    ROOT = 0,
+    EXPRESSION = 1,
+    PROPERTY = 2,
+    DEFINE = 3,
+    IMPORT = 4,
+    KEYFRAMES = 5,
+    KEYFRAME_SELECTOR = 6,
+    STYLE_SELECTOR = 7,
+    WHITESPACE = 8,
+    EXPRESSION_TEXT = 9,
+    EXPRESSION_URL = 10,
+    EXPRESSION_CONCAT = 11,
+    REFERENCE_CONTENT = 12,
+    REFERENCE_COMPILED = 13,
+    REFERENCE_PASSTHROUGH = 14,
+    REFERENCE_PANEL = 15,
+    COMPILER_CONDITIONAL = 16,
 };
 
-#endif // _INCLUDE_EINITSYSTEMRESULT_H
+#endif // _INCLUDE_ESTYLENODETYPE_H

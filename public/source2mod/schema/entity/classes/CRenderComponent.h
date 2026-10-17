@@ -56,7 +56,6 @@
 
 #include <cstdint>
 
-
 class CRenderComponent : public CEntityComponent
 {
 public:

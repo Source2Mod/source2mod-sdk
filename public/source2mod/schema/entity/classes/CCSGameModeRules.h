@@ -56,7 +56,6 @@
 
 #include <cstdint>
 
-
 class CCSGameModeRules
 {
 public:

@@ -34,47 +34,25 @@
  * Project: Source2Mod
  */
 
-#ifndef _INCLUDE_DESTRUCTIBLEPARTDAMAGEREQUEST_T_H
-#define _INCLUDE_DESTRUCTIBLEPARTDAMAGEREQUEST_T_H
+#ifndef _INCLUDE_INVENTORYNODETYPE_T_H
+#define _INCLUDE_INVENTORYNODETYPE_T_H
 #ifdef _WIN32
 #pragma once
 #endif
 
-#include "../enums/EDestructibleParts_DestroyParameterFlags.h"
-#include "source2mod/ISource2ModPlugin.h"
-#include "source2mod/schema/entityio.h"
-#include "source2mod/schema/schema.h"
-
-#include <ehandle.h>
-#include <entityhandle.h>
-#include <igameevents.h>
-#include <shareddefs.h>
-#include <utlbinaryblock.h>
-#include <utlstring.h>
-#include <utlstringtoken.h>
-#include <utlsymbol.h>
-#include <utlsymbollarge.h>
-#include <vector.h>
-
 #include <cstdint>
 
-class CBaseEntity;
-
-class DestructiblePartDamageRequest_t
+enum class InventoryNodeType_t : uint32_t
 {
-public:
-    DECLARE_SCHEMA_CLASS_INLINE(DestructiblePartDamageRequest_t);
-
-    SCHEMA_FIELD(HitGroup_t, m_nHitGroup);
-    SCHEMA_FIELD(int32_t, m_nDamageLevel);
-    SCHEMA_FIELD(uint16_t, m_nDesiredHealth);
-    SCHEMA_FIELD(EDestructibleParts_DestroyParameterFlags, m_nDestroyFlags);
-    SCHEMA_FIELD(DamageTypes_t, m_nDamageType);
-    SCHEMA_FIELD(float, m_flBreakDamage);
-    SCHEMA_FIELD(float, m_flBreakDamageRadius);
-    SCHEMA_FIELD(CHandle<CBaseEntity>, m_hAttacker);
-    SCHEMA_FIELD(Vector, m_vWsBreakDamageOrigin);
-    SCHEMA_FIELD(Vector, m_vWsBreakDamageForce);
+    NODE_TYPE_INVALID = 0,
+    VIRTUAL_NODE_SCHEMA_PREFAB = 1,
+    VIRTUAL_NODE_SCHEMA_ITEMDEF = 2,
+    VIRTUAL_NODE_SCHEMA_STICKER = 3,
+    VIRTUAL_NODE_SCHEMA_KEYCHAIN = 4,
+    CONCRETE_NODE_SCHEMA_PREFAB = 5,
+    CONCRETE_NODE_SCHEMA_ITEMDEF = 6,
+    CONCRETE_NODE_SCHEMA_STICKER = 7,
+    CONCRETE_NODE_SCHEMA_KEYCHAIN = 8,
 };
 
-#endif // _INCLUDE_DESTRUCTIBLEPARTDAMAGEREQUEST_T_H
+#endif // _INCLUDE_INVENTORYNODETYPE_T_H

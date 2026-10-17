@@ -34,22 +34,22 @@
  * Project: Source2Mod
  */
 
-#ifndef _INCLUDE_EUNLOCKSTYLE_H
-#define _INCLUDE_EUNLOCKSTYLE_H
+#ifndef _INCLUDE_COMPOSITEMATERIALINPUTCONTAINERSOURCETYPE_T_H
+#define _INCLUDE_COMPOSITEMATERIALINPUTCONTAINERSOURCETYPE_T_H
 #ifdef _WIN32
 #pragma once
 #endif
 
 #include <cstdint>
 
-enum class EUnlockStyle : uint32_t
+enum class CompositeMaterialInputContainerSourceType_t : uint32_t
 {
-    k_UnlockStyle_Succeeded = 0,
-    k_UnlockStyle_Failed_PreReq = 1,
-    k_UnlockStyle_Failed_CantAfford = 2,
-    k_UnlockStyle_Failed_CantCommit = 3,
-    k_UnlockStyle_Failed_CantLockCache = 4,
-    k_UnlockStyle_Failed_CantAffordAttrib = 5,
+    CONTAINER_SOURCE_TYPE_TARGET_MATERIAL = 0,
+    CONTAINER_SOURCE_TYPE_MATERIAL_FROM_TARGET_ATTR = 1,
+    CONTAINER_SOURCE_TYPE_SPECIFIC_MATERIAL = 2,
+    CONTAINER_SOURCE_TYPE_LOOSE_VARIABLES = 3,
+    CONTAINER_SOURCE_TYPE_VARIABLE_FROM_TARGET_ATTR = 4,
+    CONTAINER_SOURCE_TYPE_TARGET_INSTANCE_MATERIAL = 5,
 };
 
-#endif // _INCLUDE_EUNLOCKSTYLE_H
+#endif // _INCLUDE_COMPOSITEMATERIALINPUTCONTAINERSOURCETYPE_T_H
