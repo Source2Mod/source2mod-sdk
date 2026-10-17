@@ -717,6 +717,38 @@ Globals
 
 /**
 
+* @brief Points s2sdk's engine globals at the engine's interfaces.
+*
+* The globals s2sdk declares in interfaces/interfaces.h and defines in its
+* interfaces library, which every plugin links: the ones SDK code and s2sdk's
+* own sources read (g_pCVar for ConVars and commands,
+* g_pGameResourceServiceServer for GameEntitySystem()) and the ones a plugin
+* usually wants (g_pSource2Server for a hook, g_pNetworkMessages,
+* g_pSchemaSystem, ...), all from what the core already holds -- a plugin
+* connects nothing itself.
+*
+* Part of SOURCE2MOD_SAVEVARS(); the core sets its own.
+  */
+#define SOURCE2MOD_FILLGAMEVARS(api) \
+    g_pSource2Server             = (api)->GetSource2Server(); \
+    g_pSource2ServerConfig       = (api)->GetSource2ServerConfig(); \
+    g_pSource2GameClients        = (api)->GetSource2GameClients(); \
+    g_pSource2GameEntities       = (api)->GetSource2GameEntities(); \
+    g_pEngineServer              = (api)->GetEngineServer(); \
+    g_pCVar                      = (api)->GetCVar(); \
+    g_pSchemaSystem              = (ISchemaSystem*)(api)->GetSchemaSystem(); \
+    g_pGameResourceServiceServer = (api)->GetGameResourceService(); \
+    g_pNetworkServerService      = (api)->GetNetworkServerService(); \
+    g_pNetworkSystem             = (api)->GetNetworkSystem(); \
+    g_pNetworkMessages           = (api)->GetNetworkMessages(); \
+    g_pNetworkStringTableServer  = (api)->GetNetworkStringTableServer(); \
+    g_pEngineServiceMgr          = (api)->GetEngineServiceMgr(); \
+    g_pHostStateMgr              = (api)->GetHostStateMgr(); \
+    g_pLocalize                  = (api)->GetLocalize(); \
+    g_pFullFileSystem            = (api)->GetFileSystem();
+
+/**
+
 * @brief Initializes global variables inside Load().
 *
 * @note Must be called in plugin Load(), with its parameters under their
@@ -728,8 +760,7 @@ Globals
 // fetched here (see SOURCE2MOD_KHOOK_HEADER_INTERFACE).
 #define SOURCE2MOD_SAVEVARS() \
     g_Source2ModAPI = api; \
-    /* s2sdk's GameEntitySystem() (entity2/entitysystem.cpp) reads it */ \
-    g_pGameResourceServiceServer = api->GetGameResourceService(); \
+    SOURCE2MOD_FILLGAMEVARS(api) \
     g_PluginAPI  = static_cast<ISource2ModPlugin*>(this); \
     g_PluginID   = id; \
     KHook::__exported__khook = static_cast<KHook::IKHook*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_INTERFACE, nullptr, nullptr)); \
