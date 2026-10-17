@@ -86,6 +86,7 @@ class ISource2ModAddresses;
 class ISource2ModClients;
 class ISource2ModFiles;
 class ISource2ModTargeting;
+class ISource2ModFunctions;
 class ISource2ModTranslations;
 class ISource2ModUtils;
 class ISource2ModCommands;
@@ -136,6 +137,7 @@ class ISource2ModTransmit;
 #include "ISource2ModClients.h"
 #include "ISource2ModFiles.h"
 #include "ISource2ModTargeting.h"
+#include "ISource2ModFunctions.h"
 #include "ISource2ModTranslations.h"
 #include "ISource2ModUtils.h"
 
@@ -617,6 +619,7 @@ Globals
     ISource2ModClients*         g_pSource2ModClients         = nullptr; \
     ISource2ModFiles*           g_pSource2ModFiles           = nullptr; \
     ISource2ModTargeting*       g_pSource2ModTargeting       = nullptr; \
+    ISource2ModFunctions*       g_pSource2ModFunctions       = nullptr; \
     ISource2ModTranslations*    g_pSource2ModTranslations    = nullptr; \
     ISource2ModUtils*           g_pSource2ModUtils           = nullptr; \
     ISource2ModTransmit*        g_pSource2ModTransmit        = nullptr;
@@ -671,6 +674,7 @@ Globals
     extern ISource2ModClients*         g_pSource2ModClients; \
     extern ISource2ModFiles*           g_pSource2ModFiles; \
     extern ISource2ModTargeting*       g_pSource2ModTargeting; \
+    extern ISource2ModFunctions*       g_pSource2ModFunctions; \
     extern ISource2ModTranslations*    g_pSource2ModTranslations; \
     extern ISource2ModUtils*           g_pSource2ModUtils; \
     extern ISource2ModTransmit*        g_pSource2ModTransmit; \
@@ -711,6 +715,7 @@ Globals
     g_pSource2ModClients         = (ISource2ModClients*)        (api)->Source2ModFactory(SOURCE2MOD_CLIENTS_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModFiles           = (ISource2ModFiles*)          (api)->Source2ModFactory(SOURCE2MOD_FILES_INTERFACE,           nullptr, nullptr); \
     g_pSource2ModTargeting       = (ISource2ModTargeting*)      (api)->Source2ModFactory(SOURCE2MOD_TARGETING_INTERFACE,       nullptr, nullptr); \
+    g_pSource2ModFunctions       = (ISource2ModFunctions*)      (api)->Source2ModFactory(SOURCE2MOD_FUNCTIONS_INTERFACE,       nullptr, nullptr); \
     g_pSource2ModTranslations    = (ISource2ModTranslations*)   (api)->Source2ModFactory(SOURCE2MOD_TRANSLATIONS_INTERFACE,    nullptr, nullptr); \
     g_pSource2ModUtils           = (ISource2ModUtils*)          (api)->Source2ModFactory(SOURCE2MOD_UTILS_INTERFACE,           nullptr, nullptr); \
     g_pSource2ModTransmit        = (ISource2ModTransmit*)       (api)->Source2ModFactory(SOURCE2MOD_TRANSMIT_INTERFACE,        nullptr, nullptr);

@@ -87,6 +87,18 @@ methodmap Source2ModGameConfig
  */
 methodmap Source2ModFunction < Handle
 {
+	/**
+	 * A function described in gamedata: an entry with a "function" object
+	 * (its `this`, return and parameter types; see ISource2ModFunctions.h),
+	 * the same one C++ plugins call through ISource2ModFunctions::Find. No
+	 * AddParam: the types come from the gamedata. A plugin's own gamedata
+	 * file in addons/source2mod/gamedata is read with the core's.
+	 *
+	 * @return null when there is no such entry or it does not resolve (the
+	 *         reason is on the console).
+	 */
+	public static native Source2ModFunction Find(const char[] name);
+
 	/** A function by gamedata entry ("CCSPlayerController::SwitchTeam"); null when it does not resolve. */
 	public static native Source2ModFunction FromGameConfig(const char[] name, Source2ModType returnType);
 
