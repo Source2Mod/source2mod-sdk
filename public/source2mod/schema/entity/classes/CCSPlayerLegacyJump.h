@@ -56,6 +56,8 @@
 
 #include <cstdint>
 
+class CCSPlayer_MovementServices;
+
 class CCSPlayerLegacyJump
 {
 public:
@@ -63,6 +65,10 @@ public:
 
     SCHEMA_FIELD(bool, m_bOldJumpPressed);
     SCHEMA_FIELD(float, m_flJumpPressedTime);
+
+public:
+    /// <summary>The movement services that own this jump object: the back-pointer right after the vtable, in a base class the schema does not describe.</summary>
+    CCSPlayer_MovementServices* GetMovementServices();
 };
 
 #endif // _INCLUDE_CCSPLAYERLEGACYJUMP_H

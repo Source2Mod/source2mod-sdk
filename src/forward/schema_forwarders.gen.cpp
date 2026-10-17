@@ -17,22 +17,26 @@
 #include "source2mod/schema/entity/classes/CBaseEntity.h"
 #include "source2mod/ISource2ModEntities.h"
 #include "source2mod/schema/entity/classes/CBodyComponent.h"
+#include "source2mod/schema/entity/classes/CCSPlayerController.h"
+#include "source2mod/schema/entity/classes/CCSPlayerPawn.h"
 #include "source2mod/schema/entity/classes/CCollisionProperty.h"
 #include "source2mod/schema/entity/classes/CEntitySubclassVDataBase.h"
 #include "source2mod/schema/entity/classes/CGameSceneNode.h"
 #include "source2mod/schema/entity/classes/CBaseModelEntity.h"
 #include "source2mod/schema/entity/classes/CSkeletonInstance.h"
 #include "source2mod/schema/entity/classes/CBasePlayerController.h"
-#include "source2mod/schema/entity/classes/CCSPlayerPawn.h"
+#include "source2mod/schema/entity/classes/CCSPlayerPawnBase.h"
+#include "source2mod/schema/entity/classes/CPlayer_ObserverServices.h"
 #include "source2mod/schema/entity/classes/CBasePlayerPawn.h"
-#include "source2mod/schema/entity/classes/CCSPlayerController.h"
 #include "source2mod/schema/entity/classes/CBasePlayerWeapon.h"
 #include "source2mod/schema/entity/classes/CCSCustomHudLayout.h"
 #include "source2mod/ISource2ModCustomHud.h"
 #include "source2mod/schema/entity/classes/CCSGameRules.h"
 #include "source2mod/ISource2ModMenus.h"
 #include "source2mod/schema/entity/classes/CCSObserverPawn.h"
-#include "source2mod/schema/entity/classes/CCSPlayerPawnBase.h"
+#include "source2mod/schema/entity/classes/CCSPlayer_ItemServices.h"
+#include "source2mod/schema/entity/classes/CCSPlayerLegacyJump.h"
+#include "source2mod/schema/entity/classes/CCSPlayer_MovementServices.h"
 #include "source2mod/schema/entity/classes/CCSWeaponBaseVData.h"
 #include "source2mod/schema/entity/classes/CDecoyProjectile.h"
 #include "source2mod/schema/entity/classes/CFlashbangProjectile.h"
@@ -42,6 +46,7 @@
 #include "source2mod/schema/entity/classes/CPlayerPawnComponent.h"
 #include "source2mod/schema/entity/classes/CPlayer_ItemServices.h"
 #include "source2mod/schema/entity/classes/CPlayer_WeaponServices.h"
+#include "source2mod/schema/entity/classes/CPointWorldText.h"
 #include "source2mod/schema/entity/classes/CSmokeGrenadeProjectile.h"
 
 #include <utility>
@@ -92,6 +97,30 @@ void CBaseEntity::AddEntityIOEvent(const char* pszInput, CEntityInstance* pActiv
     if (!s_fn)
         return Source2ModSchemaMissing<void>();
     return s_fn(this, pszInput, pActivator, pCaller, pszValue, flDelay, eChain);
+}
+
+void CBaseEntity::AddFlags(uint32_t nMask)
+{
+    using Fn = void (*)(CBaseEntity*, uint32_t);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBaseEntity::AddFlags(uint32_t)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<void>();
+    return s_fn(this, nMask);
+}
+
+void CBaseEntity::ClearFlags(uint32_t nMask)
+{
+    using Fn = void (*)(CBaseEntity*, uint32_t);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBaseEntity::ClearFlags(uint32_t)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<void>();
+    return s_fn(this, nMask);
 }
 
 void CBaseEntity::CollisionRulesChanged()
@@ -226,6 +255,18 @@ const char* CBaseEntity::GetName() const
     return s_fn(this);
 }
 
+SharedTeams_t CBaseEntity::GetTeam()
+{
+    using Fn = SharedTeams_t (*)(CBaseEntity*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBaseEntity::GetTeam()", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<SharedTeams_t>();
+    return s_fn(this);
+}
+
 CEntitySubclassVDataBase* CBaseEntity::GetVData()
 {
     using Fn = CEntitySubclassVDataBase* (*)(CBaseEntity*);
@@ -235,6 +276,54 @@ CEntitySubclassVDataBase* CBaseEntity::GetVData()
         s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBaseEntity::GetVData()", s_resolved));
     if (!s_fn)
         return Source2ModSchemaMissing<CEntitySubclassVDataBase*>();
+    return s_fn(this);
+}
+
+bool CBaseEntity::HasFlags(uint32_t nMask)
+{
+    using Fn = bool (*)(CBaseEntity*, uint32_t);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBaseEntity::HasFlags(uint32_t)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<bool>();
+    return s_fn(this, nMask);
+}
+
+bool CBaseEntity::IsAlive()
+{
+    using Fn = bool (*)(CBaseEntity*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBaseEntity::IsAlive()", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<bool>();
+    return s_fn(this);
+}
+
+CCSPlayerController* CBaseEntity::IsPlayerController()
+{
+    using Fn = CCSPlayerController* (*)(CBaseEntity*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBaseEntity::IsPlayerController()", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<CCSPlayerController*>();
+    return s_fn(this);
+}
+
+CCSPlayerPawn* CBaseEntity::IsPlayerPawn()
+{
+    using Fn = CCSPlayerPawn* (*)(CBaseEntity*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBaseEntity::IsPlayerPawn()", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<CCSPlayerPawn*>();
     return s_fn(this);
 }
 
@@ -454,6 +543,18 @@ CUtlString CBasePlayerController::GetIpAddress()
     return s_fn(this);
 }
 
+CBaseEntity* CBasePlayerController::GetObserverTarget()
+{
+    using Fn = CBaseEntity* (*)(CBasePlayerController*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBasePlayerController::GetObserverTarget()", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<CBaseEntity*>();
+    return s_fn(this);
+}
+
 CCSPlayerPawn* CBasePlayerController::GetPawn()
 {
     using Fn = CCSPlayerPawn* (*)(CBasePlayerController*);
@@ -463,6 +564,18 @@ CCSPlayerPawn* CBasePlayerController::GetPawn()
         s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBasePlayerController::GetPawn()", s_resolved));
     if (!s_fn)
         return Source2ModSchemaMissing<CCSPlayerPawn*>();
+    return s_fn(this);
+}
+
+CSPlayerState CBasePlayerController::GetPawnState()
+{
+    using Fn = CSPlayerState (*)(CBasePlayerController*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBasePlayerController::GetPawnState()", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<CSPlayerState>();
     return s_fn(this);
 }
 
@@ -586,6 +699,18 @@ bool CBasePlayerController::IsBot()
     return s_fn(this);
 }
 
+bool CBasePlayerController::IsConnected()
+{
+    using Fn = bool (*)(CBasePlayerController*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBasePlayerController::IsConnected()", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<bool>();
+    return s_fn(this);
+}
+
 void CBasePlayerController::PrintToCenter(const char* pszMessage)
 {
     using Fn = void (*)(CBasePlayerController*, const char*);
@@ -656,6 +781,18 @@ void CBasePlayerController::SetPawn(CBasePlayerPawn* pPawn, HookChain eChain)
     if (!s_fn)
         return Source2ModSchemaMissing<void>();
     return s_fn(this, pPawn, eChain);
+}
+
+void CBasePlayerController::SetPlayerName(const char* pszName)
+{
+    using Fn = void (*)(CBasePlayerController*, const char*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBasePlayerController::SetPlayerName(const char*)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<void>();
+    return s_fn(this, pszName);
 }
 
 void CBasePlayerPawn::CommitSuicide(bool bExplode, bool bForce, HookChain eChain)
@@ -1102,6 +1239,30 @@ float CCSNavArea::Width() const
     return s_fn(this);
 }
 
+void CCSPlayerController::AddArmor(int nDelta)
+{
+    using Fn = void (*)(CCSPlayerController*, int);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CCSPlayerController::AddArmor(int)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<void>();
+    return s_fn(this, nDelta);
+}
+
+void CCSPlayerController::AddHealth(int nDelta)
+{
+    using Fn = void (*)(CCSPlayerController*, int);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CCSPlayerController::AddHealth(int)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<void>();
+    return s_fn(this, nDelta);
+}
+
 void CCSPlayerController::ChangeTeam(int nTeam, HookChain eChain)
 {
     using Fn = void (*)(CCSPlayerController*, int, HookChain);
@@ -1198,6 +1359,30 @@ CCSPlayerController * CCSPlayerController::FromUserId(int iUserId)
     return s_fn(iUserId);
 }
 
+int CCSPlayerController::GetHealth()
+{
+    using Fn = int (*)(CCSPlayerController*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CCSPlayerController::GetHealth()", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<int>();
+    return s_fn(this);
+}
+
+int CCSPlayerController::GetMaxHealth()
+{
+    using Fn = int (*)(CCSPlayerController*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CCSPlayerController::GetMaxHealth()", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<int>();
+    return s_fn(this);
+}
+
 CCSObserverPawn* CCSPlayerController::GetObserverPawn()
 {
     using Fn = CCSObserverPawn* (*)(CCSPlayerController*);
@@ -1219,6 +1404,18 @@ CCSPlayerPawn* CCSPlayerController::GetPlayerPawn()
         s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CCSPlayerController::GetPlayerPawn()", s_resolved));
     if (!s_fn)
         return Source2ModSchemaMissing<CCSPlayerPawn*>();
+    return s_fn(this);
+}
+
+CSPlayerState CCSPlayerController::GetPlayerPawnState()
+{
+    using Fn = CSPlayerState (*)(CCSPlayerController*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CCSPlayerController::GetPlayerPawnState()", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<CSPlayerState>();
     return s_fn(this);
 }
 
@@ -1246,6 +1443,42 @@ void CCSPlayerController::Respawn(HookChain eChain)
     return s_fn(this, eChain);
 }
 
+void CCSPlayerController::SetArmor(int nArmor, bool bHelmet)
+{
+    using Fn = void (*)(CCSPlayerController*, int, bool);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CCSPlayerController::SetArmor(int,bool)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<void>();
+    return s_fn(this, nArmor, bHelmet);
+}
+
+void CCSPlayerController::SetHealth(int nHealth)
+{
+    using Fn = void (*)(CCSPlayerController*, int);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CCSPlayerController::SetHealth(int)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<void>();
+    return s_fn(this, nHealth);
+}
+
+void CCSPlayerController::SetMaxHealth(int nMaxHealth)
+{
+    using Fn = void (*)(CCSPlayerController*, int);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CCSPlayerController::SetMaxHealth(int)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<void>();
+    return s_fn(this, nMaxHealth);
+}
+
 void CCSPlayerController::SwitchTeam(int nTeam, HookChain eChain)
 {
     using Fn = void (*)(CCSPlayerController*, int, HookChain);
@@ -1268,6 +1501,18 @@ void CCSPlayerController::TakeDamage(CCSPlayerController* pAttacker, int iDamage
     if (!s_fn)
         return Source2ModSchemaMissing<void>();
     return s_fn(this, pAttacker, iDamage, bitsDamageType, eChain);
+}
+
+CCSPlayer_MovementServices* CCSPlayerLegacyJump::GetMovementServices()
+{
+    using Fn = CCSPlayer_MovementServices* (*)(CCSPlayerLegacyJump*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CCSPlayerLegacyJump::GetMovementServices()", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<CCSPlayer_MovementServices*>();
+    return s_fn(this);
 }
 
 QAngle CCSPlayerPawn::GetEyeAngles()
@@ -1508,6 +1753,18 @@ void CPlayer_WeaponServices::SelectItem(CBasePlayerWeapon* pWeapon, int unk1, Ho
     if (!s_fn)
         return Source2ModSchemaMissing<void>();
     return s_fn(this, pWeapon, unk1, eChain);
+}
+
+void CPointWorldText::SetMessage(const char* pszMessage)
+{
+    using Fn = void (*)(CPointWorldText*, const char*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CPointWorldText::SetMessage(const char*)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<void>();
+    return s_fn(this, pszMessage);
 }
 
 CSmokeGrenadeProjectile* CSmokeGrenadeProjectile::EmitGrenade(const Vector& vecPosition, const QAngle& angAngle, const Vector& vecVelocity, int nTeam, CBaseEntity* pOwner, uint32_t nItemDefIndex, HookChain eChain)

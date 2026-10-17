@@ -325,6 +325,18 @@ methodmap CBaseEntity < CEntityInstance
 	public native int GetIndex();
 	// ParticleAttachment_t (PATTACH_ABSORIGIN_FOLLOW = 1); recipients: a player mask, all players by default.
 	public native void DispatchParticleEffect(const char[] particle, int attachType = 1, int attachmentPoint = 0, bool resetAllParticles = false, const int recipients[2] = {-1, -1}, Source2ModHookChain chain = HookChain_Default);
+	// This entity as a player controller / pawn (by designer name), NULL_ENTITY when it is something else.
+	public native CCSPlayerController IsPlayerController();
+	public native CCSPlayerPawn IsPlayerPawn();
+	// m_iTeamNum as a team (CS_TEAM_*); anything outside CS_TEAM_NONE..CS_TEAM_CT reads as CS_TEAM_NONE.
+	public native int GetTeam();
+	// m_lifeState is LIFE_ALIVE.
+	public native bool IsAlive();
+	// m_fFlags bits (FL_*), networked.
+	public native void AddFlags(int mask);
+	public native void ClearFlags(int mask);
+	// Every bit of the mask is set.
+	public native bool HasFlags(int mask);
 }
 
 methodmap CAI_ChangeHintGroup < CBaseEntity
@@ -1973,6 +1985,14 @@ methodmap CBasePlayerController < CBaseEntity
 	public native void GetIpAddress(char[] buffer, int maxlen);
 	public native void ReplicateConVar(const char[] name, const char[] value);
 	public native void FireEventToClient(IGameEvent event);
+	// Overwrites the networked player name (128 bytes, cut to fit).
+	public native void SetPlayerName(const char[] name);
+	// m_iConnected is PlayerConnectedState Connected.
+	public native bool IsConnected();
+	// m_iPlayerState (STATE_*) of the current pawn, the player or the observer one; STATE_WELCOME without one.
+	public native int GetPawnState();
+	// Who the current pawn is spectating, NULL_ENTITY when nobody.
+	public native CBaseEntity GetObserverTarget();
 }
 
 methodmap CBasePlayerPawn < CBaseCombatCharacter
@@ -4967,6 +4987,18 @@ methodmap CCSPlayerController < CBasePlayerController
 	public native void ChangeTeam(int team, Source2ModHookChain chain = HookChain_Default);
 	public native CCSPlayerPawn GetPlayerPawn();
 	public native CCSObserverPawn GetObserverPawn();
+	// m_iPlayerState (STATE_*) of the player pawn; STATE_WELCOME without one.
+	public native int GetPlayerPawnState();
+	// Health and armor of the living player pawn (0 / nothing without one). SetHealth raises max health
+	// to fit and ignores values below 1 (kill with damage); AddHealth may take away but not below 1;
+	// AddArmor may take away, not below 0.
+	public native int GetHealth();
+	public native int GetMaxHealth();
+	public native void SetHealth(int health);
+	public native void AddHealth(int delta);
+	public native void SetMaxHealth(int maxHealth);
+	public native void SetArmor(int armor, bool helmet = false);
+	public native void AddArmor(int delta);
 }
 
 methodmap CPlayerControllerComponent < SchemaObject
@@ -5075,6 +5107,8 @@ methodmap CCSPlayerLegacyJump < SchemaObject
 		public get() { return Source2ModSchema.GetFloat(this, "CCSPlayerLegacyJump", "m_flJumpPressedTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CCSPlayerLegacyJump", "m_flJumpPressedTime", value); }
 	}
+	// The movement services that own this jump object (the pawn's m_pMovementServices).
+	public native CCSPlayer_MovementServices GetMovementServices();
 }
 
 methodmap CCSPlayerModernJump < SchemaObject
@@ -14721,6 +14755,8 @@ methodmap CPointWorldText < CModelPointEntity
 		public get() { return Source2ModSchema.GetInt(this, "CPointWorldText", "m_nReorientMode"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CPointWorldText", "m_nReorientMode", value); }
 	}
+	// Sets the text (512 bytes, cut to fit), networked.
+	public native void SetMessage(const char[] message);
 }
 
 methodmap CPostProcessingVolume < CBaseTrigger

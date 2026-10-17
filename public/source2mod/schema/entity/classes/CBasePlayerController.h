@@ -41,6 +41,7 @@
 #endif
 
 #include "../enums/ChatIgnoreType_t.h"
+#include "../enums/CSPlayerState.h"
 #include "../enums/PlayerConnectedState.h"
 #include "CBaseEntity.h"
 #include "source2mod/ISource2ModPlugin.h"
@@ -137,8 +138,16 @@ public:
     CUtlString GetIpAddress();
     /// <summary>Replicate convar.</summary>
     void ReplicateConVar(const char* pszConVar, const char* pszValue);
-    /// <summary>Fires gameEvent to client's legacy listener.</summary>
+    /// <summary>Fires gameEvent to client's legacy listener. Does not take ownership: the caller still frees pEvent.</summary>
     void FireEventToClient(IGameEvent* pEvent);
+    /// <summary>Overwrites the networked player name (m_iszPlayerName, 128 bytes, cut to fit).</summary>
+    void SetPlayerName(const char* pszName);
+    /// <summary>Whether m_iConnected is PlayerConnectedState::Connected.</summary>
+    bool IsConnected();
+    /// <summary>m_iPlayerState of the current pawn (m_hPawn: the player or the observer pawn); STATE_WELCOME without one.</summary>
+    CSPlayerState GetPawnState();
+    /// <summary>Who the current pawn is spectating (its observer services' m_hObserverTarget), null when nobody.</summary>
+    CBaseEntity* GetObserverTarget();
 
 public:
     static CBasePlayerController* New(const char* className)

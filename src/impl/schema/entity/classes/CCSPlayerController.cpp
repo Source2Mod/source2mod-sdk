@@ -43,6 +43,7 @@
 #include "source2mod/ISource2ModPlugin.h"
 #include "source2mod/schema/entity/classes/CCSObserverPawn.h"
 #include "source2mod/schema/entity/classes/CCSPlayerPawn.h"
+#include "source2mod/schema/entity/classes/CCSPlayer_ItemServices.h"
 #include "source2mod/schema/takedamageinfo.h"
 #include "source2mod/schema/takedamageresult.h"
 #include "source2mod/utils/virtual.h"
@@ -198,4 +199,82 @@ CCSObserverPawn* CCSPlayerController::GetObserverPawn()
     if (auto handle = m_hObserverPawn(); handle.IsValid())
         return handle.Get();
     return nullptr;
+}
+
+CSPlayerState CCSPlayerController::GetPlayerPawnState()
+{
+    CCSPlayerPawn* pPawn = GetPlayerPawn();
+    return pPawn ? pPawn->m_iPlayerState() : CSPlayerState::STATE_WELCOME;
+}
+
+// The player pawn while it lives: what the health and armor helpers work on.
+static CCSPlayerPawn* LivingPlayerPawn(CCSPlayerController* pController)
+{
+    CCSPlayerPawn* pPawn = pController->GetPlayerPawn();
+    return pPawn && pController->m_bPawnIsAlive() ? pPawn : nullptr;
+}
+
+int CCSPlayerController::GetHealth()
+{
+    CCSPlayerPawn* pPawn = LivingPlayerPawn(this);
+    return pPawn ? pPawn->m_iHealth() : 0;
+}
+
+int CCSPlayerController::GetMaxHealth()
+{
+    CCSPlayerPawn* pPawn = LivingPlayerPawn(this);
+    return pPawn ? pPawn->m_iMaxHealth() : 0;
+}
+
+void CCSPlayerController::SetHealth(int nHealth)
+{
+    CCSPlayerPawn* pPawn = LivingPlayerPawn(this);
+    if (!pPawn || nHealth < 1)
+        return;
+    pPawn->m_iHealth(nHealth);
+    m_iPawnHealth(static_cast<uint32_t>(nHealth));
+    if (nHealth > pPawn->m_iMaxHealth())
+        pPawn->m_iMaxHealth(nHealth);
+}
+
+void CCSPlayerController::AddHealth(int nDelta)
+{
+    CCSPlayerPawn* pPawn = LivingPlayerPawn(this);
+    if (!pPawn)
+        return;
+    const int nHealth = pPawn->m_iHealth() + nDelta;
+    if (nHealth < 1)
+        return;
+    pPawn->m_iHealth(nHealth);
+    m_iPawnHealth(static_cast<uint32_t>(nHealth));
+}
+
+void CCSPlayerController::SetMaxHealth(int nMaxHealth)
+{
+    CCSPlayerPawn* pPawn = LivingPlayerPawn(this);
+    if (pPawn && nMaxHealth >= 1)
+        pPawn->m_iMaxHealth(nMaxHealth);
+}
+
+void CCSPlayerController::SetArmor(int nArmor, bool bHelmet)
+{
+    CCSPlayerPawn* pPawn = LivingPlayerPawn(this);
+    if (!pPawn || nArmor < 0)
+        return;
+    pPawn->m_ArmorValue(nArmor);
+    m_iPawnArmor(nArmor);
+    if (bHelmet && pPawn->m_pItemServices())
+        static_cast<CCSPlayer_ItemServices*>(pPawn->m_pItemServices())->m_bHasHelmet(true);
+}
+
+void CCSPlayerController::AddArmor(int nDelta)
+{
+    CCSPlayerPawn* pPawn = LivingPlayerPawn(this);
+    if (!pPawn)
+        return;
+    int nArmor = pPawn->m_ArmorValue() + nDelta;
+    if (nArmor < 0)
+        nArmor = 0;
+    pPawn->m_ArmorValue(nArmor);
+    m_iPawnArmor(nArmor);
 }

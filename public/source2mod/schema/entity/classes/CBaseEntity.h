@@ -67,6 +67,7 @@
 class CBaseFilter;
 class CBodyComponent;
 class CCSPlayerController;
+class CCSPlayerPawn;
 class CCollisionProperty;
 class CEntityInstance;
 class CEntityKeyValues;
@@ -238,6 +239,20 @@ public:
     void Remove(HookChain eChain = HookChain::Run);
     /// <summary>Dispatches a particle effect on this entity. A null filter sends it to everyone.</summary>
     void DispatchParticleEffect(const char* pszParticleName, ParticleAttachment_t nAttachType = ParticleAttachment_t::PATTACH_ABSORIGIN_FOLLOW, uint8 nAttachmentPoint = 0, bool bResetAllParticlesOnEntity = false, IRecipientFilter* pFilter = nullptr, HookChain eChain = HookChain::Run);
+    /// <summary>This entity as a player controller (designer name cs_player_controller), null when it is something else.</summary>
+    CCSPlayerController* IsPlayerController();
+    /// <summary>This entity as a player pawn (designer name player), null when it is something else.</summary>
+    CCSPlayerPawn* IsPlayerPawn();
+    /// <summary>m_iTeamNum as SharedTeams_t; anything outside CS_TEAM_NONE..CS_TEAM_CT reads as CS_TEAM_NONE.</summary>
+    SharedTeams_t GetTeam();
+    /// <summary>Whether m_lifeState is LIFE_ALIVE.</summary>
+    bool IsAlive();
+    /// <summary>Sets these bits in m_fFlags (Flags_t), networked.</summary>
+    void AddFlags(uint32_t nMask);
+    /// <summary>Clears these bits in m_fFlags (Flags_t), networked.</summary>
+    void ClearFlags(uint32_t nMask);
+    /// <summary>Whether every bit of the mask is set in m_fFlags.</summary>
+    bool HasFlags(uint32_t nMask);
 };
 
 #endif // _INCLUDE_CBASEENTITY_H

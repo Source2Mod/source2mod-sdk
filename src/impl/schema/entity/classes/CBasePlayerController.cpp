@@ -41,6 +41,8 @@
 #include "source2mod/ISource2ModGameConfig.h"
 #include "source2mod/ISource2ModPlugin.h"
 #include "source2mod/schema/entity/classes/CCSPlayerPawn.h"
+#include "source2mod/schema/entity/classes/CCSPlayerPawnBase.h"
+#include "source2mod/schema/entity/classes/CPlayer_ObserverServices.h"
 
 #include <engine2/serversideclient.h>
 #include <tier0/dbg.h>
@@ -274,4 +276,39 @@ CCSPlayerPawn* CBasePlayerController::GetPawn()
     if (auto handle = m_hPawn(); handle.IsValid())
         return static_cast<CCSPlayerPawn*>(handle.Get());
     return nullptr;
+}
+
+void CBasePlayerController::SetPlayerName(const char* pszName)
+{
+    char* pszBuffer = m_iszPlayerName();
+    if (!pszBuffer)
+        return;
+    V_strncpy(pszBuffer, pszName ? pszName : "", 128);
+    m_iszPlayerName.NetworkStateChanged();
+}
+
+bool CBasePlayerController::IsConnected()
+{
+    return m_iConnected() == PlayerConnectedState::Connected;
+}
+
+CSPlayerState CBasePlayerController::GetPawnState()
+{
+    // m_hPawn is the player pawn or the observer pawn; both are CCSPlayerPawnBase.
+    auto handle = m_hPawn();
+    CBasePlayerPawn* pPawn = handle.IsValid() ? handle.Get() : nullptr;
+    if (!pPawn)
+        return CSPlayerState::STATE_WELCOME;
+    return static_cast<CCSPlayerPawnBase*>(pPawn)->m_iPlayerState();
+}
+
+CBaseEntity* CBasePlayerController::GetObserverTarget()
+{
+    auto handle = m_hPawn();
+    CBasePlayerPawn* pPawn = handle.IsValid() ? handle.Get() : nullptr;
+    CPlayer_ObserverServices* pObserver = pPawn ? pPawn->m_pObserverServices() : nullptr;
+    if (!pObserver)
+        return nullptr;
+    auto target = pObserver->m_hObserverTarget();
+    return target.IsValid() ? target.Get() : nullptr;
 }

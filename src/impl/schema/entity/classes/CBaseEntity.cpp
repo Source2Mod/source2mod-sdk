@@ -42,6 +42,8 @@
 #include "source2mod/ISource2ModGameConfig.h"
 #include "source2mod/ISource2ModPlugin.h"
 #include "source2mod/schema/entity/classes/CBodyComponent.h"
+#include "source2mod/schema/entity/classes/CCSPlayerController.h"
+#include "source2mod/schema/entity/classes/CCSPlayerPawn.h"
 #include "source2mod/schema/entity/classes/CCollisionProperty.h"
 #include "source2mod/schema/entity/classes/CEntitySubclassVDataBase.h"
 #include "source2mod/schema/entity/classes/CGameSceneNode.h"
@@ -187,4 +189,42 @@ void CBaseEntity::DispatchParticleEffect(const char* pszParticleName, ParticleAt
     SOURCE2MOD_CALL_FUNCTION(void(const char*, int, CBaseEntity*, uint8, uint32, bool, int, IRecipientFilter*, uint8), "DispatchParticleEffect",
                              eChain, pszParticleName, static_cast<int>(nAttachType), this, nAttachmentPoint, 0u,
                              bResetAllParticlesOnEntity, -1, pFilter, static_cast<uint8>(0));
+}
+
+CCSPlayerController* CBaseEntity::IsPlayerController()
+{
+    const char* pszClassname = GetClassname();
+    return pszClassname && !V_strcmp(pszClassname, "cs_player_controller") ? reinterpret_cast<CCSPlayerController*>(this) : nullptr;
+}
+
+CCSPlayerPawn* CBaseEntity::IsPlayerPawn()
+{
+    const char* pszClassname = GetClassname();
+    return pszClassname && !V_strcmp(pszClassname, "player") ? reinterpret_cast<CCSPlayerPawn*>(this) : nullptr;
+}
+
+SharedTeams_t CBaseEntity::GetTeam()
+{
+    const uint8_t nTeam = m_iTeamNum();
+    return nTeam <= CS_TEAM_CT ? static_cast<SharedTeams_t>(nTeam) : CS_TEAM_NONE;
+}
+
+bool CBaseEntity::IsAlive()
+{
+    return m_lifeState() == LIFE_ALIVE;
+}
+
+void CBaseEntity::AddFlags(uint32_t nMask)
+{
+    m_fFlags(m_fFlags() | nMask);
+}
+
+void CBaseEntity::ClearFlags(uint32_t nMask)
+{
+    m_fFlags(m_fFlags() & ~nMask);
+}
+
+bool CBaseEntity::HasFlags(uint32_t nMask)
+{
+    return (m_fFlags() & nMask) == nMask;
 }

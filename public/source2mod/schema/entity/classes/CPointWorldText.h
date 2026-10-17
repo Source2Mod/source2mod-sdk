@@ -84,6 +84,10 @@ public:
     SCHEMA_FIELD(PointWorldTextReorientMode_t, m_nReorientMode);
 
 public:
+    /// <summary>Sets the text (m_messageText, 512 bytes, cut to fit), networked.</summary>
+    void SetMessage(const char* pszMessage);
+
+public:
     static CPointWorldText* New(const char* className)
     {
         return CBaseEntity::New<CPointWorldText>(className);

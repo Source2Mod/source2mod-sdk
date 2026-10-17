@@ -40,6 +40,7 @@
 #pragma once
 #endif
 
+#include "../enums/CSPlayerState.h"
 #include "../enums/QuestProgress__Reason.h"
 #include "CBaseEntity.h"
 #include "CBasePlayerController.h"
@@ -196,6 +197,22 @@ public:
     CCSPlayerPawn* GetPlayerPawn();
     /// <summary>Get observer pawn.</summary>
     CCSObserverPawn* GetObserverPawn();
+    /// <summary>m_iPlayerState of the player pawn (m_hPlayerPawn); STATE_WELCOME without one.</summary>
+    CSPlayerState GetPlayerPawnState();
+    /// <summary>The player pawn's health, 0 without a living pawn.</summary>
+    int GetHealth();
+    /// <summary>The player pawn's max health, 0 without a living pawn.</summary>
+    int GetMaxHealth();
+    /// <summary>Sets the living player pawn's health (and the scoreboard's m_iPawnHealth), raising max health to fit. Values below 1 are ignored: kill with damage instead.</summary>
+    void SetHealth(int nHealth);
+    /// <summary>Adds to the living player pawn's health (negative takes away); a result below 1 is ignored. Max health is left alone.</summary>
+    void AddHealth(int nDelta);
+    /// <summary>Sets the living player pawn's max health; values below 1 are ignored.</summary>
+    void SetMaxHealth(int nMaxHealth);
+    /// <summary>Sets the living player pawn's armor (and m_iPawnArmor); bHelmet also gives a helmet. Negative values are ignored.</summary>
+    void SetArmor(int nArmor, bool bHelmet = false);
+    /// <summary>Adds to the living player pawn's armor (negative takes away, not below 0).</summary>
+    void AddArmor(int nDelta);
 
 public:
     static CCSPlayerController* New(const char* className)
