@@ -43,38 +43,26 @@ namespace
 
 	/// The nav mesh pointer lives in a global that CSource2Server::GetNavMeshData
 	/// reads through RIP-relative addressing. The signature lands on that
-	/// instruction: bytes 3..6 are the displacement, and it is relative to the
-	/// end of the instruction -- 7 bytes on Linux (lea rax, [rip+disp]), 8 on
-	/// Windows (cmp qword ptr [rip+disp], 0).
+	/// instruction: the displacement is at byte 3, relative to the end of the
+	/// instruction -- 7 bytes on Linux (lea rax, [rip+disp]), 8 on Windows
+	/// (cmp qword ptr [rip+disp], 0).
 	///
 	/// The address of the global does not change, so it is resolved once; the
 	/// value behind it changes with every map, so it is read every time.
 	void** ResolveNavMeshGlobal()
 	{
-		static void** s_ppNavMesh = nullptr;
-		static bool s_bResolved = false;
-
-		if (s_bResolved)
-			return s_ppNavMesh;
-
-		s_bResolved = true;
-
-		void* pFunction = g_pSource2ModGameConfig
-			? g_pSource2ModGameConfig->ResolveSignature("CSource2Server::GetNavMeshData")
-			: nullptr;
-		if (!pFunction)
-			return nullptr;
-
-		auto* pBytes = static_cast<uint8_t*>(pFunction);
-		const int32_t nDisplacement = FieldAt<int32_t>(pBytes, 3);
-
 #ifdef _WIN32
-		constexpr int nInstructionLength = 8;
+		constexpr ptrdiff_t kInstructionLength = 8;
 #else
-		constexpr int nInstructionLength = 7;
+		constexpr ptrdiff_t kInstructionLength = 7;
 #endif
-
-		s_ppNavMesh = reinterpret_cast<void**>(pBytes + nInstructionLength + nDisplacement);
+		static void** const s_ppNavMesh = []() -> void**
+		{
+			const ISource2ModMemory insn = g_pSource2ModGameConfig
+				? g_pSource2ModGameConfig->ResolveSignature("CSource2Server::GetNavMeshData")
+				: ISource2ModMemory();
+			return insn ? insn.ResolveRelativeAddress(3, kInstructionLength).RCast<void**>() : nullptr;
+		}();
 		return s_ppNavMesh;
 	}
 
