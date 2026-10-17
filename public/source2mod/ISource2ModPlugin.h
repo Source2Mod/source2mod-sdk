@@ -110,7 +110,7 @@ class ISource2ModSchemaMethods;
 // The natives interface's name, here so SOURCE2MOD_FILLVARS() fills
 // g_pSource2ModNatives without pulling SourcePawn's headers into every plugin;
 // ISource2ModNatives.h (needed to call it) defines the same.
-#define SOURCE2MOD_NATIVES_INTERFACE "ISource2ModNatives001"
+#define SOURCE2MOD_NATIVES_INTERFACE "ISource2ModNatives002"
 // Same for the schema helpers the core serves (ISource2ModSchemaMethods.h).
 #define SOURCE2MOD_SCHEMAMETHODS_INTERFACE "ISource2ModSchemaMethods001"
 
