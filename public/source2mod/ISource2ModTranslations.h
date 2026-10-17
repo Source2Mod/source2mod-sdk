@@ -74,7 +74,7 @@
 Core Source2Mod Translations
 ========================= */
 
-#define SOURCE2MOD_TRANSLATIONS_INTERFACE "ISource2ModTranslations001"
+#define SOURCE2MOD_TRANSLATIONS_INTERFACE "ISource2ModTranslations002"
 
 class ISource2ModTranslations
 {
@@ -169,6 +169,18 @@ public:
      */
     virtual size_t FormatPhrase(PluginId owner, const char* phrase, CPlayerSlot target,
                                 const char* const* args, int numArgs, char* buffer, size_t maxlen) = 0;
+
+    /**
+     * @brief The raw text of a phrase in a language ({n} placeholders left
+     *        in), for a plugin that keeps a language itself rather than asking
+     *        for a player's.
+     *
+     * @param language A language index (FindLanguage); -1 for the server's.
+     *                 Falls back like Translate: the server's language,
+     *                 English, the phrase name.
+     * @return Bytes written.
+     */
+    virtual size_t TranslateLanguage(PluginId owner, const char* phrase, int language, char* buffer, size_t maxlen) = 0;
 };
 
 #endif //_INCLUDE_ISOURCE2MOD_TRANSLATIONS_H
