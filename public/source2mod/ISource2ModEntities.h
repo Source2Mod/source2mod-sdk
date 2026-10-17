@@ -60,6 +60,7 @@
 #include <igameevents.h>
 
 #include <cstring>
+#include <type_traits>
 #include <vector>
 
 /* =========================
@@ -93,7 +94,7 @@ protected:
 
 * @brief Interface for interacting with entities and Entity I/O system.
   */
-#define SOURCE2MOD_ENTITIES_INTERFACE "ISource2ModEntities003"
+#define SOURCE2MOD_ENTITIES_INTERFACE "ISource2ModEntities004"
 
 class ISource2ModEntities
 {
@@ -134,6 +135,14 @@ public:
                                           CEntityInstance* pActivator = nullptr,
                                           CEntityInstance* pCaller = nullptr,
                                           IEntityFindFilter* pFilter = nullptr) = 0;
+
+    /**
+     * @brief Every entity with this designer name ("prop_dynamic",
+     *        "cs_player_controller"), in entity-list order; empty when the
+     *        entity system is not up. UTIL_FindAllEntitiesByDesignerName<T>
+     *        is the typed form.
+     */
+    virtual std::vector<CBaseEntity*> FindAllEntitiesByDesignerName(const char* pszDesignerName) = 0;
 
     /**
 
@@ -243,30 +252,25 @@ public:
 *     pProp->AcceptInput("Kill");
 * @endcode
   */
+// Defined by every plugin (SOURCE2MOD_EXPOSE) and the core; declared here so
+// the template below can name it.
+extern ISource2ModEntities* g_pSource2ModEntities;
+
 template <typename T = CBaseEntity>
 inline std::vector<T*> UTIL_FindAllEntitiesByDesignerName(const char* pszDesignerName)
 {
-    std::vector<T*> results;
+    if (!g_pSource2ModEntities)
+        return {};
 
-    CGameEntitySystem* pEntitySystem = GetEntitySystem();
-    if (!pszDesignerName || !pEntitySystem)
-        return results;
-
-    for (CEntityIdentity* pIdentity = pEntitySystem->m_EntityList.m_pFirstActiveEntity;
-         pIdentity; pIdentity = pIdentity->m_pNext)
+    if constexpr (std::is_same_v<T, CBaseEntity>)
+        return g_pSource2ModEntities->FindAllEntitiesByDesignerName(pszDesignerName);
+    else
     {
-        if (!pIdentity->m_pInstance)
-            continue;
-
-        const char* pszDesigner = pIdentity->m_designerName.String();
-        if (!pszDesigner)
-            continue;
-
-        if (std::strcmp(pszDesigner, pszDesignerName) == 0)
-            results.push_back(reinterpret_cast<T*>(pIdentity->m_pInstance));
+        std::vector<T*> results;
+        for (CBaseEntity* pEntity : g_pSource2ModEntities->FindAllEntitiesByDesignerName(pszDesignerName))
+            results.push_back(reinterpret_cast<T*>(pEntity));
+        return results;
     }
-
-    return results;
 }
 
 #endif //_INCLUDE_ISOURCE2MOD_ENTITIES_H

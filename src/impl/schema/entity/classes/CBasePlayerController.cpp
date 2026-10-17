@@ -258,7 +258,9 @@ void CBasePlayerController::FireEventToClient(IGameEvent* pEvent)
 {
     if (!pEvent) return;
 
-    IGameEventListener2* pListener = ADDR_LEGACY_GAME_EVENT_LISTENER()(GetPlayerSlot());
+    // CPlayerSlot is one int, passed like one.
+    IGameEventListener2* pListener = SOURCE2MOD_CALL_FUNCTION(IGameEventListener2*(int), "LegacyGameEventListener", HookChain::Run,
+                                                              GetPlayerSlot().Get());
     if (!pListener) return;
 
     pListener->FireGameEvent(pEvent);

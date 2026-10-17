@@ -219,8 +219,8 @@ public:
     /**
      * @brief Creates a module wrapper by name (without extension).
      *
-     * Equivalent to `g_Source2ModAPI->LoadModule(name)`. Release with `delete`
-     * or `g_Source2ModAPI->FreeModule()`.
+     * Equivalent to `g_pSource2ModAPI->LoadModule(name)`. Release with `delete`
+     * or `g_pSource2ModAPI->FreeModule()`.
      *
      * @param name Module name, e.g. "server" or "tier0".
      */
@@ -263,8 +263,8 @@ public:
 #endif
 #endif
 
-#define LOAD_MODULE(name)       g_Source2ModAPI->LoadModule(name)
-#define LOAD_MODULE_MEM(ptr)    g_Source2ModAPI->LoadModuleFromMemory(ptr)
-#define FREE_MODULE(mod)        g_Source2ModAPI->FreeModule(mod)
+#define LOAD_MODULE(name)       g_pSource2ModAPI->LoadModule(name)
+#define LOAD_MODULE_MEM(ptr)    g_pSource2ModAPI->LoadModuleFromMemory(ptr)
+#define FREE_MODULE(mod)        g_pSource2ModAPI->FreeModule(mod)
 
 #endif // _INCLUDE_ISOURCE2MOD_MODULE_H

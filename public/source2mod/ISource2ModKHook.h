@@ -1189,7 +1189,7 @@ Macros
         if (!::Source2ModKHookVersionMatches(g_Source2ModCoreKHookHeader, g_Source2ModCoreKHookCommit, error, maxlen, &source2modKHookNote)) \
             return false; \
         if (source2modKHookNote) \
-            g_Source2ModAPI->Log(g_PluginAPI, "%s\n", source2modKHookNote); \
+            g_pSource2ModAPI->Log(g_pPluginAPI, "%s\n", source2modKHookNote); \
     } while (0)
 
 #define KHOOK_INIT() \

@@ -112,7 +112,12 @@ class Source2ModSdkPlugin(object):
   def Sources(self, sdk):
     sources = []
 
+    # src/impl is the core's (the schema helpers' code); a plugin builds the
+    # generated forwarders in src/forward that call it.
+    impl = os.path.join(self.sourcePath, 'src', 'impl')
     for root, _, files in os.walk(os.path.join(self.sourcePath, 'src')):
+      if root == impl or root.startswith(impl + os.sep):
+        continue
       for f in files:
         if f.endswith('.cpp'):
           sources += [os.path.join(root, f)]

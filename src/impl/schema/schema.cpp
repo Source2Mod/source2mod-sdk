@@ -66,55 +66,6 @@ SOURCE2MOD_GLOBALVARS();
 #define MODULE_EXT ".so"
 #endif
 
-IGameEventManager2* GetGameEventManager()
-{
-    return g_Source2ModAPI->GetGameEventManager();
-}
-
-CGlobalVars* GetGlobalVars()
-{
-    return g_Source2ModAPI->GetGlobalVars();
-}
-
-ICvar* GetCVar()
-{
-    return g_Source2ModAPI->GetCVar();
-}
-
-ISource2Server* GetSource2Server()
-{
-    return g_Source2ModAPI->GetSource2Server();
-}
-
-IVEngineServer2* GetEngineServer()
-{
-    return g_Source2ModAPI->GetEngineServer();
-}
-
-IGameEventSystem* GetGameEventSystem()
-{
-    return g_Source2ModAPI->GetGameEventSystem();
-}
-INetworkMessages* GetNetworkMessages()
-{
-    return g_Source2ModAPI->GetNetworkMessages();
-}
-
-INetworkServerService* GetNetworkServerService()
-{
-    return g_Source2ModAPI->GetNetworkServerService();
-}
-
-CGameEntitySystem* GetEntitySystem()
-{
-    return g_Source2ModAPI->GetEntitySystem();
-}
-
-CSchemaSystem* GetSchemaSystem()
-{
-    return g_Source2ModAPI->GetSchemaSystem();
-}
-
 namespace
 {
     constexpr uint32_t g_ChainKey = hash_32_fnv1a_const("__m_pChainEntity");
@@ -360,7 +311,7 @@ static bool IsInModuleText(const void* p, const void* pModuleAddress)
             return ISource2ModModule::SectionInfo{0, 0};
 
         const ISource2ModModule::SectionInfo text = pModule->GetSectionByName(".text");
-        g_Source2ModAPI->FreeModule(pModule);
+        g_pSource2ModAPI->FreeModule(pModule);
         return text;
     }();
 

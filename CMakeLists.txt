@@ -313,6 +313,15 @@ list(APPEND SOURCE_FILES
         ${SOURCESDK}/entity2/entitykeyvalues.cpp
 )
 
+# The schema helpers' code (src/impl) is the core's; a plugin gets the
+# generated forwarders (src/forward) that call it (ISource2ModSchemaMethods.h,
+# tools/schemamethods/generate.py).
+if (SOURCE2MOD_CORE)
+    list(FILTER SOURCE_FILES EXCLUDE REGEX "/src/forward/")
+else()
+    list(FILTER SOURCE_FILES EXCLUDE REGEX "/src/impl/")
+endif()
+
 add_library(source2mod-sdk STATIC ${SOURCE_FILES})
 
 if (SOURCE2MOD_CORE)

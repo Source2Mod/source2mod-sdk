@@ -49,14 +49,14 @@ SOURCE2MOD_GLOBALVARS();
 
 void ISource2ModHook::Warn(const char* pszFormat, const char* pszName)
 {
-    if (g_Source2ModAPI)
-        g_Source2ModAPI->Log(g_PluginAPI, pszFormat, pszName ? pszName : "(null)");
+    if (g_pSource2ModAPI)
+        g_pSource2ModAPI->Log(g_pPluginAPI, pszFormat, pszName ? pszName : "(null)");
 }
 
 void ISource2ModHook::FreeModule(ISource2ModModule* pModule)
 {
-    if (g_Source2ModAPI && pModule)
-        g_Source2ModAPI->FreeModule(pModule);
+    if (g_pSource2ModAPI && pModule)
+        g_pSource2ModAPI->FreeModule(pModule);
 }
 
 int ISource2ModHook::GetOffset(const char* pszName)

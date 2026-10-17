@@ -344,7 +344,7 @@ namespace
             }
 
             g_RttiSectionsLock.clear(std::memory_order_release);
-            g_Source2ModAPI->FreeModule(module);
+            g_pSource2ModAPI->FreeModule(module);
         }
 
         t_InModuleLookup = false;
@@ -363,7 +363,7 @@ namespace
             return true;
         if (!InLoadedModule(address))
             return false;
-        if (!g_Source2ModAPI || t_InModuleLookup)
+        if (!g_pSource2ModAPI || t_InModuleLookup)
             return true;
         if (!AddRttiSectionsOf(address))
             return true; // in a binary the core cannot read -- trust it, as before

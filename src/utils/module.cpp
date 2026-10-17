@@ -41,12 +41,12 @@ SOURCE2MOD_GLOBALVARS();
 
 ISource2ModModule* ISource2ModModule::New(const char* name)
 {
-    return g_Source2ModAPI->LoadModule(name);
+    return g_pSource2ModAPI->LoadModule(name);
 }
 
 ISource2ModModule* ISource2ModModule::New(uintptr_t ptr)
 {
-    return g_Source2ModAPI->LoadModuleFromMemory(ptr);
+    return g_pSource2ModAPI->LoadModuleFromMemory(ptr);
 }
 
 ISource2ModModule* ISource2ModModule::New(void* ptr)

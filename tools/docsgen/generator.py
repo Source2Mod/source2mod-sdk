@@ -584,7 +584,7 @@ def main():
         text = open(os.path.join(SOURCE_DIR, plugin_h), encoding='utf-8-sig').read()
         for cls, glob in re.findall(r'\b(ISource2Mod\w+)\*\s+(g_pSource2Mod\w+)\s*=', text):
             GLOBALS[cls] = glob
-        GLOBALS.setdefault('ISource2ModAPI', 'g_Source2ModAPI')
+        GLOBALS.setdefault('ISource2ModAPI', 'g_pSource2ModAPI')
 
     # first pass: every documented name -> url
     for rel, r in parsed.items():

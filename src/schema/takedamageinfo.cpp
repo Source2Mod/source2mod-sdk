@@ -34,41 +34,26 @@
  * Project: Source2Mod
  */
 
-#include "source2mod/schema/takedamageinfo.h"
+// Constructors stay in every binary (a plugin builds the object itself); the
+// engine's constructor they call is the gamedata function.
 
+#include "source2mod/schema/takedamageinfo.h"
 #include "source2mod/ISource2ModAddresses.h"
 #include "source2mod/ISource2ModApi.h"
 #include "source2mod/ISource2ModGameConfig.h"
 #include "source2mod/ISource2ModPlugin.h"
+#include "source2mod/ISource2ModFunctions.h"
+
 SOURCE2MOD_GLOBALVARS();
 
 CTakeDamageInfo::CTakeDamageInfo()
 {
-    ADDR_TAKE_DAMAGE_INFO()(this, nullptr, nullptr, nullptr, &vec3_origin, &vec3_origin, 0.f, 0, 0, nullptr);
+    SOURCE2MOD_CALL_FUNCTION(void(CTakeDamageInfo*, CBaseEntity*, CBaseEntity*, CBaseEntity*, const Vector*, const Vector*, float, int, int, void*), "CTakeDamageInfo::Constructor", HookChain::Run,
+                             this, nullptr, nullptr, nullptr, &vec3_origin, &vec3_origin, 0.f, 0, 0, nullptr);
 }
 
 CTakeDamageInfo::CTakeDamageInfo(CBaseEntity* pInflictor, CBaseEntity* pAttacker, CBaseEntity* pAbility, float flDamage, DamageTypes_t bitsDamageType)
 {
-    ADDR_TAKE_DAMAGE_INFO()(this, pInflictor, pAttacker, pAbility, &vec3_origin, &vec3_origin, flDamage, (int)bitsDamageType, 0, nullptr);
-}
-
-HitGroup_t CTakeDamageInfo::GetHitGroup() const
-{
-    static int offset = g_pSource2ModGameConfig->GetOffset("CTakeDamageInfo::HitGroup");
-
-    if (offset <= 0)
-        return HitGroup_t::HITGROUP_INVALID;
-
-    const uintptr_t base = reinterpret_cast<uintptr_t>(this);
-
-    const uintptr_t v4 = *reinterpret_cast<const uintptr_t*>(base + offset);
-    if (!v4)
-        return HitGroup_t::HITGROUP_INVALID;
-
-    const uintptr_t v1 = *reinterpret_cast<const uintptr_t*>(v4 + 16);
-    if (!v1)
-        return HitGroup_t::HITGROUP_GENERIC;
-
-    const int32_t group = *reinterpret_cast<const int32_t*>(v1 + 56);
-    return static_cast<HitGroup_t>(group);
+    SOURCE2MOD_CALL_FUNCTION(void(CTakeDamageInfo*, CBaseEntity*, CBaseEntity*, CBaseEntity*, const Vector*, const Vector*, float, int, int, void*), "CTakeDamageInfo::Constructor", HookChain::Run,
+                             this, pInflictor, pAttacker, pAbility, &vec3_origin, &vec3_origin, flDamage, (int)bitsDamageType, 0, nullptr);
 }

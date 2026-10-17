@@ -44,11 +44,12 @@
  * with the script's IPluginContext and its parameters -- so the SourcePawn
  * headers come with this one (public/sourcepawn, the core's VM version).
  *
- * Not part of SOURCE2MOD_FILLVARS(): a plugin that wants it asks for it,
+ * SOURCE2MOD_SAVEVARS() fills g_pSource2ModNatives like every other global
+ * (null on a core without script support); including this header is only
+ * needed to call it.
  *
  * @code
- * auto* natives = (ISource2ModNatives*)g_Source2ModAPI->Source2ModFactory(SOURCE2MOD_NATIVES_INTERFACE, nullptr, nullptr);
- * natives->AddNatives(g_PluginID, g_MyNatives);
+ * g_pSource2ModNatives->AddNatives(g_PluginID, g_MyNatives);
  * @endcode
  *
  * Everything registered here goes when the plugin unloads: its natives

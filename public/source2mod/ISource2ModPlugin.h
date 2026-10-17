@@ -104,6 +104,15 @@ class ISource2ModScripts;
 class ISource2ModSounds;
 class ISource2ModTrace;
 class ISource2ModTransmit;
+class ISource2ModNatives;
+class ISource2ModSchemaMethods;
+
+// The natives interface's name, here so SOURCE2MOD_FILLVARS() fills
+// g_pSource2ModNatives without pulling SourcePawn's headers into every plugin;
+// ISource2ModNatives.h (needed to call it) defines the same.
+#define SOURCE2MOD_NATIVES_INTERFACE "ISource2ModNatives001"
+// Same for the schema helpers the core serves (ISource2ModSchemaMethods.h).
+#define SOURCE2MOD_SCHEMAMETHODS_INTERFACE "ISource2ModSchemaMethods001"
 
 // Everything below this line may use Action and the forward declarations
 // above. Nothing above it can: the interface headers include this
@@ -515,8 +524,8 @@ Globals
 * globals (ADDR_*, g_pSource2ModGameConfig, ...) whichever binary it is linked into.
   */
 #define SOURCE2MOD_DEFINE_GLOBALVARS() \
-    ISource2ModAPI*             g_Source2ModAPI              = nullptr; \
-    ISource2ModPlugin*          g_PluginAPI                  = nullptr; \
+    ISource2ModAPI*             g_pSource2ModAPI              = nullptr; \
+    ISource2ModPlugin*          g_pPluginAPI                  = nullptr; \
     PluginId                    g_PluginID                   = 0; \
     const char*                 g_Source2ModCoreKHookCommit  = nullptr; \
     const char*                 g_Source2ModCoreKHookHeader  = nullptr; \
@@ -550,7 +559,9 @@ Globals
     ISource2ModFunctions*       g_pSource2ModFunctions       = nullptr; \
     ISource2ModTranslations*    g_pSource2ModTranslations    = nullptr; \
     ISource2ModUtils*           g_pSource2ModUtils           = nullptr; \
-    ISource2ModTransmit*        g_pSource2ModTransmit        = nullptr;
+    ISource2ModTransmit*        g_pSource2ModTransmit        = nullptr; \
+    ISource2ModNatives*         g_pSource2ModNatives         = nullptr; \
+    ISource2ModSchemaMethods*   g_pSource2ModSchemaMethods   = nullptr;
 
 /**
 
@@ -570,8 +581,8 @@ Globals
 * @brief Declares external globals.
   */
 #define SOURCE2MOD_GLOBALVARS() \
-    extern ISource2ModAPI*             g_Source2ModAPI; \
-    extern ISource2ModPlugin*          g_PluginAPI; \
+    extern ISource2ModAPI*             g_pSource2ModAPI; \
+    extern ISource2ModPlugin*          g_pPluginAPI; \
     extern PluginId                    g_PluginID; \
     extern const char*                 g_Source2ModCoreKHookCommit; \
     extern const char*                 g_Source2ModCoreKHookHeader; \
@@ -606,6 +617,8 @@ Globals
     extern ISource2ModTranslations*    g_pSource2ModTranslations; \
     extern ISource2ModUtils*           g_pSource2ModUtils; \
     extern ISource2ModTransmit*        g_pSource2ModTransmit; \
+    extern ISource2ModNatives*         g_pSource2ModNatives; \
+    extern ISource2ModSchemaMethods*   g_pSource2ModSchemaMethods; \
     namespace KHook { extern KHook::IKHook* __exported__khook; }
 
 /**
@@ -646,7 +659,9 @@ Globals
     g_pSource2ModFunctions       = (ISource2ModFunctions*)      (api)->Source2ModFactory(SOURCE2MOD_FUNCTIONS_INTERFACE,       nullptr, nullptr); \
     g_pSource2ModTranslations    = (ISource2ModTranslations*)   (api)->Source2ModFactory(SOURCE2MOD_TRANSLATIONS_INTERFACE,    nullptr, nullptr); \
     g_pSource2ModUtils           = (ISource2ModUtils*)          (api)->Source2ModFactory(SOURCE2MOD_UTILS_INTERFACE,           nullptr, nullptr); \
-    g_pSource2ModTransmit        = (ISource2ModTransmit*)       (api)->Source2ModFactory(SOURCE2MOD_TRANSMIT_INTERFACE,        nullptr, nullptr);
+    g_pSource2ModTransmit        = (ISource2ModTransmit*)       (api)->Source2ModFactory(SOURCE2MOD_TRANSMIT_INTERFACE,        nullptr, nullptr); \
+    g_pSource2ModNatives         = (ISource2ModNatives*)        (api)->Source2ModFactory(SOURCE2MOD_NATIVES_INTERFACE,         nullptr, nullptr); \
+    g_pSource2ModSchemaMethods   = (ISource2ModSchemaMethods*)  (api)->Source2ModFactory(SOURCE2MOD_SCHEMAMETHODS_INTERFACE,   nullptr, nullptr);
 
 /**
 
@@ -692,9 +707,9 @@ Globals
 // KHOOK_INIT() makes it, the first time KHook is used, from the two values
 // fetched here (see SOURCE2MOD_KHOOK_HEADER_INTERFACE).
 #define SOURCE2MOD_SAVEVARS() \
-    g_Source2ModAPI = api; \
+    g_pSource2ModAPI = api; \
     SOURCE2MOD_FILLGAMEVARS(api) \
-    g_PluginAPI  = static_cast<ISource2ModPlugin*>(this); \
+    g_pPluginAPI  = static_cast<ISource2ModPlugin*>(this); \
     g_PluginID   = id; \
     KHook::__exported__khook = static_cast<KHook::IKHook*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_INTERFACE, nullptr, nullptr)); \
     g_Source2ModCoreKHookCommit = static_cast<const char*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_VERSION_INTERFACE, nullptr, nullptr)); \
@@ -706,13 +721,13 @@ Logging helpers
 ========================= */
 
 /// Shortcut for logging
-#define SOURCE2MOD_LOG        g_Source2ModAPI->Log
+#define SOURCE2MOD_LOG        g_pSource2ModAPI->Log
 
 /// Console print
-#define SOURCE2MOD_CONPRINT   g_Source2ModAPI->ConPrint
+#define SOURCE2MOD_CONPRINT   g_pSource2ModAPI->ConPrint
 
 /// Console printf
-#define SOURCE2MOD_CONPRINTF  g_Source2ModAPI->ConPrintf
+#define SOURCE2MOD_CONPRINTF  g_pSource2ModAPI->ConPrintf
 
 /* =========================
 Interface helpers
@@ -727,12 +742,12 @@ Interface helpers
  * @param v_name		Interface name.
  */
 #define GET_VALVE_IFACE_CURRENT(v_factory, v_var, v_type, v_name) \
-	v_var = (v_type *)g_Source2ModAPI->QueryInterface(g_Source2ModAPI->v_factory(), v_name); \
+	v_var = (v_type *)g_pSource2ModAPI->QueryInterface(g_pSource2ModAPI->v_factory(), v_name); \
 	if (!v_var) \
 	{ \
 		if (error && maxlen) \
 		{ \
-			g_Source2ModAPI->Format(error, maxlen, "Could not find interface: %s", v_name); \
+			g_pSource2ModAPI->Format(error, maxlen, "Could not find interface: %s", v_name); \
 		} \
 		return false; \
 	}
@@ -746,12 +761,12 @@ Interface helpers
  * @param v_name		Interface name.
  */
 #define GET_VALVE_IFACE_ANY(v_factory, v_var, v_type, v_name) \
-	v_var = (v_type *)g_Source2ModAPI->QueryInterface(g_Source2ModAPI->v_factory(), v_name, 0); \
+	v_var = (v_type *)g_pSource2ModAPI->QueryInterface(g_pSource2ModAPI->v_factory(), v_name, 0); \
 	if (!v_var) \
 	{ \
 		if (error && maxlen) \
 		{ \
-			g_Source2ModAPI->Format(error, maxlen, "Could not find interface: %s", v_name); \
+			g_pSource2ModAPI->Format(error, maxlen, "Could not find interface: %s", v_name); \
 		} \
 		return false; \
 	}
@@ -770,7 +785,7 @@ Interface helpers
  * @param v_ret		int receiving SOURCE2MOD_IFACE_OK or SOURCE2MOD_IFACE_FAILED.
  */
 #define GET_SOURCE2MOD_IFACE(v_var, v_type, v_name, v_ret) \
-	v_var = (v_type *)g_Source2ModAPI->Source2ModFactory(v_name, &(v_ret), nullptr); \
+	v_var = (v_type *)g_pSource2ModAPI->Source2ModFactory(v_name, &(v_ret), nullptr); \
 	if (!v_var) \
 	{ \
 		(v_ret) = SOURCE2MOD_IFACE_FAILED; \
@@ -790,7 +805,7 @@ Interface helpers
  * @param v_ret		int receiving SOURCE2MOD_IFACE_OK or SOURCE2MOD_IFACE_FAILED.
  */
 #define GET_METAMOD_IFACE(v_var, v_type, v_name, v_ret) \
-	v_var = (v_type *)g_Source2ModAPI->MetaFactory(v_name, &(v_ret), nullptr); \
+	v_var = (v_type *)g_pSource2ModAPI->MetaFactory(v_name, &(v_ret), nullptr); \
 	if (!v_var) \
 	{ \
 		(v_ret) = SOURCE2MOD_IFACE_FAILED; \

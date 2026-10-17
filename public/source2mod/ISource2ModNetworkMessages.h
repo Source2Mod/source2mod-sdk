@@ -426,7 +426,7 @@ public:
 };
 
 /**
- * @brief Shorthand accessors via g_Source2ModAPI.
+ * @brief Shorthand accessors via g_pSource2ModAPI.
  */
 #define NET_MSG_ALLOC_BY_ID(id)              g_pSource2ModNetworkMessages->AllocateNetMessageByID(id)
 #define NET_MSG_ALLOC_BY_NAME(name)          g_pSource2ModNetworkMessages->AllocateNetMessageByPartialName(name)
