@@ -34,7 +34,6 @@ enum Source2ModAddress
 	Address_CGameEntitySystem_FindEntityByClassName,
 	Address_CGameEntitySystem_FindEntityByName,
 	Address_CTakeDamageInfo_CTakeDamageInfo,
-	Address_INetworkMessageProcessingPreFilter_FilterMessage,
 	Address_CEntityIdentity_AcceptInput,
 	Address_CCSPlayer_ItemServices_CanAcquire,
 	Address_CCSPlayerPawnBase_CanMove,

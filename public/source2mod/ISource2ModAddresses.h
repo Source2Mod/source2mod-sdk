@@ -226,10 +226,6 @@ using CTakeDamageInfo_CTakeDamageInfo_t = void (FASTCALL*)(CTakeDamageInfo* pThi
                                                            const Vector* vecDamagePosition, float flDamage,
                                                            int bitsDamageType, int iCustomDamage, void* a10);
 
-using INetworkMessageProcessingPreFilter_FilterMessage_t = bool (THISCALL*)(INetworkMessageProcessingPreFilter* pThis,
-                                                                            const CNetMessage* pData,
-                                                                            INetChannel* pChannel);
-
 
 /* =========================
 SwiftlyS2-derived typedefs
@@ -472,7 +468,6 @@ public:
     virtual CGameEntitySystem_FindEntityByClassName_t CGameEntitySystem_FindEntityByClassName() = 0;
     virtual CGameEntitySystem_FindEntityByName_t CGameEntitySystem_FindEntityByName() = 0;
     virtual CTakeDamageInfo_CTakeDamageInfo_t CTakeDamageInfo_CTakeDamageInfo() = 0;
-    virtual INetworkMessageProcessingPreFilter_FilterMessage_t INetworkMessageProcessingPreFilter_FilterMessage() = 0;
 
     // Ported from SwiftlyS2; appended so the indices above stay put. The ones
     // an SDK schema helper calls (CanMove, SetOrAddAttributeValueByName, the
@@ -579,7 +574,6 @@ public:
 #define ADDR_FIND_ENTITY_BY_CLASSNAME()             g_pSource2ModAddresses->CGameEntitySystem_FindEntityByClassName()
 #define ADDR_FIND_ENTITY_BY_NAME()                  g_pSource2ModAddresses->CGameEntitySystem_FindEntityByName()
 #define ADDR_TAKE_DAMAGE_INFO()                     g_pSource2ModAddresses->CTakeDamageInfo_CTakeDamageInfo()
-#define ADDR_FILTER_MESSAGE()                       g_pSource2ModAddresses->INetworkMessageProcessingPreFilter_FilterMessage()
 
 #define ADDR_IDENTITY_ACCEPT_INPUT()                g_pSource2ModAddresses->CEntityIdentity_AcceptInput()
 #define ADDR_CAN_ACQUIRE()                          g_pSource2ModAddresses->CCSPlayer_ItemServices_CanAcquire()
