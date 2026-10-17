@@ -71,7 +71,7 @@ all welcome. Contributions go through pull requests from your own fork, against
   layout (a method added, removed, reordered or retyped) is a new revision
   (`ISource2ModX002` -> `003`), and the core has to serve both. That needs a matching
   pull request in [source2mod](https://github.com/Source2Mod/source2mod);
-  link the two. See [Compatibility](https://www.source2toolkit.net/docs/development/compatibility).
+  link the two. See [Compatibility](https://source2mod.net/docs/development/compatibility).
 - **No STL or other complex types across a new interface boundary** unless the
   interface already does so.
 - **Doc comments** above the `virtual` are what the API reference on the website
