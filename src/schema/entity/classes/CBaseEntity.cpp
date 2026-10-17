@@ -71,25 +71,6 @@ void CBaseEntity::AddEntityIOEvent(const char* pszInput, CEntityInstance* pActiv
     fn(reinterpret_cast<CEntitySystem*>(pEntitySystem), this, pszInput, pActivator, pCaller, variant_t(pszValue), flDelay, nullptr, nullptr);
 }
 
-CEntityIOListenerHandle* CBaseEntity::AddSingleEntityIOListener(const char* pszOutput, std::function<Action(const char*, CEntityInstance*, CEntityInstance*, float, bool)> callback, bool post)
-{
-    auto* listener = new CSingleEntityIOListener(this, std::move(callback));
-
-    const char* classname = GetClassname();
-
-    // The listener and the callback it holds are in whichever plugin called
-    // this, so that plugin has to be the one Source2Mod drops it with.
-    g_pSource2ModEntities->AddEntityIOListener(listener, classname, pszOutput, post);
-
-    auto* handle = new CEntityIOListenerHandle();
-    handle->m_pListener = listener;
-    handle->m_szClassname = classname ? classname : "*";
-    handle->m_szOutput = pszOutput ? pszOutput : "*";
-    handle->m_bPost = post;
-
-    return handle;
-}
-
 Vector CBaseEntity::GetAbsOrigin()
 {
     return m_CBodyComponent->m_pSceneNode->m_vecAbsOrigin();

@@ -87,6 +87,7 @@ class ISource2ModClients;
 class ISource2ModFiles;
 class ISource2ModTargeting;
 class ISource2ModFunctions;
+class ISource2ModHooks;
 class ISource2ModTranslations;
 class ISource2ModUtils;
 class ISource2ModCommands;
@@ -118,7 +119,7 @@ class ISource2ModTransmit;
 #include "ISource2ModEvents.h"
 #include "ISource2ModFeatures.h"
 #include "ISource2ModGameConfig.h"
-#include "ISource2ModGameHooks.h"
+#include "ISource2ModHooks.h"
 #include "ISource2ModGameSystems.h"
 #include "ISource2ModGeoIP.h"
 #include "ISource2ModHTTP.h"
@@ -163,7 +164,6 @@ Export system
 /// to it at load; this is how that same engine reaches a source2mod plugin, so
 /// every hook on the server -- metamod's, Source2Mod's, every plugin's --
 /// runs on one instance. SOURCE2MOD_SAVEVARS() does the fetch.
-#define SOURCE2MOD_GAMEHOOKS_INTERFACE "ISource2ModGameHooks003"
 #define SOURCE2MOD_KHOOK_INTERFACE "Source2ModKHook001"
 
 /// The commit of the KHook the core was compiled against, as a const char*
@@ -260,7 +260,13 @@ inline bool Source2ModKHookVersionMatches(const char* coreHeader, const char* co
 // OnClientDisconnectPost on ISource2ModListener, which is now in the order
 // the engine calls it; OnClientDisconnect is called pre instead of post. The
 // slots moved, so a plugin built against 3 or older is refused.
-#define SOURCE2MOD_PLAPI_VERSION 4
+// 5: ISource2ModHooks (HookPoint + HookTarget) replaces ISource2ModGameHooks
+// and the engine callbacks of ISource2ModListener (now hook points);
+// ISource2ModEntities' entity / output listeners take filters and one entity
+// (IEntityOutputListener replaces the IEntityIOListener classes); the KHook
+// wrappers moved to ISource2ModKHook.h. The listener's slots moved: a plugin built
+// against 4 or older is refused.
+#define SOURCE2MOD_PLAPI_VERSION 5
 
 /// Plugin API interface name
 #define SOURCE2MOD_PLAPI_NAME "ISource2ModPlugin"
@@ -359,9 +365,12 @@ Listener Interface
 
 /**
 
-* @brief Listener for source2mod and engine events.
+* @brief Source2Mod and Metamod events: plugins coming and going, the map,
+* interface queries, the permission system.
 *
-* Allows plugins to react to lifecycle and map events.
+* The engine's own callbacks (GameFrame, client connect / put in server /
+* disconnect, ...) are hook points: g_pSource2ModHooks->Hook(HookPoint::GameFrame,
+* HookTarget::All(), ...) -- ISource2ModHooks.h.
   */
 class ISource2ModListener
 {
@@ -462,87 +471,6 @@ public:
         return OnSource2ModQuery(iface, ret);
     }
 
-    /// Post ISource2Server::GameFrame: once a frame, after Source2Mod's own
-    /// per-frame work (timers, menus).
-    virtual void OnGameFrame(bool simulating, bool firstTick, bool lastTick)
-    {
-    }
-
-    /// Post INetworkServerService::StartupServer: a new server session; the
-    /// entity system of the new map is already Source2Mod's.
-    virtual void OnStartupServer(const GameSessionConfiguration_t& config, ISource2WorldSession* session, const char* mapName)
-    {
-    }
-
-    /// Pre ISource2GameClients::ClientConnect: a player asks to join (the
-    /// engine does not call it for bots), right after OnClientConnected.
-    /// `networkId` is the player's "ip:port" here. Return false to refuse;
-    /// the reason goes into `rejectReason` (the CS2 client shows its own
-    /// "rejected by game" text whatever it says). The first plugin to refuse
-    /// ends it -- the ones after it are not asked.
-    virtual bool OnClientConnect(CPlayerSlot slot, const char* name, uint64 xuid, const char* networkId, bool unk1, CBufferString* rejectReason)
-    {
-        return true;
-    }
-
-    /// Post ISource2GameClients::OnClientConnected: a player or a bot
-    /// (`fakePlayer`) got a slot. For a player the engine calls this before
-    /// ClientConnect, so it also comes for a connection that is then
-    /// refused. `networkId` is the SteamID ("[U:1:...]"), `address` the
-    /// player's "ip:port".
-    virtual void OnClientConnected(CPlayerSlot slot, const char* name, uint64 xuid, const char* networkId, const char* address, bool fakePlayer)
-    {
-    }
-
-    /// Post ISource2GameClients::ClientPutInServer: the player (type 0) or
-    /// bot (type 1) is in the game and has a controller.
-    virtual void OnClientPutInServer(CPlayerSlot slot, const char* name, int type, uint64 xuid)
-    {
-    }
-
-    /// Pre ISource2GameClients::ClientDisconnect: the player is leaving and
-    /// everything of theirs is still there.
-    virtual void OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason, const char* name, uint64 xuid, const char* networkId)
-    {
-    }
-
-    /// Post ISource2GameClients::ClientDisconnect: the game is done with the
-    /// player; Source2Mod forgets the slot's permissions and cookies only
-    /// after this.
-    virtual void OnClientDisconnectPost(CPlayerSlot slot, ENetworkDisconnectionReason reason, const char* name, uint64 xuid, const char* networkId)
-    {
-    }
-
-    /// Post ISource2GameClients::ClientVoice: the player in this slot is
-    /// talking.
-    virtual void OnClientVoice(CPlayerSlot slot)
-    {
-    }
-
-    /// Post ISource2GameClients::ClientSettingsChanged: the player's convars
-    /// (name, language, ...) changed.
-    virtual void OnClientSettingsChanged(CPlayerSlot slot)
-    {
-    }
-
-    /// Post ISource2Server::GameServerSteamAPIActivated: the Steam API is up.
-    virtual void OnGameServerSteamAPIActivated()
-    {
-    }
-
-    /// Pre ISource2Server::GameServerSteamAPIDeactivated: the Steam API is
-    /// about to go.
-    virtual void OnGameServerSteamAPIDeactivated()
-    {
-    }
-
-    /// Post IGameEventManager2::LoadEventsFromFile, with the manager it was
-    /// called on: the place to keep it, or to register a .gameevents file of
-    /// your own.
-    virtual void OnLoadEventsFromFile(IGameEventManager2* manager, const char* filename, bool searchAll)
-    {
-    }
-
     /// Steam validated the player in this slot: from now on they are checked
     /// under `steamId` whatever SteamAuthMode says. Not called for bots.
     virtual void OnClientAuthorized(CPlayerSlot slot, uint64 steamId)
@@ -601,7 +529,7 @@ Globals
     ISource2ModEvents*          g_pSource2ModEvents          = nullptr; \
     ISource2ModFeatures*        g_pSource2ModFeatures        = nullptr; \
     ISource2ModGameConfig*      g_pSource2ModGameConfig      = nullptr; \
-    ISource2ModGameHooks*       g_pSource2ModGameHooks       = nullptr; \
+    ISource2ModHooks*           g_pSource2ModHooks           = nullptr; \
     ISource2ModGameSystems*     g_pSource2ModGameSystems     = nullptr; \
     ISource2ModGeoIP*           g_pSource2ModGeoIP           = nullptr; \
     ISource2ModHTTP*            g_pSource2ModHTTP            = nullptr; \
@@ -656,7 +584,7 @@ Globals
     extern ISource2ModEvents*          g_pSource2ModEvents; \
     extern ISource2ModFeatures*        g_pSource2ModFeatures; \
     extern ISource2ModGameConfig*      g_pSource2ModGameConfig; \
-    extern ISource2ModGameHooks*       g_pSource2ModGameHooks; \
+    extern ISource2ModHooks*           g_pSource2ModHooks; \
     extern ISource2ModGameSystems*     g_pSource2ModGameSystems; \
     extern ISource2ModGeoIP*           g_pSource2ModGeoIP; \
     extern ISource2ModHTTP*            g_pSource2ModHTTP; \
@@ -697,7 +625,7 @@ Globals
     g_pSource2ModEvents          = (ISource2ModEvents*)         (api)->Source2ModFactory(SOURCE2MOD_EVENTS_INTERFACE,          nullptr, nullptr); \
     g_pSource2ModFeatures        = (ISource2ModFeatures*)       (api)->Source2ModFactory(SOURCE2MOD_FEATURES_INTERFACE,        nullptr, nullptr); \
     g_pSource2ModGameConfig      = (ISource2ModGameConfig*)     (api)->Source2ModFactory(SOURCE2MOD_GAMECONFIG_INTERFACE,      nullptr, nullptr); \
-    g_pSource2ModGameHooks       = (ISource2ModGameHooks*)      (api)->Source2ModFactory(SOURCE2MOD_GAMEHOOKS_INTERFACE,       nullptr, nullptr); \
+    g_pSource2ModHooks           = (ISource2ModHooks*)          (api)->Source2ModFactory(SOURCE2MOD_HOOKS_INTERFACE,           nullptr, nullptr); \
     g_pSource2ModGameSystems     = (ISource2ModGameSystems*)    (api)->Source2ModFactory(SOURCE2MOD_GAMESYSTEMS_INTERFACE,     nullptr, nullptr); \
     g_pSource2ModGeoIP           = (ISource2ModGeoIP*)          (api)->Source2ModFactory(SOURCE2MOD_GEOIP_INTERFACE,           nullptr, nullptr); \
     g_pSource2ModHTTP            = (ISource2ModHTTP*)           (api)->Source2ModFactory(SOURCE2MOD_HTTP_INTERFACE,            nullptr, nullptr); \
@@ -870,6 +798,7 @@ Interface helpers
 
 // Last, on purpose: the hook macros need the globals SOURCE2MOD_GLOBALVARS() above
 // declares, and are meant to be there wherever this header is.
-#include "ISource2ModHooks.h"
+#define SOURCE2MOD_KHOOK_WRAPPERS
+#include "ISource2ModKHook.h"
 
 #endif //_INCLUDE_ISOURCE2MOD_PLUGIN_H

@@ -1,16 +1,34 @@
 /**
- * Source2Mod SourcePawn API: raw hooks on game functions (KHook from C++:
- * KHOOK_MEMBER / KHOOK_FUNCTION / KHOOK_VIRTUAL).
+ * Source2Mod SourcePawn API: hooks (ISource2ModHooks).
  *
- * For what the game hooks (source2mod/gamehooks) do not cover: any function
- * found by gamedata, by a signature or symbol of the script's own, or by
- * vtable slot. The parameters are described with Source2ModType, as for
- * Source2ModFunction (and with the same limits on how many). Handlers read
- * and change the arguments and the return value through the objects they
- * are handed, valid inside the handler.
+ * One way to hook anything, the same as C++:
  *
- * A hook is a Handle, not an id: it is described (AddParam) before it is
- * installed, and Enable / Disable can be repeated.
+ *     Hook = Point (what) + Target (on which object) + Handler (with its context)
+ *
+ * Points (HookPoint):
+ *   - game functions with a typed context: TakeDamage, Touch, PostThink,
+ *     AcceptInput, the movement functions, ... (source2mod/hookcontexts);
+ *   - engine callbacks: GameFrame, StartupServer, ClientConnect, ...;
+ *   - any function: HookFunction on a Source2ModFunction (Find on a gamedata
+ *     "function" entry, FromSignature, FromSymbol, FromVirtualTable,
+ *     FromVirtual, FromAddress) -- SourceMod's DHooks.
+ *
+ * Targets: Hook -- every call; HookInstance -- one object (an entity, or a
+ * SchemaObject: services, the game rules, ...); HookClass -- every object of
+ * a C++ class ("CCSPlayerPawn") or one derived from it. Engine callbacks
+ * take Hook only.
+ *
+ * Filters (optional): a point whose object is an entity compares its
+ * designer name ("logic_relay", "player"); AcceptInput also the input's name.
+ *
+ * Entity events and entity outputs are listeners of Source2ModEntities
+ * (source2mod/entities), the way commands, convars and game events have
+ * theirs: this is for functions.
+ *
+ * A handler answers Action_Ignore, Action_Override or Action_Supersede (pre:
+ * the original does not run). Every Hook* returns an id for Unhook; what a
+ * script still holds when it unloads goes with it, and a hook on one entity
+ * goes with the entity.
  */
 
 #if defined _source2mod_hooks_included
@@ -19,137 +37,322 @@
 #define _source2mod_hooks_included
 
 #include <source2mod/types>
+#include <source2mod/schema>
 #include <source2mod/gameconfig>
 #include <source2mod/commands>
+#include <source2mod/hookcontexts>
 
-/** The arguments of the hooked call. Numbered from 1; `this` is 1 for a member function. */
-methodmap Source2ModHookParams
+/** Every point; the numbers are C++'s HookPointId. */
+enum HookPoint
 {
-	/** An int; for an IntRef / BoolRef / FloatRef out-parameter the value it points at. */
-	public native int GetInt(int num);
-	public native float GetFloat(int num);
-	public native bool GetBool(int num);
-	public native CEntityInstance GetEntity(int num);
-	public native SchemaObject GetObject(int num);
-	/**
-	 * Text of a String, BufferString or Int64 (decimal) parameter, or the
-	 * whole command line of a Command parameter.
-	 */
-	public native int GetString(int num, char[] buffer, int maxlen);
-	/** An Int64 parameter as decimal text. */
-	public native int GetInt64(int num, char[] buffer, int maxlen);
-	public native void GetVector(int num, float vec[3]);
+	// Game functions (source2mod/hookcontexts).
+	HookPoint_TakeDamage = 0,
+	HookPoint_CanAcquire,
+	HookPoint_CanMove,
+	HookPoint_CanUse,
+	HookPoint_PostThink,
+	HookPoint_ProcessUsercmds,
+	HookPoint_SimulateUserCommands,
+	HookPoint_RunCommand,
+	HookPoint_AcceptInput,
+	HookPoint_Touch,
+	HookPoint_DropWeapon,
+	HookPoint_AirAccelerate,
+	HookPoint_AirMove,
+	HookPoint_CanUnduck,
+	HookPoint_CategorizePosition,
+	HookPoint_CheckFalling,
+	HookPoint_CheckParameters,
+	HookPoint_CheckVelocity,
+	HookPoint_CheckWater,
+	HookPoint_Duck,
+	HookPoint_Friction,
+	HookPoint_FullWalkMove,
+	HookPoint_GroundAccelerate,
+	HookPoint_LadderMove,
+	HookPoint_MoveInit,
+	HookPoint_PlayerMove,
+	HookPoint_ProcessMovement,
+	HookPoint_SetupMove,
+	HookPoint_TryPlayerMove,
+	HookPoint_WalkMove,
+	HookPoint_WaterMove,
+	HookPoint_OnJumpLegacy,
+	HookPoint_OnJumpModern,
+	HookPoint_CheckJumpButtonLegacy,
+	HookPoint_CheckJumpButtonModern,
+
+	// Engine callbacks.
+	HookPoint_GameFrame = 100,
+	HookPoint_StartupServer,
+	HookPoint_ClientConnect,            /**< pre may refuse: result = false, Action_Supersede */
+	HookPoint_ClientConnected,
+	HookPoint_ClientPutInServer,
+	HookPoint_ClientDisconnect,         /**< pre: still in game; post: gone */
+	HookPoint_ClientVoice,
+	HookPoint_ClientSettingsChanged,
+	HookPoint_GameServerSteamAPIActivated,
+	HookPoint_GameServerSteamAPIDeactivated,
+	HookPoint_LoadEventsFromFile,
+
+	// Source2ModHooks.HookFunction.
+	HookPoint_Function = 300
+};
+
+/* ---- engine callbacks ------------------------------------------------------------- */
+
+/** ISource2Server::GameFrame -- every tick. */
+methodmap GameFrameContext
+{
+	property bool simulating
+	{
+		public native get();
+	}
+	property bool firstTick
+	{
+		public native get();
+	}
+	property bool lastTick
+	{
+		public native get();
+	}
+}
+
+/** INetworkServerService::StartupServer -- a new map's server is up. */
+methodmap StartupServerContext
+{
+	public native int GetMapName(char[] buffer, int maxlen);
+}
+
+/**
+ * ISource2GameClients::ClientConnect. Pre: set result = false and answer
+ * Action_Supersede to turn the client away (SetRejectReason first). Not
+ * called for bots.
+ */
+methodmap ClientConnectContext
+{
+	property CPlayerSlot slot
+	{
+		public native get();
+	}
+	public native int GetName(char[] buffer, int maxlen);
+	/** The SteamID64 as decimal text. */
+	public native int GetXuid(char[] buffer, int maxlen);
+	public native int GetNetworkId(char[] buffer, int maxlen);
+	public native void SetRejectReason(const char[] reason);
+}
+
+/** ISource2GameClients::OnClientConnected -- bots too (fakePlayer). */
+methodmap ClientConnectedContext
+{
+	property CPlayerSlot slot
+	{
+		public native get();
+	}
+	public native int GetName(char[] buffer, int maxlen);
+	public native int GetXuid(char[] buffer, int maxlen);
+	public native int GetNetworkId(char[] buffer, int maxlen);
+	public native int GetAddress(char[] buffer, int maxlen);
+	property bool fakePlayer
+	{
+		public native get();
+	}
+}
+
+/** ISource2GameClients::ClientPutInServer. */
+methodmap ClientPutInServerContext
+{
+	property CPlayerSlot slot
+	{
+		public native get();
+	}
+	public native int GetName(char[] buffer, int maxlen);
+	/** 0 a player, 1 a bot. */
+	property int type
+	{
+		public native get();
+	}
+	public native int GetXuid(char[] buffer, int maxlen);
+}
+
+/** ISource2GameClients::ClientDisconnect: pre while the client is still in game, post once it is gone. */
+methodmap ClientDisconnectContext
+{
+	property CPlayerSlot slot
+	{
+		public native get();
+	}
+	/** NETWORK_DISCONNECT_* (source2mod/consts). */
+	property int reason
+	{
+		public native get();
+	}
+	public native int GetName(char[] buffer, int maxlen);
+	public native int GetXuid(char[] buffer, int maxlen);
+	public native int GetNetworkId(char[] buffer, int maxlen);
+}
+
+/** ClientVoice, ClientSettingsChanged. */
+methodmap ClientSlotContext
+{
+	property CPlayerSlot slot
+	{
+		public native get();
+	}
+}
+
+/** GameServerSteamAPIActivated / Deactivated: nothing to pass. */
+methodmap EmptyContext
+{
+}
+
+/** IGameEventManager2::LoadEventsFromFile -- a resource file of game events. */
+methodmap LoadEventsFromFileContext
+{
+	public native int GetFilename(char[] buffer, int maxlen);
+	property bool searchAll
+	{
+		public native get();
+	}
+}
+
+/* ---- function points --------------------------------------------------------------- */
+
+/**
+ * One call of a hooked Source2ModFunction: the arguments by index, as the
+ * function describes them (`this` of a member function is 0), and the
+ * return value -- C++'s FunctionContext. Valid inside the handler.
+ *
+ * A Set* on an argument in a pre handler changes what the original (and the
+ * later handlers) get. SetReturn* with Action_Override / Action_Supersede is
+ * what the caller gets; in post GetReturn* is what the original returned.
+ */
+methodmap FunctionContext < Handle
+{
+	property int ParamCount
+	{
+		public native get();
+	}
+
+	public native int GetInt(int index);
+	public native bool GetBool(int index);
+	public native float GetFloat(int index);
+	public native CEntityInstance GetEntity(int index);
+	public native SchemaObject GetObject(int index);
+	/** A string, a CBufferString, a command's text, or an int64 as decimal text. */
+	public native int GetString(int index, char[] buffer, int maxlen);
+	/** A Vector* / const Vector& or a Vector by value. */
+	public native void GetVector(int index, float vec[3]);
+
+	public native void SetInt(int index, int value);
+	public native void SetBool(int index, bool value);
+	public native void SetFloat(int index, float value);
+	public native void SetEntity(int index, CEntityInstance entity);
+	public native void SetObject(int index, SchemaObject value);
+	public native void SetVector(int index, const float vec[3]);
+	/** A String parameter: points at a copy that lives until the call is over. */
+	public native void SetString(int index, const char[] value);
+	/** An Int64 parameter, from decimal text. */
+	public native void SetInt64(int index, const char[] value);
+	/** A CBufferString parameter, written in place. */
+	public native void SetBufferString(int index, const char[] value);
+	/** A Command parameter (const CCommand&) as Source2ModCommandArgs, valid inside the handler. */
+	public native Source2ModCommandArgs GetCommandArgs(int index);
+
+	public native int GetReturnInt();
+	public native bool GetReturnBool();
+	public native float GetReturnFloat();
+	public native CEntityInstance GetReturnEntity();
+	public native SchemaObject GetReturnObject();
+	/** A const char* return value, or an integer as decimal text. */
+	public native int GetReturnString(char[] buffer, int maxlen);
+
+	public native void SetReturnInt(int value);
+	public native void SetReturnBool(bool value);
+	public native void SetReturnFloat(float value);
+	public native void SetReturnEntity(CEntityInstance entity);
+	public native void SetReturnObject(SchemaObject value);
+	public native void SetReturnInt64(const char[] value);
 
 	/**
-	 * Changes take effect with Action_Override / Action_Supersede (pre).
-	 * An IntRef / BoolRef / FloatRef out-parameter is written in place
-	 * instead (no Action needed), as SetVector does.
-	 */
-	public native void SetInt(int num, int value);
-	public native void SetFloat(int num, float value);
-	public native void SetBool(int num, bool value);
-	public native void SetEntity(int num, CEntityInstance entity);
-	public native void SetVector(int num, const float vec[3]);
-	/** An Object or Pointer parameter; 0 for null. */
-	public native void SetObject(int num, SchemaObject value);
-	/** A String parameter: points at a copy that lives until the hooked call returns. */
-	public native void SetString(int num, const char[] value);
-	/** An Int64 parameter from decimal text. */
-	public native void SetInt64(int num, const char[] value);
-
-	/** A BufferString parameter: replaces its text in place (no Action needed). */
-	public native void SetBufferString(int num, const char[] value);
-
-	/** A Command parameter as command arguments, Arg(0) the command; valid inside the handler. */
-	public native Source2ModCommandArgs GetCommandArgs(int num);
-
-	/**
-	 * Pre only: runs the original now, past every hook, with the current
-	 * (possibly changed) parameters, and makes its value the return value.
-	 * Answer Action_Supersede after it, or it runs twice.
-	 *
-	 * @return What it returned (int, bool, float, entity, object); 0 for void
+	 * Pre: the function now, with the current arguments, past every hook; its
+	 * value becomes the return value. Answer Action_Supersede afterwards or
+	 * the game calls it a second time.
 	 */
 	public native any CallOriginal();
 }
 
-/** The return value: what the original returned (post), what the caller gets when overridden. */
-methodmap Source2ModHookReturn
+typedef Source2ModFunctionHandler = function Source2ModAction (FunctionContext ctx, bool post);
+
+/* ---- handlers and Source2ModHooks ------------------------------------------------- */
+
+/** The handler of a point: its context, post, and for a point with a value `result`. */
+typeset Source2ModHookHandler
 {
-	public native int GetInt();
-	public native float GetFloat();
-	public native bool GetBool();
-	public native CEntityInstance GetEntity();
-	/** An Object or Pointer return value. */
-	public native SchemaObject GetObject();
-	/** An integer return value as decimal text. */
-	public native int GetInt64(char[] buffer, int maxlen);
-	public native void SetInt(int value);
-	public native void SetFloat(float value);
-	public native void SetBool(bool value);
-	public native void SetEntity(CEntityInstance entity);
-	/** 0 for null. */
-	public native void SetObject(SchemaObject value);
-	/** From decimal text. */
-	public native void SetInt64(const char[] value);
-}
+	function Source2ModAction (TakeDamageContext ctx, bool post, int &result);
+	function Source2ModAction (CanAcquireContext ctx, bool post, AcquireResult &result);
+	function Source2ModAction (CanMoveContext ctx, bool post, bool &result);
+	function Source2ModAction (CanUseContext ctx, bool post, bool &result);
+	function Source2ModAction (PostThinkContext ctx, bool post);
+	function Source2ModAction (ProcessUsercmdsContext ctx, bool post);
+	function Source2ModAction (SimulateUserCommandsContext ctx, bool post);
+	function Source2ModAction (RunCommandContext ctx, bool post);
+	function Source2ModAction (AcceptInputContext ctx, bool post, bool &result);
+	function Source2ModAction (TouchContext ctx, bool post);
+	function Source2ModAction (DropWeaponContext ctx, bool post);
+	function Source2ModAction (MovementContext ctx, bool post, bool &result);
+	function Source2ModAction (AirAccelerateContext ctx, bool post);
+	function Source2ModAction (GroundAccelerateContext ctx, bool post);
+	function Source2ModAction (CategorizePositionContext ctx, bool post);
+	function Source2ModAction (CheckVelocityContext ctx, bool post);
+	function Source2ModAction (FullWalkMoveContext ctx, bool post);
+	function Source2ModAction (SetupMoveContext ctx, bool post);
+	function Source2ModAction (TryPlayerMoveContext ctx, bool post);
+	function Source2ModAction (LegacyJumpContext ctx, bool post);
+	function Source2ModAction (ModernJumpContext ctx, bool post);
+	function Source2ModAction (GameFrameContext ctx, bool post);
+	function Source2ModAction (StartupServerContext ctx, bool post);
+	function Source2ModAction (ClientConnectContext ctx, bool post, bool &result);
+	function Source2ModAction (ClientConnectedContext ctx, bool post);
+	function Source2ModAction (ClientPutInServerContext ctx, bool post);
+	function Source2ModAction (ClientDisconnectContext ctx, bool post);
+	function Source2ModAction (ClientSlotContext ctx, bool post);
+	function Source2ModAction (EmptyContext ctx, bool post);
+	function Source2ModAction (LoadEventsFromFileContext ctx, bool post);
+};
 
-typedef Source2ModRawHookHandler = function Source2ModAction (Source2ModHookParams params, Source2ModHookReturn ret, bool post);
-
-/**
- * One hooked function. Enable() installs it, Disable() or delete takes it
- * down; it goes with the plugin otherwise.
- */
-methodmap Source2ModHook < Handle
+methodmap Source2ModHooks
 {
-	/** By gamedata entry; null when it does not resolve. */
-	public static native Source2ModHook FromGameConfig(const char[] name, Source2ModType returnType);
+	/**
+	 * Hooks a point on every call. The handler's context must be the point's.
+	 *
+	 * @param post          false: before the original; true: after it.
+	 * @param designerName  The object is an entity: only this designer name ("" any).
+	 * @param name          AcceptInput: only this input ("" any).
+	 * @return The id Unhook takes.
+	 */
+	public static native int Hook(HookPoint point, Source2ModHookHandler handler, bool post = false,
+	                              const char[] designerName = "", const char[] name = "");
 
-	/** By a signature of the script's own, in a module ("server"), optionally only in one section (".text"). */
-	public static native Source2ModHook FromSignature(const char[] module, const char[] signature, Source2ModType returnType, const char[] section = "");
+	/** The same, only for calls on one object: an entity or a SchemaObject. */
+	public static native int HookInstance(HookPoint point, any instance, Source2ModHookHandler handler, bool post = false,
+	                                      const char[] designerName = "", const char[] name = "");
 
-	/** The function a matched call / jmp / lea refers to: see Source2ModFunction.FromSignatureRelative. */
-	public static native Source2ModHook FromSignatureRelative(const char[] module, const char[] signature, Source2ModType returnType,
-	                                                          int offset = 1, int nextInstructionOffset = 5, const char[] section = "");
-
-	/** By its exported or debug symbol in a module ("server"); null when there is none. */
-	public static native Source2ModHook FromSymbol(const char[] module, const char[] symbol, Source2ModType returnType);
+	/** The same, for every object of a C++ class ("CCSPlayerPawn") or one derived from it. */
+	public static native int HookClass(HookPoint point, const char[] className, Source2ModHookHandler handler, bool post = false,
+	                                   const char[] designerName = "", const char[] name = "");
 
 	/**
-	 * A virtual function of every object with this vtable: an RTTI class
-	 * name in a module, and the slot. baseName picks the vtable of a
-	 * secondary base (KHOOK_VTABLE_BASE).
+	 * Hooks any function (HookPoint_Function). A virtual needs a vtable: one
+	 * from FromVirtualTable, or HookFunctionInstance / HookFunctionClass.
 	 */
-	public static native Source2ModHook FromVirtual(const char[] module, const char[] vtableName, int vtableIndex, Source2ModType returnType, const char[] baseName = "");
+	public static native int HookFunction(Source2ModFunction fn, Source2ModFunctionHandler handler, bool post = false);
+	public static native int HookFunctionInstance(Source2ModFunction fn, any instance, Source2ModFunctionHandler handler, bool post = false);
+	public static native int HookFunctionClass(Source2ModFunction fn, const char[] className, Source2ModFunctionHandler handler, bool post = false);
 
-	/**
-	 * A virtual function in a secondary vtable of a class with multiple
-	 * bases: the one whose offset-to-top is `offset` (0 the primary,
-	 * negative for the others as the ABI stores it).
-	 */
-	public static native Source2ModHook FromVirtualSecondary(const char[] module, const char[] vtableName, int offset, int vtableIndex, Source2ModType returnType);
+	/** Drops one of the script's hooks. */
+	public static native bool Unhook(int id);
 
-	/**
-	 * A virtual function of one object (an entity or a SchemaObject): the
-	 * vtable it uses is hooked, the handlers run only for calls on it. Disable
-	 * it before the object goes; a new object at the same address would match.
-	 */
-	public static native Source2ModHook FromVirtualObject(any instance, int vtableIndex, Source2ModType returnType);
-
-	/** A function at a core address (ISource2ModAddresses); null when it is not resolved. */
-	public static native Source2ModHook FromAddress(Source2ModAddress address, Source2ModType returnType);
-
-	/** The next parameter; `this` of a member function is the first. */
-	public native void AddParam(Source2ModType type);
-
-	/** Installs the hook; either handler may be INVALID_FUNCTION. */
-	public native bool Enable(Source2ModRawHookHandler pre = INVALID_FUNCTION, Source2ModRawHookHandler post = INVALID_FUNCTION);
-
-	public native void Disable();
-
-	/** Whether the hook is installed (ISource2ModHook::IsInstalled). */
-	property bool Enabled
-	{
-		public native get();
-	}
+	/** Whether the point resolves on the running game (its gamedata matched). */
+	public static native bool IsAvailable(HookPoint point);
 }

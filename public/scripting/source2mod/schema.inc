@@ -172,12 +172,5 @@ methodmap Source2ModSchema
 	public static native SchemaObject GetUtlVectorElement(any instance, const char[] className, const char[] field, int index, int elementSize);
 }
 
-/**
- * IEntityIOListener::OnEntityOutput (Source2ModEntities.AddEntityIOListener,
- * CBaseEntity.AddSingleEntityIOListener). Pre may answer Action_Supersede:
- * the output then never fires.
- */
-typedef Source2ModEntityOutputHandler = function Source2ModAction (const char[] output, CEntityInstance activator, CEntityInstance caller, float delay, bool post);
-
 #include <source2mod/schema/classes>
 #include <source2mod/schema/enums>

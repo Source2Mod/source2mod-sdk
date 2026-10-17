@@ -1,5 +1,7 @@
 /**
- * Source2Mod SourcePawn API: game hooks (ISource2ModGameHooks).
+ * Source2Mod SourcePawn API: the contexts of the game-function hook points
+ * (HookPoint_TakeDamage .. HookPoint_CheckJumpButtonModern, source2mod/hooks;
+ * C++ ISource2ModHookContexts.h).
  *
  * Game functions the core hooks from its own gamedata. A handler gets the
  * call's context -- valid inside the handler -- and post, and answers an
@@ -18,10 +20,10 @@
  * class, its SchemaObject is opaque (for Source2ModFunction calls).
  */
 
-#if defined _source2mod_gamehooks_included
+#if defined _source2mod_hookcontexts_included
  #endinput
 #endif
-#define _source2mod_gamehooks_included
+#define _source2mod_hookcontexts_included
 
 #include <source2mod/types>
 #include <source2mod/schema>
@@ -49,46 +51,6 @@ enum AcquireMethod
 	AcquireMethod_PickUp = 0,
 	AcquireMethod_Buy,
 	AcquireMethod_BuyWithCtrl
-};
-
-/** The hooks, for Source2ModGameHooks.IsAvailable (C++ GameHook). */
-enum Source2ModGameHook
-{
-	GameHook_TakeDamage = 0,
-	GameHook_CanAcquire,
-	GameHook_CanMove,
-	GameHook_CanUse,
-	GameHook_PostThink,
-	GameHook_ProcessUsercmds,
-	GameHook_SimulateUserCommands,
-	GameHook_RunCommand,
-	GameHook_AcceptInput,
-	GameHook_Touch,
-	GameHook_DropWeapon,
-	GameHook_AirAccelerate,
-	GameHook_AirMove,
-	GameHook_CanUnduck,
-	GameHook_CategorizePosition,
-	GameHook_CheckFalling,
-	GameHook_CheckParameters,
-	GameHook_CheckVelocity,
-	GameHook_CheckWater,
-	GameHook_Duck,
-	GameHook_Friction,
-	GameHook_FullWalkMove,
-	GameHook_GroundAccelerate,
-	GameHook_LadderMove,
-	GameHook_MoveInit,
-	GameHook_PlayerMove,
-	GameHook_ProcessMovement,
-	GameHook_SetupMove,
-	GameHook_TryPlayerMove,
-	GameHook_WalkMove,
-	GameHook_WaterMove,
-	GameHook_OnJumpLegacy,
-	GameHook_OnJumpModern,
-	GameHook_CheckJumpButtonLegacy,
-	GameHook_CheckJumpButtonModern
 };
 
 /** The damage being dealt (CTakeDamageInfo); valid inside the hook. */
@@ -803,6 +765,7 @@ methodmap ModernJumpContext
 	public native void CallOriginal();
 }
 
+// The handler of each point (Source2ModHookHandler in source2mod/hooks lists them all).
 typedef Source2ModTakeDamageHandler = function Source2ModAction (TakeDamageContext ctx, bool post, int &result);
 typedef Source2ModCanAcquireHandler = function Source2ModAction (CanAcquireContext ctx, bool post, AcquireResult &result);
 typedef Source2ModCanMoveHandler = function Source2ModAction (CanMoveContext ctx, bool post, bool &result);
@@ -826,87 +789,3 @@ typedef Source2ModSetupMoveHandler = function Source2ModAction (SetupMoveContext
 typedef Source2ModTryPlayerMoveHandler = function Source2ModAction (TryPlayerMoveContext ctx, bool post);
 typedef Source2ModLegacyJumpHandler = function Source2ModAction (LegacyJumpContext ctx, bool post);
 typedef Source2ModModernJumpHandler = function Source2ModAction (ModernJumpContext ctx, bool post);
-
-/**
- * Every HookX returns the id UnhookX takes (0 when it failed). The movement
- * and think hooks run for every player every tick: do as little as possible.
- */
-methodmap Source2ModGameHooks
-{
-	public static native int HookTakeDamage(Source2ModTakeDamageHandler handler, bool post);
-	public static native bool UnhookTakeDamage(int id);
-	public static native int HookCanAcquire(Source2ModCanAcquireHandler handler, bool post);
-	public static native bool UnhookCanAcquire(int id);
-	public static native int HookCanMove(Source2ModCanMoveHandler handler, bool post);
-	public static native bool UnhookCanMove(int id);
-	public static native int HookCanUse(Source2ModCanUseHandler handler, bool post);
-	public static native bool UnhookCanUse(int id);
-	public static native int HookPostThink(Source2ModPostThinkHandler handler, bool post);
-	public static native bool UnhookPostThink(int id);
-	public static native int HookProcessUsercmds(Source2ModProcessUsercmdsHandler handler, bool post);
-	public static native bool UnhookProcessUsercmds(int id);
-	public static native int HookSimulateUserCommands(Source2ModSimulateUserCommandsHandler handler, bool post);
-	public static native bool UnhookSimulateUserCommands(int id);
-	public static native int HookRunCommand(Source2ModRunCommandHandler handler, bool post);
-	public static native bool UnhookRunCommand(int id);
-	public static native int HookAcceptInput(Source2ModAcceptInputHandler handler, bool post);
-	public static native bool UnhookAcceptInput(int id);
-	public static native int HookTouch(Source2ModTouchHandler handler, bool post);
-	public static native bool UnhookTouch(int id);
-	public static native int HookDropWeapon(Source2ModDropWeaponHandler handler, bool post);
-	public static native bool UnhookDropWeapon(int id);
-	public static native int HookAirAccelerate(Source2ModAirAccelerateHandler handler, bool post);
-	public static native bool UnhookAirAccelerate(int id);
-	public static native int HookAirMove(Source2ModMovementHandler handler, bool post);
-	public static native bool UnhookAirMove(int id);
-	public static native int HookCanUnduck(Source2ModMovementHandler handler, bool post);
-	public static native bool UnhookCanUnduck(int id);
-	public static native int HookCategorizePosition(Source2ModCategorizePositionHandler handler, bool post);
-	public static native bool UnhookCategorizePosition(int id);
-	public static native int HookCheckFalling(Source2ModMovementHandler handler, bool post);
-	public static native bool UnhookCheckFalling(int id);
-	public static native int HookCheckParameters(Source2ModMovementHandler handler, bool post);
-	public static native bool UnhookCheckParameters(int id);
-	public static native int HookCheckVelocity(Source2ModCheckVelocityHandler handler, bool post);
-	public static native bool UnhookCheckVelocity(int id);
-	public static native int HookCheckWater(Source2ModMovementHandler handler, bool post);
-	public static native bool UnhookCheckWater(int id);
-	public static native int HookDuck(Source2ModMovementHandler handler, bool post);
-	public static native bool UnhookDuck(int id);
-	public static native int HookFriction(Source2ModMovementHandler handler, bool post);
-	public static native bool UnhookFriction(int id);
-	public static native int HookFullWalkMove(Source2ModFullWalkMoveHandler handler, bool post);
-	public static native bool UnhookFullWalkMove(int id);
-	public static native int HookGroundAccelerate(Source2ModGroundAccelerateHandler handler, bool post);
-	public static native bool UnhookGroundAccelerate(int id);
-	public static native int HookLadderMove(Source2ModMovementHandler handler, bool post);
-	public static native bool UnhookLadderMove(int id);
-	public static native int HookMoveInit(Source2ModMovementHandler handler, bool post);
-	public static native bool UnhookMoveInit(int id);
-	public static native int HookPlayerMove(Source2ModMovementHandler handler, bool post);
-	public static native bool UnhookPlayerMove(int id);
-	public static native int HookProcessMovement(Source2ModMovementHandler handler, bool post);
-	public static native bool UnhookProcessMovement(int id);
-	public static native int HookSetupMove(Source2ModSetupMoveHandler handler, bool post);
-	public static native bool UnhookSetupMove(int id);
-	public static native int HookTryPlayerMove(Source2ModTryPlayerMoveHandler handler, bool post);
-	public static native bool UnhookTryPlayerMove(int id);
-	public static native int HookWalkMove(Source2ModMovementHandler handler, bool post);
-	public static native bool UnhookWalkMove(int id);
-	public static native int HookWaterMove(Source2ModMovementHandler handler, bool post);
-	public static native bool UnhookWaterMove(int id);
-	public static native int HookOnJumpLegacy(Source2ModLegacyJumpHandler handler, bool post);
-	public static native bool UnhookOnJumpLegacy(int id);
-	public static native int HookOnJumpModern(Source2ModModernJumpHandler handler, bool post);
-	public static native bool UnhookOnJumpModern(int id);
-	public static native int HookCheckJumpButtonLegacy(Source2ModLegacyJumpHandler handler, bool post);
-	public static native bool UnhookCheckJumpButtonLegacy(int id);
-	public static native int HookCheckJumpButtonModern(Source2ModModernJumpHandler handler, bool post);
-	public static native bool UnhookCheckJumpButtonModern(int id);
-
-	/**
-	 * False when the core's gamedata has no entry for the function on this
-	 * platform -- handlers can still be registered, they just never run.
-	 */
-	public static native bool IsAvailable(Source2ModGameHook hook);
-}

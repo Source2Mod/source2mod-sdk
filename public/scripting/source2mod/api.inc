@@ -24,7 +24,6 @@
 #include <source2mod/listener>
 #include <source2mod/netmessages>
 #include <source2mod/sounds>
-#include <source2mod/gamehooks>
 #include <source2mod/gameconfig>
 #include <source2mod/hooks>
 #include <source2mod/scheduler>

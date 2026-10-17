@@ -71,14 +71,29 @@ class CBasePlayerController;
 class CEntityInstance;
 class CCSGameRules;
 class IEntityFindFilter;
-class IEntityIOListener;
 class IEntityListener;
+
+/**
+ * Entity outputs firing (CEntityIOOutput::FireOutputInternal), for
+ * ISource2ModEntities::AddEntityOutputListener. Called pre (post = false),
+ * before the output's targets get it, and post, after; pre may answer
+ * Action::Supersede and the output does not fire. Override and Ignore both
+ * let it fire. The strongest answer of all listeners wins.
+ */
+class IEntityOutputListener
+{
+public:
+    virtual Action OnEntityOutput(CEntityInstance* pCaller, const char* pszOutput, CEntityInstance* pActivator, float flDelay, bool post) = 0;
+
+protected:
+    ~IEntityOutputListener() = default;
+};
 
 /**
 
 * @brief Interface for interacting with entities and Entity I/O system.
   */
-#define SOURCE2MOD_ENTITIES_INTERFACE "ISource2ModEntities002"
+#define SOURCE2MOD_ENTITIES_INTERFACE "ISource2ModEntities003"
 
 class ISource2ModEntities
 {
@@ -128,24 +143,6 @@ public:
 
     /**
 
-    * @brief Adds listener for entity spawn, creation, deletion and parent change.
-    *
-    * @param pListener Listener object; the plugin whose class it is owns it
-    *
-    * @note Removed for you if the owning plugin unloads. The listener is an
-    *       object inside that plugin's library and the engine holds it
-    *       directly, so one left behind is a call into unmapped memory.
-      */
-    virtual void AddEntityListener(IEntityListener* pListener) = 0;
-
-    /**
-
-    * @brief Removes listener for entity spawn, creation, deletion and parent change.
-      */
-    virtual void RemoveEntityListener(IEntityListener* pListener) = 0;
-
-    /**
-
     * @brief Sends input to entity.
     *
     * @note Equivalent to Source engine AcceptInput()
@@ -168,28 +165,49 @@ public:
                                   float flDelay = 0.0f) = 0;
 
     /**
+     * @brief Entity events: the IEntityListener's OnEntityCreated (keyvalues not
+     *        applied, not spawned yet), OnEntitySpawned, OnEntityDeleted (the
+     *        last call for it), OnEntityParentChanged. Override what you need.
+     *
+     * @param pListener      The plugin whose class it is owns it; dropped for
+     *                       you when that plugin unloads.
+     * @param pszDesignerName Only entities of this designer name ("player",
+     *                       "smokegrenade_projectile"); nullptr for every one.
+     * @param pEntity        Only this one entity; nullptr for every one. Gone
+     *                       with the entity, after its OnEntityDeleted.
+     *
+     * @note The same listener may be added again with other filters; it is then
+     *       called once per matching registration. Remove drops them all.
+     */
+    virtual void AddEntityListener(IEntityListener* pListener,
+                                   const char* pszDesignerName = nullptr,
+                                   CEntityInstance* pEntity = nullptr) = 0;
 
-    * @brief Adds listener for entity outputs; the plugin whose class the
-    *        listener is owns it.
-    *
-    *
-    * @note Removed for you if the owning plugin unloads, for the same reason
-    *       as AddEntityListener().
-      */
-    virtual void AddEntityIOListener(IEntityIOListener* pListener,
-                                     const char* pchClassName,
-                                     const char* pchOutputName,
-                                     bool post = false) = 0;
-
+    /// @brief Drops every registration of the listener.
+    virtual void RemoveEntityListener(IEntityListener* pListener) = 0;
 
     /**
+     * @brief Entity outputs: IEntityOutputListener::OnEntityOutput, pre and post.
+     *
+     * @param pListener      The plugin whose class it is owns it; dropped for
+     *                       you when that plugin unloads.
+     * @param pszDesignerName Only outputs of entities of this designer name
+     *                       (the caller's); nullptr for every one.
+     * @param pszOutput      Only this output ("OnTrigger", "OnStartTouch");
+     *                       nullptr for every one.
+     * @param pEntity        Only outputs of this one entity; nullptr for every
+     *                       one. Gone with the entity.
+     *
+     * @note The same listener may be added again with other filters. Remove
+     *       drops them all.
+     */
+    virtual void AddEntityOutputListener(IEntityOutputListener* pListener,
+                                         const char* pszDesignerName = nullptr,
+                                         const char* pszOutput = nullptr,
+                                         CEntityInstance* pEntity = nullptr) = 0;
 
-    * @brief Removes entity output listener.
-      */
-    virtual void RemoveEntityIOListener(IEntityIOListener* pListener,
-                                        const char* pchClassName,
-                                        const char* pchOutputName,
-                                        bool post = false) = 0;
+    /// @brief Drops every registration of the listener.
+    virtual void RemoveEntityOutputListener(IEntityOutputListener* pListener) = 0;
 };
 
 #define GET_GAME_RULES()                          g_pSource2ModEntities->GetGameRules()
@@ -197,12 +215,12 @@ public:
 #define FIND_ENTITY_BY_CLASSNAME(start, name)     g_pSource2ModEntities->FindEntityByClassname(start, name)
 #define FIND_ENTITY_BY_NAME(start, name, ...)     g_pSource2ModEntities->FindEntityByName(start, name, ##__VA_ARGS__)
 #define CREATE_ENTITY(classname)                  g_pSource2ModEntities->CreateEntityByName(classname)
-#define ADD_ENTITY_LISTENER(l)                    g_pSource2ModEntities->AddEntityListener(l)
+#define ADD_ENTITY_LISTENER(l, ...)               g_pSource2ModEntities->AddEntityListener(l, ##__VA_ARGS__)
 #define REMOVE_ENTITY_LISTENER(l)                 g_pSource2ModEntities->RemoveEntityListener(l)
+#define ADD_ENTITY_OUTPUT_LISTENER(l, ...)        g_pSource2ModEntities->AddEntityOutputListener(l, ##__VA_ARGS__)
+#define REMOVE_ENTITY_OUTPUT_LISTENER(l)          g_pSource2ModEntities->RemoveEntityOutputListener(l)
 #define ACCEPT_INPUT(target, input, ...)          g_pSource2ModEntities->AcceptInput(target, input, ##__VA_ARGS__)
 #define ADD_ENTITY_IO_EVENT(target, input, ...)   g_pSource2ModEntities->AddEntityIOEvent(target, input, ##__VA_ARGS__)
-#define ADD_ENTITY_IO_LISTENER(l, cls, out, ...)  g_pSource2ModEntities->AddEntityIOListener(l, cls, out, ##__VA_ARGS__)
-#define REMOVE_ENTITY_IO_LISTENER(l, cls, out, ...) g_pSource2ModEntities->RemoveEntityIOListener(l, cls, out, ##__VA_ARGS__)
 
 
 /**

@@ -190,8 +190,6 @@ public:
     void AcceptInput(const char* pszInput, CEntityInstance* pActivator = nullptr, CEntityInstance* pCaller = nullptr, const char* pszValue = "", HookChain eChain = HookChain::Run);
     /// <summary>Add delayed entity IO event.</summary>
     void AddEntityIOEvent(const char* pszInput, CEntityInstance* pActivator = nullptr, CEntityInstance* pCaller = nullptr, const char* pszValue = "", float flDelay = 0.0f, HookChain eChain = HookChain::Run);
-    /// <summary>Add signle entity IO listener.</summary>
-    CEntityIOListenerHandle* AddSingleEntityIOListener(const char* pszOutput, std::function<Action(const char*, CEntityInstance*, CEntityInstance*, float, bool)> callback, bool post);
     /// <summary>Get absolute origin.</summary>
     Vector GetAbsOrigin();
     /// <summary>Get local rotation.</summary>

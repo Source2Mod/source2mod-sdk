@@ -43,7 +43,7 @@
 #include "source2mod/ISource2ModApi.h"
 #include "source2mod/ISource2ModGameConfig.h"
 #include "source2mod/ISource2ModPlugin.h"
-#include "source2mod/ISource2ModHooks.h"
+#include "source2mod/ISource2ModKHook.h"
 
 SOURCE2MOD_GLOBALVARS();
 

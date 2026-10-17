@@ -120,7 +120,7 @@ class ISource2ModScheduler;
 class ISource2ModSounds;
 class ISource2ModTrace;
 class ISource2ModTransmit;
-class ISource2ModGameHooks;
+class ISource2ModHooks;
 
 typedef void* (*CreateInterfaceFn)(const char* pName, int* pReturnCode);
 
@@ -422,9 +422,10 @@ public:
 
     /**
 
-    * @brief Access the core's hooks on common game functions.
+    * @brief The hooks (ISource2ModHooks.h): game functions, engine callbacks,
+    *        entity events, any function.
       */
-    virtual ISource2ModGameHooks* GameHooks() = 0;
+    virtual ISource2ModHooks* Hooks() = 0;
 };
 
 #endif //_INCLUDE_ISOURCE2MOD_API_H
