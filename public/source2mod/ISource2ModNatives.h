@@ -70,7 +70,7 @@
  *
  * g_pSource2ModNatives->HookScriptForward("Shop_OnBuy", [](const char*, Source2ModScriptArg* args, int count) -> cell_t
  * {
- *     return args[1].AsInt() > 1000 ? 3 : 0;   // Plugin_Handled
+ *     return args[1].AsInt() > 1000 ? 2 : 0;   // Action_Supersede : Action_Ignore
  * });
  * g_pSource2ModNatives->AddLibraryListener([](const char* name, bool added) { ... });
  * @endcode
@@ -374,8 +374,9 @@ public:
 /**
  * A global forward by name: every running script's public function of that
  * name (GlobalForward semantics) and every C++ HookScriptForward() on it, in
- * that order. The result is combined by the ExecType of the script's
- * GlobalForward of that name, ET_Event (the highest) when no script made one.
+ * that order. The result -- a Source2ModAction value, 0 Ignore, 1 Override,
+ * 2 Supersede -- is combined by the ExecType of the script's GlobalForward of
+ * that name, ET_Event (the highest) when no script made one.
  */
 class ISource2ModScriptForward : public ISource2ModScriptCallable
 {

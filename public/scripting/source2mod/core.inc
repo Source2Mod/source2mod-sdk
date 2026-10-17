@@ -67,18 +67,6 @@ struct PlVers
 };
 
 /**
- * What a forward's function answers (GlobalForward / PrivateForward with
- * ET_Hook / ET_Event / ET_Single). Game hooks answer Source2ModAction.
- */
-enum Action
-{
-	Plugin_Continue = 0,    /**< Continue with the original action */
-	Plugin_Changed = 1,     /**< Inputs or outputs have been overridden with new values */
-	Plugin_Handled = 3,     /**< Handle the action at the end (don't call it) */
-	Plugin_Stop = 4         /**< Immediately stop the hook chain and handle the original */
-};
-
-/**
  * Specifies identity types.
  */
 enum Identity

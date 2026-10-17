@@ -70,8 +70,8 @@ enum ExecType
 {
 	ET_Ignore   = 0,    /**< Ignore all return values, return 0 */
 	ET_Single   = 1,    /**< Only return the last exec, ignore all others */
-	ET_Event    = 2,    /**< Acts as an event with the Actions defined in core.inc, no mid-Stops allowed, returns highest */
-	ET_Hook     = 3     /**< Acts as a hook with the Actions defined in core.inc, mid-Stops allowed, returns highest */
+	ET_Event    = 2,    /**< Every function answers a Source2ModAction; all are called, returns the highest */
+	ET_Hook     = 3     /**< Every function answers a Source2ModAction; Action_Supersede stops the rest, returns the highest */
 };
 
 /**
@@ -299,7 +299,8 @@ methodmap Source2ModCall
 
 	// Completes a call to a function or forward's call list.
 	//
-	// @param result        Return value of function or forward's call list.
+	// @param result        Return value of function or forward's call list; a
+	//                      forward's is a Source2ModAction, combined by its ExecType.
 	// @return              SP_ERROR_NONE on success, any other integer on failure.
 	// @error               Called before a call has been started.
 	public static native int Finish(any &result=0);
