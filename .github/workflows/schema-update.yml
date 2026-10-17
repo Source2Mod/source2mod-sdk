@@ -2,8 +2,9 @@
 #
 # Every 30 minutes the manifest of the Linux dedicated server binaries (depot
 # 2347773) is compared with tools/schemadump/manifest, on main and on the open
-# update branch. When the binaries changed, the schema is dumped from a headless
-# server (tools/schemadump/dump.sh), the headers are regenerated
+# update branch. When the binaries changed, the schema is dumped from the server
+# binaries with DumpSource2 -- built from our fork, Source2Mod/DumpSource2
+# (tools/schemadump/dump.sh) -- the headers are regenerated
 # (tools/schemagen/generator.py), the SDK is built, and the result goes to a
 # pull request on the schema/auto-update branch -- the build result is in its
 # description, so a CS2 update that removes fields the SDK uses shows up there
@@ -85,8 +86,9 @@ jobs:
       - name: Install tools
         run: |
           sudo apt-get update -q
-          sudo apt-get install -yq cmake ninja-build clang-18
-          python3 -m pip install --quiet --break-system-packages vpk
+          # the libraries after clang-18 are what the game's client module links against;
+          # DumpSource2 loads it for the convars
+          sudo apt-get install -yq cmake ninja-build clang-18 libva2 libvdpau1 libharfbuzz0b libthai0
 
       - name: Move s2sdk to the head of its cs2 branch
         run: |
@@ -107,8 +109,10 @@ jobs:
           CC: clang-18
           CXX: clang++-18
         run: |
-          bash tools/schemadump/dump.sh "$RUNNER_TEMP/schemadump" tools/schemagen/server.json | tee "$RUNNER_TEMP/dump.log"
+          bash tools/schemadump/dump.sh "$RUNNER_TEMP/schemadump" tools/schemagen/schemas.json | tee "$RUNNER_TEMP/dump.log"
           echo "${{ needs.check.outputs.manifest }}" > tools/schemadump/manifest
+          # the game version of the dump, for the website's game data viewers
+          grep -oP '^CS2 \K\S+' "$RUNNER_TEMP/dump.log" | head -1 > tools/schemadump/version
 
       - name: Regenerate the headers
         run: |
@@ -127,13 +131,13 @@ jobs:
       - name: Describe the update
         id: describe
         run: |
-          game=$(python3 -c "import json; print(json.load(open('tools/schemagen/server.json'))['game_info'].get('PatchVersion', '?').strip())")
+          game=$(grep -oP '^CS2 \K\S+' "$RUNNER_TEMP/dump.log" | head -1)
           echo "game=$game" >> "$GITHUB_OUTPUT"
           {
             echo "Automatic schema update for CS2 **$game** (binaries manifest \`${{ needs.check.outputs.manifest }}\`)."
             echo
             echo '```'
-            grep -E '^(Metamod|Dumper|defs):' "$RUNNER_TEMP/dump.log" || true
+            grep -E '^(DumpSource2|CS2) ' "$RUNNER_TEMP/dump.log" || true
             echo '```'
             echo
             if [ "${{ steps.build.outcome }}" = "success" ]; then
@@ -163,8 +167,9 @@ jobs:
           commit-message: 'schema: regenerate for CS2 ${{ steps.describe.outputs.game }}'
           body-path: ${{ runner.temp }}/pr.md
           add-paths: |
-            tools/schemagen/server.json
+            tools/schemagen/schemas.json
             tools/schemadump/manifest
+            tools/schemadump/version
             public/source2mod/schema/entity/**
             vendor/s2sdk
           delete-branch: true

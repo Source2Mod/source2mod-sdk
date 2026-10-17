@@ -37,7 +37,8 @@ Usage:
     python generator.py [output_path]
 
 Default output_path: ../../public/source2mod/schema/entity
-Reads server.json from the same directory as this script.
+Reads schemas.json -- DumpSource2's dump, see tools/schemadump -- from the
+same directory as this script.
 """
 
 from __future__ import annotations
@@ -112,105 +113,6 @@ class SchemaAtomicCategory(Enum):
     I = 4
     Unknown = 5
     NoneAtomic = 6
-
-# ---------------------------------------------------------------------------
-# JSON input model
-# ---------------------------------------------------------------------------
-
-@dataclass
-class SchemaMetaTag:
-    name: str
-    value: Optional[str]
-
-@dataclass
-class SchemaBaseClass:
-    offset: int
-    ref_idx: int
-
-@dataclass
-class SchemaSubtype:
-    type: str
-    name: Optional[str]
-    size: Optional[int]
-    alignment: Optional[int]
-    template: Optional[list[SchemaSubtype]]
-    ref_idx: Optional[int]
-    element_size: Optional[int]
-    count: Optional[int]
-    subtype: Optional[SchemaSubtype]
-
-    @staticmethod
-    def from_dict(d: dict) -> SchemaSubtype:
-        template = [SchemaSubtype.from_dict(t) for t in d["template"]] if d.get("template") else None
-        subtype = SchemaSubtype.from_dict(d["subtype"]) if d.get("subtype") else None
-        return SchemaSubtype(
-            type=d.get("type", ""),
-            name=d.get("name"),
-            size=d.get("size"),
-            alignment=d.get("alignment"),
-            template=template,
-            ref_idx=d.get("ref_idx"),
-            element_size=d.get("element_size"),
-            count=d.get("count"),
-            subtype=subtype,
-        )
-
-@dataclass
-class MemberTraits:
-    metatags: Optional[list[SchemaMetaTag]]
-    subtype: Optional[SchemaSubtype]
-
-@dataclass
-class SchemaMember:
-    name: str
-    offset: int
-    traits: Optional[MemberTraits]
-
-@dataclass
-class SchemaEnumField:
-    name: str
-    value: int
-
-@dataclass
-class SchemaTraits:
-    baseclasses: Optional[list[SchemaBaseClass]]
-    members: Optional[list[SchemaMember]]
-    fields: Optional[list[SchemaEnumField]]
-
-@dataclass
-class SchemaDef:
-    type: str
-    name: str
-    size: Optional[int]
-    alignment: Optional[int]
-    traits: Optional[SchemaTraits]
-
-def _parse_schema_defs(raw_defs: list[dict]) -> list[SchemaDef]:
-    result = []
-    for d in raw_defs:
-        traits = None
-        if raw_traits := d.get("traits"):
-            baseclasses = None
-            if raw_bc := raw_traits.get("baseclasses"):
-                baseclasses = [SchemaBaseClass(b["offset"], b["ref_idx"]) for b in raw_bc]
-            members = None
-            if raw_members := raw_traits.get("members"):
-                members = []
-                for m in raw_members:
-                    mt = None
-                    if raw_mt := m.get("traits"):
-                        metatags = None
-                        if raw_tags := raw_mt.get("metatags"):
-                            metatags = [SchemaMetaTag(t["name"], t.get("value")) for t in raw_tags]
-                        sub = SchemaSubtype.from_dict(raw_mt["subtype"]) if raw_mt.get("subtype") else None
-                        mt = MemberTraits(metatags, sub)
-                    members.append(SchemaMember(m["name"], m["offset"], mt))
-            enum_fields = None
-            if raw_fields := raw_traits.get("fields"):
-                enum_fields = [SchemaEnumField(f["name"], f["value"]) for f in raw_fields]
-            traits = SchemaTraits(baseclasses, members, enum_fields)
-        result.append(SchemaDef(d["type"], d["name"], d.get("size"), d.get("alignment"), traits))
-    return result
 
 # ---------------------------------------------------------------------------
 # Intermediate model
@@ -377,6 +279,8 @@ HARD_SKIP_CLASSES: frozenset[str] = frozenset({
     "CEntityInstance",
     "CEntityIOOutput",
     "ChangeAccessorFieldPathIndex_t",
+    # s2sdk has it (networkvar.h); the generated one would clash
+    "CNetworkVarChainer",
     "CScriptComponent",
     "CVariantDefaultAllocator",
 })
@@ -489,6 +393,13 @@ MANUAL_FORWARDS: dict[str, list[str]] = {
     "CHEGrenadeProjectile": ["CBaseEntity"],
     "CMolotovProjectile": ["CBaseEntity"],
     "CSmokeGrenadeProjectile": ["CBaseEntity"],
+}
+
+# Helpers the MANUAL_METHODS implementations keep to the class.
+MANUAL_PRIVATE_METHODS: dict[str, list[str]] = {
+    "CCSCustomHudLayout": [
+        "void StateChanged(CCSPlayerController* pController);",
+    ],
 }
 
 MANUAL_METHODS: dict[str, list[str]] = {
@@ -846,35 +757,25 @@ def _field_has_ignored_wildcard(t: SchemaFieldType) -> bool:
     return any(w in t.name for w in IGNORE_CLASS_WILDCARDS)
 
 # ---------------------------------------------------------------------------
-# Schema conversion
+# DumpSource2's schemas.json -> the intermediate model
 # ---------------------------------------------------------------------------
 
-def convert_subtype_to_field_type(
-        subtype: SchemaSubtype,
-        def_lookup: dict[int, SchemaDef],
-) -> SchemaFieldType:
-    if subtype.type == "ref" and subtype.ref_idx is not None:
-        ref_def = def_lookup.get(subtype.ref_idx)
-        if ref_def is not None:
-            resolved_type = (
-                "declared_class" if ref_def.type == "class"
-                else ("declared_enum" if ref_def.type == "enum" else ref_def.type)
-            )
-            return convert_subtype_to_field_type(
-                SchemaSubtype(
-                    type=resolved_type,
-                    name=ref_def.name,
-                    size=ref_def.size,
-                    alignment=ref_def.alignment,
-                    template=None,
-                    ref_idx=None,
-                    element_size=None,
-                    count=None,
-                    subtype=None,
-                ),
-                def_lookup,
-            )
+# DumpSource2 gives an enum's underlying type by name, the old dump by size.
+_ENUM_ALIGN = {
+    "int8_t": 1, "uint8_t": 1, "int16_t": 2, "uint16_t": 2,
+    "int32_t": 4, "uint32_t": 4, "int64_t": 8, "uint64_t": 8,
+}
 
+# A name both the server and another module register (client, mostly) is the
+# server's: the SDK is for server plugins.
+_MODULE_RANK = {"server": 0, "client": 2}
+
+def _ds2_name(name: str) -> str:
+    """Nested types are A::B in DumpSource2, A__B in the headers."""
+    return name.replace("::", "__")
+
+def _ds2_type(t: dict) -> SchemaFieldType:
+    cat = t["category"]
     category = {
         "builtin": SchemaTypeCategory.Builtin,
         "atomic": SchemaTypeCategory.Atomic,
@@ -883,11 +784,11 @@ def convert_subtype_to_field_type(
         "declared_class": SchemaTypeCategory.DeclaredClass,
         "declared_enum": SchemaTypeCategory.DeclaredEnum,
         "bitfield": SchemaTypeCategory.Bitfield,
-    }.get(subtype.type, SchemaTypeCategory.NoneType)
+    }.get(cat, SchemaTypeCategory.NoneType)
 
     atomic: Optional[SchemaAtomicCategory] = None
-    if subtype.type == "atomic" and subtype.name:
-        name = subtype.name
+    name = _ds2_name(t.get("name") or "unknown")
+    if cat == "atomic":
         if "CUtlVector" in name or "CNetworkUtlVectorBase" in name:
             atomic = SchemaAtomicCategory.Collection
         elif "CHandle" in name or "CWeakHandle" in name or "CStrongHandle" in name:
@@ -895,53 +796,90 @@ def convert_subtype_to_field_type(
         else:
             atomic = SchemaAtomicCategory.Basic
 
-    inner: Optional[SchemaFieldType] = None
-    if subtype.template:
-        inner = convert_subtype_to_field_type(subtype.template[0], def_lookup)
-    elif subtype.subtype is not None:
-        inner = convert_subtype_to_field_type(subtype.subtype, def_lookup)
+    inner = _ds2_type(t["inner"]) if t.get("inner") else None
+    if category == SchemaTypeCategory.Ptr:
+        name = "unknown"
+    if category == SchemaTypeCategory.FixedArray and inner is not None:
+        name = f"{inner.name}[{t['count']}]"
+    return SchemaFieldType(name, category, atomic, inner)
 
-    type_name = subtype.name or "unknown"
-    if category == SchemaTypeCategory.FixedArray and subtype.count is not None and inner is not None:
-        type_name = f"{inner.name}[{subtype.count}]"
+def convert_dumpsource2(raw: dict) -> tuple[dict[str, SchemaEnum], dict[str, SchemaClass]]:
+    def pick(items: list[dict]) -> dict[str, dict]:
+        chosen: dict[str, dict] = {}
+        for item in items:
+            name = _ds2_name(item["name"])
+            rank = _MODULE_RANK.get(item.get("module", ""), 1)
+            if name not in chosen or rank < _MODULE_RANK.get(chosen[name].get("module", ""), 1):
+                chosen[name] = item
+        return chosen
 
-    return SchemaFieldType(type_name, category, atomic, inner)
+    # The client module registers many shared types (enums, structs the server
+    # uses too) -- the old dump's "!GlobalTypes". Its own classes (C_AK47, ...)
+    # are not the SDK's: a client type is kept only when a type of another
+    # module refers to it, directly or through other kept client types.
+    all_classes = pick(raw["classes"])
+    all_enums = pick(raw["enums"])
 
-def convert_new_schema_to_old(
-        defs: list[SchemaDef],
-) -> tuple[dict[str, SchemaEnum], dict[str, SchemaClass]]:
+    def refs(c: dict) -> set[str]:
+        out = {_ds2_name(p["name"]) for p in c.get("parents") or []}
+        for f in c.get("fields", []):
+            t = f["type"]
+            while t:
+                if t["category"] in ("declared_class", "declared_enum"):
+                    out.add(_ds2_name(t["name"]))
+                t = t.get("inner")
+        return out
+
+    def shared(name: str, c: dict) -> bool:
+        # client classes the shared ones derive into (graph controllers),
+        # and VData; never its C_ entity hierarchy
+        if name.startswith("C_"):
+            return False
+        parents = c.get("parents") or []
+        return "VData" in name or bool(parents and _ds2_name(parents[0]["name"]) in keep)
+
+    keep = {n for n, c in all_classes.items() if c.get("module") != "client"}
+    keep |= {n for n, e in all_enums.items() if e.get("module") != "client"}
+    changed = True
+    while changed:
+        changed = False
+        for name, c in all_classes.items():
+            if name in keep:
+                new = {r for r in refs(c) if r not in keep and (r in all_classes or r in all_enums)}
+            elif shared(name, c):
+                new = {name}
+            else:
+                continue
+            if new:
+                keep |= new
+                changed = True
+
     enums: dict[str, SchemaEnum] = {}
+    # Every enum, as the old dump had them all: an unused header costs nothing,
+    # a missing one breaks whoever includes it.
+    for name, e in all_enums.items():
+        items = [SchemaEnumItem(m["name"], m["value"]) for m in e.get("members", [])]
+        if items:
+            enums[name] = SchemaEnum(_ENUM_ALIGN.get(e.get("alignment", ""), 4), items)
+
     classes: dict[str, SchemaClass] = {}
-    def_lookup: dict[int, SchemaDef] = {i: d for i, d in enumerate(defs)}
-
-    for def_ in defs:
-        if def_.type == "enum" and def_.traits and def_.traits.fields:
-            items = [SchemaEnumItem(f.name, f.value) for f in def_.traits.fields]
-            enums[def_.name] = SchemaEnum(def_.alignment or 4, items)
-
-    for i, def_ in enumerate(defs):
-        if def_.type == "class" and def_.traits is not None:
-            parent_name: Optional[str] = None
-            if def_.traits.baseclasses:
-                parent_idx = def_.traits.baseclasses[0].ref_idx
-                parent_def = def_lookup.get(parent_idx)
-                if parent_def:
-                    parent_name = parent_def.name
-
-            fields: list[SchemaField] = []
-            if def_.traits.members:
-                for member in def_.traits.members:
-                    if member.traits and member.traits.subtype:
-                        ft = convert_subtype_to_field_type(member.traits.subtype, def_lookup)
-                        metadata = (
-                            {t.name: t.value or "" for t in member.traits.metatags}
-                            if member.traits.metatags else {}
-                        )
-                        fields.append(SchemaField(member.name, ft, metadata))
-
-            classes[def_.name] = SchemaClass(i, def_.name, parent_name, fields)
-
+    for i, (name, c) in enumerate(all_classes.items()):
+        if name not in keep:
+            continue
+        parents = c.get("parents") or []
+        parent = _ds2_name(parents[0]["name"]) if parents else None
+        fields = [
+            SchemaField(f["name"], _ds2_type(f["type"]),
+                        {m["name"]: m["value"] if isinstance(m.get("value"), str) else ""
+                         for m in f.get("metadata", [])})
+            for f in c.get("fields", [])
+        ]
+        classes[name] = SchemaClass(i, name, parent, fields)
     return enums, classes
+
+def load_schema(script_dir: str) -> tuple[dict[str, SchemaEnum], dict[str, SchemaClass]]:
+    with open(os.path.join(script_dir, "schemas.json"), encoding="utf-8") as fh:
+        return convert_dumpsource2(json.load(fh))
 
 # ---------------------------------------------------------------------------
 # Graph / BFS
@@ -1251,6 +1189,11 @@ def write_class(
         for method in MANUAL_METHODS[class_name]:
             lines.append(f"    {method}")
 
+    if class_name in MANUAL_PRIVATE_METHODS:
+        lines += ["", "private:"]
+        for method in MANUAL_PRIVATE_METHODS[class_name]:
+            lines.append(f"    {method}")
+
     if inherits and class_name != "CBaseEntity":
         lines += [
             "",
@@ -1291,12 +1234,7 @@ def main() -> None:
         script_dir, "../../public/source2mod/schema/entity"
     )
 
-    schema_path = os.path.join(script_dir, "server.json")
-    with open(schema_path, encoding="utf-8") as fh:
-        raw = json.load(fh)
-
-    defs = _parse_schema_defs(raw["defs"])
-    enums, classes = convert_new_schema_to_old(defs)
+    enums, classes = load_schema(script_dir)
 
     all_enums: dict[str, SchemaEnum] = {
         k: v for k, v in sorted(enums.items()) if k not in IGNORE_CLASSES
