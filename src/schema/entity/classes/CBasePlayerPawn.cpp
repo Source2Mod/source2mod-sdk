@@ -45,18 +45,15 @@
 SOURCE2MOD_GLOBALVARS();
 
 void CBasePlayerPawn::CommitSuicide(bool bExplode, bool bForce, HookChain eChain) {
-    static int offset = g_pSource2ModGameConfig->GetOffset("CBasePlayerPawn::CommitSuicide");
-    CALL_VIRTUAL_CHAIN(void, offset, eChain, this, bExplode, bForce);
+    SOURCE2MOD_CALL_FUNCTION(void(CBasePlayerPawn*, bool, bool), "CBasePlayerPawn::CommitSuicide", eChain, this, bExplode, bForce);
 }
 
 void CBasePlayerPawn::SnapViewAngles(const QAngle& angEyeAngles, HookChain eChain) {
-    const auto fn = ResolveHookChain(ADDR_SNAP_VIEW_ANGLES(), eChain);
-    // Only resolved where a signature exists for the platform -- currently Linux.
-    if (!fn) return;
-
-    // The engine takes the angles by pointer and does not modify them.
+    // Only resolved where a signature exists for the platform -- currently
+    // Linux; elsewhere nothing is called. The engine takes the angles by
+    // pointer and does not modify them.
     QAngle ang = angEyeAngles;
-    fn(this, &ang);
+    SOURCE2MOD_CALL_FUNCTION(void(CBasePlayerPawn*, QAngle*), "CBasePlayerPawn::SnapViewAngles", eChain, this, &ang);
 }
 
 // m_hController is typed CHandle<CBasePlayerController>, but every controller

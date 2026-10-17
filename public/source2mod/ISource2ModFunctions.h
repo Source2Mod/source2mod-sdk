@@ -410,4 +410,37 @@ public:
     virtual ISource2ModFunction* FromVirtual(PluginId owner, int index, const FunctionTypes& types) = 0;
 };
 
+/**
+ * A gamedata function by name (its "function" object), called through the
+ * hooks (HookChain::Run) or straight to the original (HookChain::Bypass) --
+ * how the SDK's schema helpers (Teleport, SwitchTeam, GiveNamedItem, ...) make
+ * their calls. Found once per call site. When the entry is missing or does not
+ * match @p Sig nothing is called and the result is value-initialised.
+ */
+template <typename Sig, typename... A>
+inline typename source2mod_functions_detail::Signature<Sig>::Return
+Source2ModCallFunction(ISource2ModFunctions* functions, ISource2ModFunction*& cache, const char* name, HookChain chain, A&&... args)
+{
+    using R = typename source2mod_functions_detail::Signature<Sig>::Return;
+    if (!cache && functions)
+        cache = functions->Find(name);
+    if (!cache)
+    {
+        if constexpr (std::is_void_v<R>)
+            return;
+        else
+            return R{};
+    }
+    if (chain == HookChain::Bypass)
+        return cache->template CallOriginal<Sig>(static_cast<A&&>(args)...);
+    return cache->template Call<Sig>(static_cast<A&&>(args)...);
+}
+
+/// SOURCE2MOD_CALL_FUNCTION(void(CCSPlayerController*, int), "CCSPlayerController::SwitchTeam", eChain, this, nTeam)
+#define SOURCE2MOD_CALL_FUNCTION(SIG, NAME, CHAIN, ...)                                             \
+    ([&]() -> typename source2mod_functions_detail::Signature<SIG>::Return {                        \
+        static ISource2ModFunction* s_function = nullptr;                                          \
+        return Source2ModCallFunction<SIG>(g_pSource2ModFunctions, s_function, NAME, CHAIN, __VA_ARGS__); \
+    }())
+
 #endif //_INCLUDE_ISOURCE2MOD_FUNCTIONS_H

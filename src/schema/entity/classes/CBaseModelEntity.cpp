@@ -66,7 +66,7 @@ Vector CBaseModelEntity::GetEyePosition()
 }
 
 void CBaseModelEntity::SetModel(const char* pszModel, HookChain eChain) {
-    ResolveHookChain(ADDR_SET_MODEL(), eChain)(this, pszModel);
+    SOURCE2MOD_CALL_FUNCTION(void(CBaseModelEntity*, const char*), "CBaseModelEntity::SetModel", eChain, this, pszModel);
 }
 
 void CBaseModelEntity::SetBodyGroup(const char* pszName, int nValue)

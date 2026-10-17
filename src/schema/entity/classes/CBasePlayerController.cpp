@@ -79,7 +79,8 @@ static void ClientPrint(int slot, int hudDestination, const char* message)
 }
 
 void CBasePlayerController::SetPawn(CBasePlayerPawn* pPawn, HookChain eChain){
-    ResolveHookChain(ADDR_SET_PAWN(), eChain)(this, pPawn, true, false, false, false);
+    SOURCE2MOD_CALL_FUNCTION(void(CBasePlayerController*, CBasePlayerPawn*, bool, bool, bool, bool), "CBasePlayerController::SetPawn", eChain,
+                             this, pPawn, true, false, false, false);
 }
 
 void CBasePlayerController::PrintToConsole(const char* pszMessage)

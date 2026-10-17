@@ -56,8 +56,9 @@
  * after it; in post, `result` holds what the original returned.
  *
  * The game-function points are one detour per function, placed by the core
- * from its gamedata the first time a plugin asks for it and taken out again
- * once the last handler is gone. When Valve changes one -- an argument added,
+ * from its gamedata the first time a plugin asks for it and kept until
+ * shutdown (a detour taken out and put back would miss calls while KHook
+ * inserts it again). When Valve changes one -- an argument added,
  * the order swapped between platforms, as GroundAccelerate's is -- the core's
  * gamedata and its one call site change, and the plugins keep running.
  */
@@ -89,6 +90,7 @@ class CCSPlayerModernJump;
 class CCSPlayerPawn;
 class CCSPlayerPawnBase;
 class CEconItemView;
+class CEntityKeyValues;
 class CEntityIdentity;
 class CEntityInstance;
 class CGameTrace;
@@ -378,6 +380,98 @@ struct ModernJumpContext
     CMoveData* moveData;
 
     SOURCE2MOD_HOOK_CALL_ORIGINAL(void)
+};
+
+/* =========================
+Entity virtuals (SourceMod's SDKHooks)
+========================= */
+
+// Spawn, Use, StartTouch, EndTouch, Blocked, Think, Killed: virtuals that
+// most entity classes override, so they are hooked on the vtable of the
+// target's class -- HookTarget::Instance(entity) (one entity, SDKHook) or
+// HookTarget::Class("CCSPlayerPawn") (every entity of that class or one
+// derived from it). HookTarget::All() is refused: there is no one function
+// to hook. The handler runs for the entity's own override.
+
+/// CBaseEntity::Use's argument (activator, caller, USE_TYPE, value).
+struct EntityUseInfo
+{
+    CBaseEntity* activator;
+    CBaseEntity* caller;
+    std::int32_t useType;           // 0 off, 1 on, 2 set, 3 toggle
+    float value;
+};
+
+/// CBaseEntity::Spawn(keyValues) -- the entity's keyvalues are applied here.
+struct SpawnContext
+{
+    CBaseEntity* entity;
+    const CEntityKeyValues* keyValues;
+
+    SOURCE2MOD_HOOK_CALL_ORIGINAL(void)
+};
+
+/// CBaseEntity::Use(info) -- a player's +use, a map's Use input. Changing
+/// *info in pre changes what the entity gets.
+struct UseContext
+{
+    CBaseEntity* entity;
+    EntityUseInfo* info;
+
+    SOURCE2MOD_HOOK_CALL_ORIGINAL(void)
+};
+
+/// CBaseEntity::StartTouch / EndTouch / Blocked(other)
+struct EntityOtherContext
+{
+    CBaseEntity* entity;
+    CBaseEntity* other;
+
+    SOURCE2MOD_HOOK_CALL_ORIGINAL(void)
+};
+
+/// CBaseEntity::Think() -- the entity's think function, every time it runs.
+struct ThinkContext
+{
+    CBaseEntity* entity;
+
+    SOURCE2MOD_HOOK_CALL_ORIGINAL(void)
+};
+
+/// CBaseEntity::Event_Killed(damage) -> bool -- health reached 0 and
+/// m_lifeState is already "dying". Supersede skips the class's death handling
+/// (a player's ragdoll and death, a breakable's gibs).
+struct KilledContext
+{
+    CBaseEntity* entity;
+    const CTakeDamageResult* damage;
+    bool result;
+
+    SOURCE2MOD_HOOK_CALL_ORIGINAL(bool)
+};
+
+/// CCSPlayer_WeaponServices::PickupWeapon(weapon) -> 0 refused, 1 taken,
+/// 2 taken as ammo -- touching or +using a weapon (SDKHooks' WeaponEquip /
+/// WeaponCanUse). Every player: HookTarget::All() works.
+struct WeaponPickupContext
+{
+    CCSPlayer_WeaponServices* services;
+    CBasePlayerWeapon* weapon;
+    std::int32_t result;
+
+    SOURCE2MOD_HOOK_CALL_ORIGINAL(std::int32_t)
+};
+
+/// CCSPlayer_WeaponServices::SwitchToWeapon(weapon, viewModelIndex) -> bool
+/// (SDKHooks' WeaponSwitch). Every player: HookTarget::All() works.
+struct WeaponSwitchContext
+{
+    CCSPlayer_WeaponServices* services;
+    CBasePlayerWeapon* weapon;
+    std::int32_t viewModelIndex;
+    bool result;
+
+    SOURCE2MOD_HOOK_CALL_ORIGINAL(bool)
 };
 
 /* =========================

@@ -51,5 +51,5 @@ CCSPlayerController* CCSPlayerPawnBase::GetOriginalController()
 
 bool CCSPlayerPawnBase::CanMove()
 {
-    return ADDR_CAN_MOVE()(this);
+    return SOURCE2MOD_CALL_FUNCTION(bool(CCSPlayerPawnBase*), "CCSPlayerPawnBase::CanMove", HookChain::Run, this);
 }

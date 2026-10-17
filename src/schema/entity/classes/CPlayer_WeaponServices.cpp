@@ -50,26 +50,25 @@ SOURCE2MOD_GLOBALVARS();
 
 bool CPlayer_WeaponServices::CanUse(CBasePlayerWeapon* pWeapon)
 {
-    static int offset = g_pSource2ModGameConfig->GetOffset("CCSPlayer_WeaponServices::CanUse");
-    return CALL_VIRTUAL(bool, offset, this, pWeapon);
+    return SOURCE2MOD_CALL_FUNCTION(bool(CPlayer_WeaponServices*, CBasePlayerWeapon*), "CCSPlayer_WeaponServices::CanUse", HookChain::Run, this,
+                                    pWeapon);
 }
 
 void CPlayer_WeaponServices::DropWeapon(CBasePlayerWeapon *pWeapon, Vector *pVecTarget, Vector *pVelocity, HookChain eChain)
 {
-    static int offset = g_pSource2ModGameConfig->GetOffset("CCSPlayer_WeaponServices::DropWeapon");
-    CALL_VIRTUAL_CHAIN(void, offset, eChain, this, pWeapon, pVecTarget, pVelocity);
+    SOURCE2MOD_CALL_FUNCTION(void(CPlayer_WeaponServices*, CBasePlayerWeapon*, Vector*, Vector*), "CCSPlayer_WeaponServices::DropWeapon", eChain,
+                             this, pWeapon, pVecTarget, pVelocity);
 }
 
 int CPlayer_WeaponServices::BumpWeapon(CBasePlayerWeapon* pWeapon, HookChain eChain)
 {
-    static int offset = g_pSource2ModGameConfig->GetOffset("CCSPlayer_WeaponServices::BumpWeapon");
-    return CALL_VIRTUAL_CHAIN(int, offset, eChain, this, pWeapon);
+    return SOURCE2MOD_CALL_FUNCTION(int(CPlayer_WeaponServices*, CBasePlayerWeapon*), "CCSPlayer_WeaponServices::BumpWeapon", eChain, this, pWeapon);
 }
 
 void CPlayer_WeaponServices::SelectItem(CBasePlayerWeapon* pWeapon, int unk1, HookChain eChain)
 {
-    static int offset = g_pSource2ModGameConfig->GetOffset("CCSPlayer_WeaponServices::SelectItem");
-    CALL_VIRTUAL_CHAIN(void, offset, eChain, this, pWeapon, unk1);
+    SOURCE2MOD_CALL_FUNCTION(bool(CPlayer_WeaponServices*, CBasePlayerWeapon*, int), "CCSPlayer_WeaponServices::SelectItem", eChain, this, pWeapon,
+                             unk1);
 }
 
 void CPlayer_WeaponServices::Destroy(CBasePlayerWeapon* pWeapon, HookChain eChain)
@@ -78,6 +77,6 @@ void CPlayer_WeaponServices::Destroy(CBasePlayerWeapon* pWeapon, HookChain eChai
     if(pWeapon)
 #endif
     {
-        ResolveHookChain(ADDR_WEAPON_SERVICES_DESTROY(), eChain)(this, pWeapon);
+        SOURCE2MOD_CALL_FUNCTION(void(CPlayer_WeaponServices*, CBasePlayerWeapon*), "CCSPlayer_WeaponServices::Destroy", eChain, this, pWeapon);
     }
 }

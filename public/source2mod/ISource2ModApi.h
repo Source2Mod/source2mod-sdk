@@ -422,8 +422,9 @@ public:
 
     /**
 
-    * @brief The hooks (ISource2ModHooks.h): game functions, engine callbacks,
-    *        entity events, any function.
+    * @brief The hooks (ISource2ModHooks.h): game functions, entity virtuals,
+    *        engine callbacks, any function. Entity events and outputs are
+    *        listeners of ISource2ModEntities.
       */
     virtual ISource2ModHooks* Hooks() = 0;
 };

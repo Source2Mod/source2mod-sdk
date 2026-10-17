@@ -82,6 +82,17 @@ enum HookPoint
 	HookPoint_CheckJumpButtonLegacy,
 	HookPoint_CheckJumpButtonModern,
 
+	// Entity virtuals (SDKHooks): HookInstance(entity) / HookClass(name); not Hook.
+	HookPoint_Spawn = 50,
+	HookPoint_Use,
+	HookPoint_StartTouch,
+	HookPoint_EndTouch,
+	HookPoint_Blocked,
+	HookPoint_Think,
+	HookPoint_Killed,
+	HookPoint_WeaponPickup,             /**< Hook works: every player's weapon services */
+	HookPoint_WeaponSwitch,             /**< Hook works: every player's weapon services */
+
 	// Engine callbacks.
 	HookPoint_GameFrame = 100,
 	HookPoint_StartupServer,
@@ -300,6 +311,13 @@ typeset Source2ModHookHandler
 	function Source2ModAction (AcceptInputContext ctx, bool post, bool &result);
 	function Source2ModAction (TouchContext ctx, bool post);
 	function Source2ModAction (DropWeaponContext ctx, bool post);
+	function Source2ModAction (SpawnContext ctx, bool post);
+	function Source2ModAction (UseContext ctx, bool post);
+	function Source2ModAction (EntityOtherContext ctx, bool post);
+	function Source2ModAction (ThinkContext ctx, bool post);
+	function Source2ModAction (KilledContext ctx, bool post, bool &result);
+	function Source2ModAction (WeaponPickupContext ctx, bool post, int &result);
+	function Source2ModAction (WeaponSwitchContext ctx, bool post, bool &result);
 	function Source2ModAction (MovementContext ctx, bool post, bool &result);
 	function Source2ModAction (AirAccelerateContext ctx, bool post);
 	function Source2ModAction (GroundAccelerateContext ctx, bool post);

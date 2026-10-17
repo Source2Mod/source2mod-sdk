@@ -50,5 +50,5 @@ QAngle CCSPlayerPawn::GetEyeAngles()
 
 void CCSPlayerPawn::PostThink(HookChain eChain)
 {
-    ResolveHookChain(ADDR_POST_THINK(), eChain)(this);
+    SOURCE2MOD_CALL_FUNCTION(void(CCSPlayerPawn*), "CCSPlayerPawn::PostThink", eChain, this);
 }

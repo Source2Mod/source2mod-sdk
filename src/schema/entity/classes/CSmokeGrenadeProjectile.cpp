@@ -53,5 +53,6 @@ CSmokeGrenadeProjectile* CSmokeGrenadeProjectile::EmitGrenade(const Vector& vecP
     QAngle angAng = angAngle;
     Vector vecVel = vecVelocity;
 
-    return ResolveHookChain(ADDR_EMIT_SMOKE(), eChain)(&vecPos, &angAng, &vecVel, &vecVel, pOwner, nItemDefIndex, nTeam);
+    return SOURCE2MOD_CALL_FUNCTION(CSmokeGrenadeProjectile*(Vector*, QAngle*, Vector*, Vector*, CBaseEntity*, uint32_t, int), "CSmokeGrenadeProjectile::EmitGrenade", eChain, &vecPos,
+                             &angAng, &vecVel, &vecVel, pOwner, nItemDefIndex, nTeam);
 }

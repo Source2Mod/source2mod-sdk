@@ -79,8 +79,8 @@ API_GROUPS = [
                   'ISource2ModClients', 'ISource2ModTargeting', 'ISource2ModMenus', 'ISource2ModCustomHud', 'ISource2ModTranslations',
                   'ISource2ModNetworkMessages', 'ISource2ModSounds', 'ISource2ModTransmit', 'ISource2ModTrace', 'ISource2ModScheduler',
                   'ISource2ModScripts', 'ISource2ModMaps', 'ISource2ModFeatures']),
-    ('Engine', ['ISource2ModGameHooks', 'ISource2ModAddresses', 'ISource2ModHooks', 'ISource2ModKHook', 'ISource2ModGameConfig', 'ISource2ModGameSystems',
-                'ISource2ModMemory', 'ISource2ModModule', 'Schema']),
+    ('Engine', ['ISource2ModHooks', 'ISource2ModHookContexts', 'ISource2ModFunctions', 'ISource2ModAddresses', 'ISource2ModKHook',
+                'ISource2ModGameConfig', 'ISource2ModGameSystems', 'ISource2ModMemory', 'ISource2ModModule', 'Schema', 'consts']),
     ('Services', ['ISource2ModHTTP', 'ISource2ModJSON', 'ISource2ModSQL', 'ISource2ModCookies', 'ISource2ModGeoIP',
                   'ISource2ModFiles', 'ISource2ModPaths', 'ISource2ModUtils']),
 ]

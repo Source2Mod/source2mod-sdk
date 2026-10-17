@@ -49,5 +49,6 @@ void CAttributeList::SetOrAddAttribute(const char* pszAttributeName, float flVal
 
 void CAttributeList::SetOrAddAttributeValueByName(const char* pszAttributeName, float flValue, HookChain eChain)
 {
-    ResolveHookChain(ADDR_SET_OR_ADD_ATTRIBUTE(), eChain)(this, pszAttributeName, flValue);
+    SOURCE2MOD_CALL_FUNCTION(void(CAttributeList*, const char*, float), "CAttributeList::SetOrAddAttributeValueByName", eChain, this,
+                             pszAttributeName, flValue);
 }

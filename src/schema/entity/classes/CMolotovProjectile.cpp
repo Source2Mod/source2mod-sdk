@@ -53,5 +53,6 @@ CMolotovProjectile* CMolotovProjectile::EmitGrenade(const Vector& vecPosition, c
     QAngle angAng = angAngle;
     Vector vecVel = vecVelocity;
 
-    return ResolveHookChain(ADDR_EMIT_MOLOTOV(), eChain)(&vecPos, &angAng, &vecVel, &vecVel, pOwner, nItemDefIndex);
+    return SOURCE2MOD_CALL_FUNCTION(CMolotovProjectile*(Vector*, QAngle*, Vector*, Vector*, CBaseEntity*, uint32_t), "CMolotovProjectile::EmitGrenade", eChain, &vecPos,
+                             &angAng, &vecVel, &vecVel, pOwner, nItemDefIndex);
 }

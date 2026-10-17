@@ -46,6 +46,5 @@ SOURCE2MOD_GLOBALVARS();
 
 CSkeletonInstance* CGameSceneNode::GetSkeletonInstance()
 {
-    static int offset = g_pSource2ModGameConfig->GetOffset("CGameSceneNode::GetSkeletonInstance");
-    return CALL_VIRTUAL(CSkeletonInstance*, offset, this);
+    return SOURCE2MOD_CALL_FUNCTION(CSkeletonInstance*(CGameSceneNode*), "CGameSceneNode::GetSkeletonInstance", HookChain::Run, this);
 }

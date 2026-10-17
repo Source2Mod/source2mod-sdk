@@ -46,14 +46,18 @@
 #include <cstdint>
 #include <type_traits>
 
-/*
- * One way to hook anything, the same from C++ and SourcePawn:
+/**
+ * @file ISource2ModHooks.h
+ * @brief One way to hook anything, the same from C++ and SourcePawn:
  *
  *     Hook = Point (what) + Target (on which object) + Handler (with its Context)
  *
  * Points (HookPoint::*):
  *   - game functions with a typed context: TakeDamage, Touch, PostThink,
  *     AcceptInput, the movement functions, ... (ISource2ModHookContexts.h);
+ *   - entity virtuals with a typed context, hooked on the target's own class
+ *     (SourceMod's SDKHooks): Spawn, Use, StartTouch, EndTouch, Blocked,
+ *     Think, Killed, WeaponPickup, WeaponSwitch;
  *   - engine callbacks: GameFrame, StartupServer, ClientConnect, ClientConnected,
  *     ClientPutInServer, ClientDisconnect, ClientVoice, ClientSettingsChanged,
  *     the Steam API, LoadEventsFromFile;
@@ -198,6 +202,17 @@ enum class HookPointId : int32_t
     OnJumpModern,
     CheckJumpButtonLegacy,
     CheckJumpButtonModern,
+
+    // Entity virtuals, on the target's class vtable (SDKHooks).
+    Spawn = 50,
+    Use,
+    StartTouch,
+    EndTouch,
+    Blocked,
+    Think,
+    Killed,
+    WeaponPickup,
+    WeaponSwitch,
 
     // Engine callbacks.
     GameFrame = 100,
@@ -386,6 +401,17 @@ namespace HookPoint
     inline constexpr HookPointOf<ModernJumpContext> OnJumpModern{ HookPointId::OnJumpModern };
     inline constexpr HookPointOf<LegacyJumpContext> CheckJumpButtonLegacy{ HookPointId::CheckJumpButtonLegacy };
     inline constexpr HookPointOf<ModernJumpContext> CheckJumpButtonModern{ HookPointId::CheckJumpButtonModern };
+
+    // Entity virtuals (SDKHooks): HookTarget::Instance(entity) or Class(name).
+    inline constexpr HookPointOf<SpawnContext> Spawn{ HookPointId::Spawn };
+    inline constexpr HookPointOf<UseContext> Use{ HookPointId::Use };
+    inline constexpr HookPointOf<EntityOtherContext> StartTouch{ HookPointId::StartTouch };
+    inline constexpr HookPointOf<EntityOtherContext> EndTouch{ HookPointId::EndTouch };
+    inline constexpr HookPointOf<EntityOtherContext> Blocked{ HookPointId::Blocked };
+    inline constexpr HookPointOf<ThinkContext> Think{ HookPointId::Think };
+    inline constexpr HookPointOf<KilledContext> Killed{ HookPointId::Killed };
+    inline constexpr HookPointOf<WeaponPickupContext> WeaponPickup{ HookPointId::WeaponPickup };
+    inline constexpr HookPointOf<WeaponSwitchContext> WeaponSwitch{ HookPointId::WeaponSwitch };
 
     // Engine callbacks.
     inline constexpr HookPointOf<GameFrameContext> GameFrame{ HookPointId::GameFrame };

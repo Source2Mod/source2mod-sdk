@@ -44,5 +44,5 @@ SOURCE2MOD_GLOBALVARS();
 CCSWeaponBaseVData* CCSWeaponBaseVData::FromKey(const char* pszKey, int nWeaponType)
 {
     // The engine takes the type first; -1 accepts any.
-    return ADDR_GET_WEAPON_CS_DATA_FROM_KEY()(nWeaponType, pszKey);
+    return SOURCE2MOD_CALL_FUNCTION(CCSWeaponBaseVData*(int, const char*), "GetWeaponCSDataFromKey", HookChain::Run, nWeaponType, pszKey);
 }

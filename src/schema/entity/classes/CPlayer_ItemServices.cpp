@@ -49,14 +49,13 @@ SOURCE2MOD_GLOBALVARS();
 
 void CPlayer_ItemServices::DropActivePlayerWeapon(CBasePlayerWeapon* pActiveWeapon, HookChain eChain)
 {
-    static int offset = g_pSource2ModGameConfig->GetOffset("CCSPlayer_ItemServices::DropActivePlayerWeapon");
-    CALL_VIRTUAL_CHAIN(void, offset, eChain, this, pActiveWeapon);
+    SOURCE2MOD_CALL_FUNCTION(void(CPlayer_ItemServices*, CBasePlayerWeapon*), "CCSPlayer_ItemServices::DropActivePlayerWeapon", eChain, this,
+                             pActiveWeapon);
 }
 
 void CPlayer_ItemServices::RemoveWeapons(bool bRemoveSuit, HookChain eChain)
 {
-    static int offset = g_pSource2ModGameConfig->GetOffset("CCSPlayer_ItemServices::RemoveWeapons");
-    CALL_VIRTUAL_CHAIN(void, offset, eChain, this, bRemoveSuit);
+    SOURCE2MOD_CALL_FUNCTION(void(CPlayer_ItemServices*, bool), "CCSPlayer_ItemServices::RemoveWeapons", eChain, this, bRemoveSuit);
 }
 
 CBasePlayerWeapon* CPlayer_ItemServices::GiveNamedItem(const char* pszItem, HookChain eChain)
@@ -65,5 +64,6 @@ CBasePlayerWeapon* CPlayer_ItemServices::GiveNamedItem(const char* pszItem, Hook
     // virtual's thunk passes. Going through it rather than the vtable is what
     // lets HookChain::Run reach a hook on "CCSPlayer_ItemServices::GiveNamedItem".
     auto* pThis = reinterpret_cast<CCSPlayer_ItemServices*>(this);
-    return ResolveHookChain(ADDR_GIVE_NAMED_ITEM(), eChain)(pThis, pszItem, 0, nullptr, false, nullptr);
+    return SOURCE2MOD_CALL_FUNCTION(CBasePlayerWeapon*(CCSPlayer_ItemServices*, const char*, int, CEconItemView*, bool, void*),
+                                    "CCSPlayer_ItemServices::GiveNamedItem", eChain, pThis, pszItem, 0, nullptr, false, nullptr);
 }

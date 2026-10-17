@@ -765,6 +765,129 @@ methodmap ModernJumpContext
 	public native void CallOriginal();
 }
 
+/* ---- entity virtuals (SourceMod's SDKHooks) ----------------------------------------
+ * Spawn, Use, StartTouch, EndTouch, Blocked, Think and Killed are overridden by most
+ * entity classes: hook them on one entity (Source2ModHooks.HookInstance, SDKHook) or
+ * on a class (HookClass, "CCSPlayerPawn"); Hook (every call) is refused.
+ * WeaponPickup and WeaponSwitch take Hook too. */
+
+/** CBaseEntity::Spawn(keyValues) */
+methodmap SpawnContext
+{
+	property CBaseEntity entity
+	{
+		public native get();
+	}
+	public native void CallOriginal();
+}
+
+/** CBaseEntity::Use(info): a player's +use, a map's Use input. */
+methodmap UseContext
+{
+	property CBaseEntity entity
+	{
+		public native get();
+	}
+	property CBaseEntity activator
+	{
+		public native get();
+	}
+	property CBaseEntity caller
+	{
+		public native get();
+	}
+	/** 0 off, 1 on, 2 set, 3 toggle. */
+	property int useType
+	{
+		public native get();
+		public native set(int value);
+	}
+	property float value
+	{
+		public native get();
+		public native set(float value);
+	}
+	public native void CallOriginal();
+}
+
+/** CBaseEntity::StartTouch / EndTouch / Blocked(other) */
+methodmap EntityOtherContext
+{
+	property CBaseEntity entity
+	{
+		public native get();
+	}
+	property CBaseEntity other
+	{
+		public native get();
+	}
+	public native void CallOriginal();
+}
+
+/** CBaseEntity::Think(): the entity's think function, each time it runs. */
+methodmap ThinkContext
+{
+	property CBaseEntity entity
+	{
+		public native get();
+	}
+	public native void CallOriginal();
+}
+
+/** CBaseEntity::Event_Killed(damage) -> bool: health reached 0, m_lifeState already "dying". Supersede skips the death handling. */
+methodmap KilledContext
+{
+	property CBaseEntity entity
+	{
+		public native get();
+	}
+	property CTakeDamageResult damage
+	{
+		public native get();
+	}
+	public native bool CallOriginal();
+}
+
+/** CCSPlayer_WeaponServices::PickupWeapon(weapon) -> 0 refused, 1 taken, 2 taken as ammo. */
+methodmap WeaponPickupContext
+{
+	property CCSPlayer_WeaponServices services
+	{
+		public native get();
+	}
+	property CCSPlayerPawn pawn
+	{
+		public native get();
+	}
+	property CBasePlayerWeapon weapon
+	{
+		public native get();
+	}
+	public native int CallOriginal();
+}
+
+/** CCSPlayer_WeaponServices::SwitchToWeapon(weapon, viewModelIndex) -> bool */
+methodmap WeaponSwitchContext
+{
+	property CCSPlayer_WeaponServices services
+	{
+		public native get();
+	}
+	property CCSPlayerPawn pawn
+	{
+		public native get();
+	}
+	property CBasePlayerWeapon weapon
+	{
+		public native get();
+	}
+	property int viewModelIndex
+	{
+		public native get();
+	}
+	public native bool CallOriginal();
+}
+
 // The handler of each point (Source2ModHookHandler in source2mod/hooks lists them all).
 typedef Source2ModTakeDamageHandler = function Source2ModAction (TakeDamageContext ctx, bool post, int &result);
 typedef Source2ModCanAcquireHandler = function Source2ModAction (CanAcquireContext ctx, bool post, AcquireResult &result);
@@ -789,3 +912,11 @@ typedef Source2ModSetupMoveHandler = function Source2ModAction (SetupMoveContext
 typedef Source2ModTryPlayerMoveHandler = function Source2ModAction (TryPlayerMoveContext ctx, bool post);
 typedef Source2ModLegacyJumpHandler = function Source2ModAction (LegacyJumpContext ctx, bool post);
 typedef Source2ModModernJumpHandler = function Source2ModAction (ModernJumpContext ctx, bool post);
+typedef Source2ModSpawnHandler = function Source2ModAction (SpawnContext ctx, bool post);
+typedef Source2ModUseHandler = function Source2ModAction (UseContext ctx, bool post);
+/** StartTouch, EndTouch, Blocked. */
+typedef Source2ModEntityOtherHandler = function Source2ModAction (EntityOtherContext ctx, bool post);
+typedef Source2ModThinkHandler = function Source2ModAction (ThinkContext ctx, bool post);
+typedef Source2ModKilledHandler = function Source2ModAction (KilledContext ctx, bool post, bool &result);
+typedef Source2ModWeaponPickupHandler = function Source2ModAction (WeaponPickupContext ctx, bool post, int &result);
+typedef Source2ModWeaponSwitchHandler = function Source2ModAction (WeaponSwitchContext ctx, bool post, bool &result);

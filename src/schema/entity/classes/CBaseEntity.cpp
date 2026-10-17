@@ -54,11 +54,12 @@ CBaseEntity* CBaseEntity::CreateEntityByName(const char* pszClassName)
 }
 
 // Called here rather than through ISource2ModEntities, which has no way to say
-// which chain to take; this is the same call that interface makes.
+// which chain to take; the gamedata functions (ISource2ModFunctions) are the
+// same ones that interface calls.
 void CBaseEntity::AcceptInput(const char* pszInput, CEntityInstance* pActivator, CEntityInstance* pCaller, const char* pszValue, HookChain eChain)
 {
-    const auto fn = ResolveHookChain(ADDR_ACCEPT_INPUT(), eChain);
-    fn(this, pszInput, pActivator, pCaller, variant_t(pszValue));
+    SOURCE2MOD_CALL_FUNCTION(bool(CEntityInstance*, const char*, CEntityInstance*, CEntityInstance*, const variant_t&),
+                             "CEntityInstance::AcceptInput", eChain, this, pszInput, pActivator, pCaller, variant_t(pszValue));
 }
 
 void CBaseEntity::AddEntityIOEvent(const char* pszInput, CEntityInstance* pActivator, CEntityInstance* pCaller, const char* pszValue, float flDelay, HookChain eChain)
@@ -67,8 +68,10 @@ void CBaseEntity::AddEntityIOEvent(const char* pszInput, CEntityInstance* pActiv
     if (!pEntitySystem)
         return;
 
-    const auto fn = ResolveHookChain(ADDR_ADD_ENTITY_IO_EVENT(), eChain);
-    fn(reinterpret_cast<CEntitySystem*>(pEntitySystem), this, pszInput, pActivator, pCaller, variant_t(pszValue), flDelay, nullptr, nullptr);
+    SOURCE2MOD_CALL_FUNCTION(void(CEntitySystem*, CEntityInstance*, const char*, CEntityInstance*, CEntityInstance*, const variant_t&, float,
+                                  void*, void*),
+                             "CEntitySystem::AddEntityIOEvent", eChain, reinterpret_cast<CEntitySystem*>(pEntitySystem), this,
+                             pszInput, pActivator, pCaller, variant_t(pszValue), flDelay, nullptr, nullptr);
 }
 
 Vector CBaseEntity::GetAbsOrigin()
@@ -123,13 +126,13 @@ CEntitySubclassVDataBase* CBaseEntity::GetVData()
 
 void CBaseEntity::DispatchSpawn(CEntityKeyValues* pEntityKeyValues, HookChain eChain)
 {
-    ResolveHookChain(ADDR_DISPATCH_SPAWN(), eChain)(this, pEntityKeyValues);
+    SOURCE2MOD_CALL_FUNCTION(void(CBaseEntity*, CEntityKeyValues*), "CBaseEntity::DispatchSpawn", eChain, this, pEntityKeyValues);
 }
 
 void CBaseEntity::Teleport(const Vector* pPosition, const QAngle* pAngles, const Vector* pVelocity, HookChain eChain)
 {
-    static int offset = g_pSource2ModGameConfig->GetOffset("CBaseEntity::Teleport");
-    CALL_VIRTUAL_CHAIN(void, offset, eChain, this, pPosition, pAngles, pVelocity);
+    SOURCE2MOD_CALL_FUNCTION(void(CBaseEntity*, const Vector*, const QAngle*, const Vector*), "CBaseEntity::Teleport", eChain, this,
+                             pPosition, pAngles, pVelocity);
 }
 
 void CBaseEntity::SetMoveType(MoveType_t nMoveType)
@@ -158,8 +161,7 @@ void CBaseEntity::SetCollisionGroup(uint8 nCollisionGroup)
 
 void CBaseEntity::CollisionRulesChanged()
 {
-    static int offset = g_pSource2ModGameConfig->GetOffset("CBaseEntity::CollisionRulesChanged");
-    CALL_VIRTUAL(void, offset, this);
+    SOURCE2MOD_CALL_FUNCTION(void(CBaseEntity*), "CBaseEntity::CollisionRulesChanged", HookChain::Run, this);
 }
 
 int CBaseEntity::GetIndex()
@@ -174,15 +176,15 @@ const char* CBaseEntity::GetName() const
 
 void CBaseEntity::Remove(HookChain eChain)
 {
-    ResolveHookChain(ADDR_UTIL_REMOVE(), eChain)(this);
+    SOURCE2MOD_CALL_FUNCTION(void(CEntityInstance*), "UTIL::Remove", eChain, this);
 }
 
 void CBaseEntity::DispatchParticleEffect(const char* pszParticleName, ParticleAttachment_t nAttachType, uint8 nAttachmentPoint,
                                          bool bResetAllParticlesOnEntity, IRecipientFilter* pFilter, HookChain eChain)
 {
-    const auto fn = ResolveHookChain(ADDR_DISPATCH_PARTICLE_EFFECT(), eChain);
-
     // No attachment name token and the default split-screen slot, as the
     // game's own entity-attached calls pass them.
-    fn(pszParticleName, static_cast<int>(nAttachType), this, nAttachmentPoint, 0, bResetAllParticlesOnEntity, -1, pFilter, 0);
+    SOURCE2MOD_CALL_FUNCTION(void(const char*, int, CBaseEntity*, uint8, uint32, bool, int, IRecipientFilter*, uint8), "DispatchParticleEffect",
+                             eChain, pszParticleName, static_cast<int>(nAttachType), this, nAttachmentPoint, 0u,
+                             bResetAllParticlesOnEntity, -1, pFilter, static_cast<uint8>(0));
 }

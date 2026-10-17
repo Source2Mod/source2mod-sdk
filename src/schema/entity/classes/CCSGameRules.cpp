@@ -48,10 +48,6 @@ SOURCE2MOD_GLOBALVARS();
 
 void CCSGameRules::TerminateRound(float flDelay, int32_t eRoundEndReason, uint32 nTeamId, HookChain eChain)
 {
-    auto pfnTerminateRound = ADDR_TERMINATE_ROUND();
-    if (!pfnTerminateRound)
-        return;
-
     // The team is taken by pointer, and null is what "no winning team" looks
     // like -- passing a pointer to zero is not the same thing.
     uint32 nTeam = nTeamId;
@@ -62,13 +58,14 @@ void CCSGameRules::TerminateRound(float flDelay, int32_t eRoundEndReason, uint32
     // the round, and a gamemode's TerminateRound hook exists to police the
     // latter. HookChain::Run lets those hooks see (and veto) this one too.
     //
-    // See the note on CCSGameRules_TerminateRound_t: the argument order is not
-    // the same on both platforms.
-    auto pfnOriginal = ResolveHookChain(pfnTerminateRound, eChain);
+    // The argument order is not the same on both platforms (the gamedata
+    // entry's "function" object lists both).
 #ifdef _WIN32
-    pfnOriginal(this, flDelay, static_cast<uint32>(eRoundEndReason), pnTeamId);
+    SOURCE2MOD_CALL_FUNCTION(void(CCSGameRules*, float, uint32, uint32*), "CCSGameRules::TerminateRound", eChain, this, flDelay,
+                             static_cast<uint32>(eRoundEndReason), pnTeamId);
 #else
-    pfnOriginal(this, static_cast<uint32>(eRoundEndReason), pnTeamId, flDelay);
+    SOURCE2MOD_CALL_FUNCTION(void(CCSGameRules*, uint32, uint32*, float), "CCSGameRules::TerminateRound", eChain, this,
+                             static_cast<uint32>(eRoundEndReason), pnTeamId, flDelay);
 #endif
 }
 
@@ -87,6 +84,5 @@ CCSPlayerController* CCSGameRules::GetClientAimTarget(CCSPlayerController* pPlay
 
 void CCSGameRules::GoToIntermission(bool bAbortedMatch, HookChain eChain)
 {
-    static int offset = g_pSource2ModGameConfig->GetOffset("CCSGameRules::GoToIntermission");
-    CALL_VIRTUAL_CHAIN(void, offset, eChain, this, bAbortedMatch);
+    SOURCE2MOD_CALL_FUNCTION(void(CCSGameRules*, bool), "CCSGameRules::GoToIntermission", eChain, this, bAbortedMatch);
 }

@@ -154,8 +154,6 @@ void CCSPlayerController::TakeDamage(CCSPlayerController* pAttacker, int iDamage
     CTakeDamageResult result(iDamage);
     result.CopyFrom(&info);
 
-    auto pfn = ADDR_TAKE_DAMAGE_OLD();
-
     // Bypass by default: damage Source2Mod was asked to deal is not the game
     // dealing damage, so a plugin hooking TakeDamage to police the game's own
     // hits should not have to tell the two apart -- and a handler that
@@ -165,7 +163,8 @@ void CCSPlayerController::TakeDamage(CCSPlayerController* pAttacker, int iDamage
     // On the pawn, not the controller: the tracing showed a real hit arriving
     // on classname 'player' while this call arrived on 'cs_player_controller',
     // whose m_iHealth is 0.
-    ResolveHookChain(pfn, eChain)(pVictimPawn, &info, &result);
+    SOURCE2MOD_CALL_FUNCTION(int64_t(CBaseEntity*, CTakeDamageInfo*, CTakeDamageResult*), "CBaseEntity::TakeDamageOld", eChain, pVictimPawn,
+                             &info, &result);
 }
 
 void CCSPlayerController::Respawn(HookChain eChain)
@@ -174,19 +173,17 @@ void CCSPlayerController::Respawn(HookChain eChain)
 
     // The Call To Arms update appears to have invalidated the need for CCSPlayerPawn_Respawn.
     SetPawn(m_hPlayerPawn(), eChain);
-    static int offset = g_pSource2ModGameConfig->GetOffset("CCSPlayerController::Respawn");
-    CALL_VIRTUAL_CHAIN(void, offset, eChain, this);
+    SOURCE2MOD_CALL_FUNCTION(void(CCSPlayerController*), "CCSPlayerController::Respawn", eChain, this);
 }
 
 void CCSPlayerController::SwitchTeam(int nTeam, HookChain eChain)
 {
-    ResolveHookChain(ADDR_SWITCH_TEAM(), eChain)(this, nTeam);
+    SOURCE2MOD_CALL_FUNCTION(void(CCSPlayerController*, int), "CCSPlayerController::SwitchTeam", eChain, this, nTeam);
 }
 
 void CCSPlayerController::ChangeTeam(int nTeam, HookChain eChain)
 {
-    static int offset = g_pSource2ModGameConfig->GetOffset("CCSPlayerController::ChangeTeam");
-    CALL_VIRTUAL_CHAIN(void, offset, eChain, this, nTeam);
+    SOURCE2MOD_CALL_FUNCTION(void(CCSPlayerController*, int), "CCSPlayerController::ChangeTeam", eChain, this, nTeam);
 }
 
 CCSPlayerPawn* CCSPlayerController::GetPlayerPawn()

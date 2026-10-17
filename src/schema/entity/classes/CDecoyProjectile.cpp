@@ -53,5 +53,6 @@ CDecoyProjectile* CDecoyProjectile::EmitGrenade(const Vector& vecPosition, const
     QAngle angAng = angAngle;
     Vector vecVel = vecVelocity;
 
-    return ResolveHookChain(ADDR_EMIT_DECOY(), eChain)(&vecPos, &angAng, &vecVel, &vecVel, pOwner, nItemDefIndex);
+    return SOURCE2MOD_CALL_FUNCTION(CDecoyProjectile*(Vector*, QAngle*, Vector*, Vector*, CBaseEntity*, uint32_t), "CDecoyProjectile::EmitGrenade", eChain, &vecPos,
+                             &angAng, &vecVel, &vecVel, pOwner, nItemDefIndex);
 }
