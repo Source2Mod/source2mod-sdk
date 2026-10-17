@@ -32,7 +32,7 @@
 # SOURCE2MOD_KHOOK_HEADER (a hash of its khook.hpp) and SOURCE2MOD_KHOOK_COMMIT,
 # defined from that submodule, are what KHOOK_INIT() compares with the core's
 # own KHook at plugin load.
-import hashlib, os, subprocess
+import hashlib, os, shutil, subprocess
 
 class Source2ModSdkPlugin(object):
   def __init__(self):
@@ -196,6 +196,32 @@ class Source2ModSdkPlugin(object):
     binary.sources += self.Sources(sdk)
     # s2sdk's libraries, the Steam API among them, come from
     # SdkHelpers.configureCxx().
+
+  # A SourcePawn plugin needs nothing built from the SDK, only the two below
+  # (SdkScripting.cmake is the CMake twin):
+  #
+  #   Source2ModSdk = builder.Eval(os.path.join(os.environ['SOURCE2MOD_SDK'],
+  #                                          'SdkPlugin.ambuild'), {})
+  #   include = Source2ModSdk.ScriptingIncludePath()
+  #   spcomp = Source2ModSdk.FindSpcomp(builder.options.spcomp)
+
+  def ScriptingIncludePath(self):
+    # The root of `#include <source2mod/...>`: the files a Source2Mod build
+    # ships in addons/source2mod/scripting/include.
+    path = os.path.join(self.sourcePath, 'public', 'scripting')
+    if not os.path.isfile(os.path.join(path, 'source2mod', 'api.inc')):
+      raise Exception('The SourcePawn include set is not at {}'.format(path))
+    return os.path.abspath(path)
+
+  def FindSpcomp(self, path=None):
+    # The path given (a plugin's --spcomp), else SPCOMP, else spcomp on the
+    # PATH -- the way a C++ plugin finds its compiler. A Source2Mod build or
+    # release has it in addons/source2mod/scripting.
+    for candidate in [path, os.environ.get('SPCOMP'), shutil.which('spcomp'), shutil.which('spcomp64')]:
+      if candidate and os.path.isfile(candidate):
+        return os.path.abspath(candidate)
+    raise Exception('spcomp not found: put it on the PATH, set SPCOMP or pass --spcomp '
+                    '(a Source2Mod build or release has it in addons/source2mod/scripting)')
 
 
 rvalue = Source2ModSdkPlugin()
