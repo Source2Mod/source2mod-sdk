@@ -387,8 +387,9 @@ struct ModernJumpContext
 /// is about to print and send. Lines a silent chat trigger hid for a
 /// Source2Mod command never get here; "!command" lines do (they stay in chat).
 /// Pre: Supersede drops the line (no chat, no player_say event).
-/// Source2Mod does not fire a player_chat game event (CounterStrikeSharp
-/// does, from its own Host_Say hook): this point is the way to see chat.
+/// After the say command, Source2Mod fires the game's player_chat event for a
+/// line that went out (the game never does), unless somebody else already
+/// fired one for it (CounterStrikeSharp does, from its own Host_Say hook).
 struct PlayerChatContext
 {
     CCSPlayerController* controller;    // nullptr: the server console

@@ -90,11 +90,11 @@ methodmap Source2ModCommands
 	 * Listens to a command that is not the plugin's: the game's, another
 	 * plugin's. Pre may answer Action_Supersede, post only watches.
 	 *
-	 * @return The id UnregisterConListener takes
+	 * @return The id UnhookConCommand takes
 	 */
-	public static native int RegisterConListener(const char[] name, Source2ModCommandHandler handler, bool post);
+	public static native int HookConCommand(const char[] name, Source2ModCommandHandler handler, bool post);
 
-	public static native bool UnregisterConListener(int id);
+	public static native bool UnhookConCommand(int id);
 
 	/** Answers where the command came from: the caller's console or chat. Formatted. */
 	public static native void ReplyToCommand(Source2ModCommandContext context, const char[] format, any ...);

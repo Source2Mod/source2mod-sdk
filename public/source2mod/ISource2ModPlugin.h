@@ -275,7 +275,11 @@ inline bool Source2ModKHookVersionMatches(const char* coreHeader, const char* co
 // (IEntityOutputListener replaces the IEntityIOListener classes); the KHook
 // wrappers moved to ISource2ModKHook.h. The listener's slots moved: a plugin built
 // against 4 or older is refused.
-#define SOURCE2MOD_PLAPI_VERSION 5
+// 6: ISource2ModCommands004 -- RegisterConListener / UnregisterConListener are
+// HookConCommand / UnhookConCommand (REGISTER_CON_LISTENER is
+// HOOK_CON_COMMAND). A plugin built against 5 asks for ISource2ModCommands003,
+// which is gone, so it is refused instead of running with no commands interface.
+#define SOURCE2MOD_PLAPI_VERSION 6
 
 /// Plugin API interface name
 #define SOURCE2MOD_PLAPI_NAME "ISource2ModPlugin"

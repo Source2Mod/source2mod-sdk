@@ -60,7 +60,7 @@
 
 /// A console command of the plugin's own (RegisterConCommand).
 using Source2ModCommandId = Source2ModHookId;
-/// A listener on a command somebody else owns (RegisterConListener).
+/// A listener on a command somebody else owns (HookConCommand).
 using Source2ModCommandHookId = Source2ModHookId;
 /// A chat-only listener (RegisterChatListener).
 using Source2ModChatListenerId = Source2ModHookId;
@@ -186,7 +186,7 @@ Core Source2Mod Commands
 *
 * @note Every registration belongs to the plugin whose handler it is.
   */
-#define SOURCE2MOD_COMMANDS_INTERFACE "ISource2ModCommands003"
+#define SOURCE2MOD_COMMANDS_INTERFACE "ISource2ModCommands004"
 
 class ISource2ModCommands
 {
@@ -279,9 +279,9 @@ public:
      * @param pchName Existing command name to listen for
      * @param handler A function, an object and a method, or a lambda
      * @param post false to run before the original, true to run after
-     * @return The id UnregisterConListener(id) takes
+     * @return The id UnhookConCommand(id) takes
      */
-    virtual Source2ModCommandHookId RegisterConListener(const char* pchName, CommandHandler handler, bool post) = 0;
+    virtual Source2ModCommandHookId HookConCommand(const char* pchName, CommandHandler handler, bool post) = 0;
 
     /**
      * @brief Drops the console listener with this handler -- a function or an
@@ -289,14 +289,14 @@ public:
      *
      * @return true when one was found
      */
-    virtual bool UnregisterConListener(const char* pchName, const CommandHandler& handler, bool post) = 0;
+    virtual bool UnhookConCommand(const char* pchName, const CommandHandler& handler, bool post) = 0;
 
     /**
-     * @brief Drops the console listener RegisterConListener() returned the id for.
+     * @brief Drops the console listener HookConCommand() returned the id for.
      *
      * @return true when it was still there
      */
-    virtual bool UnregisterConListener(Source2ModCommandHookId id) = 0;
+    virtual bool UnhookConCommand(Source2ModCommandHookId id) = 0;
 
     /**
      * @brief Answers a command where it was typed: to the player's chat when
@@ -310,7 +310,7 @@ public:
 /// RegisterConCommand(name, handler) or RegisterConCommand(name, handler, permission).
 #define REGISTER_CHAT_LISTENER(pchName, ...) g_pSource2ModCommands->RegisterChatListener(pchName, __VA_ARGS__)
 #define REGISTER_CON_COMMAND(pchName, ...)   g_pSource2ModCommands->RegisterConCommand(pchName, __VA_ARGS__)
-#define REGISTER_CON_LISTENER(pchName, handler, post) g_pSource2ModCommands->RegisterConListener(pchName, handler, post)
+#define HOOK_CON_COMMAND(pchName, handler, post) g_pSource2ModCommands->HookConCommand(pchName, handler, post)
 
 /// ReplyToCommand() with printf formatting.
 #define REPLY_TO_COMMAND(ctx, fmt, ...) \

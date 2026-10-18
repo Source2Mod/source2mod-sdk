@@ -767,8 +767,8 @@ methodmap ModernJumpContext
  * Host_Say: a say / say_team line the game is about to print and send.
  * Lines a silent chat trigger hid for a Source2Mod command never get here;
  * "!command" lines do. Pre: Action_Supersede drops the line (no chat, no
- * player_say). Source2Mod fires no player_chat game event -- this is the
- * way to see chat.
+ * player_say). After the say command Source2Mod fires the player_chat game
+ * event for a line that went out, unless somebody else already did.
  */
 methodmap PlayerChatContext
 {

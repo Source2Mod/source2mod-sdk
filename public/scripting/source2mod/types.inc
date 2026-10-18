@@ -3,7 +3,7 @@
  *
  * The source2mod/ includes mirror Source2Mod's C++ API (ISource2Mod*): an
  * interface is a methodmap of static methods named after it without the "I"
- * and the version (ISource2ModCommands003 -> Source2ModCommands), with the
+ * and the version (ISource2ModCommands004 -> Source2ModCommands), with the
  * C++ method names and argument order. Hook* returns an id Unhook* takes; a
  * plugin's hooks, listeners and timers go when it unloads.
  */
