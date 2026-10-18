@@ -1,6 +1,6 @@
 /**
  * Source2Mod SourcePawn API: the contexts of the game-function hook points
- * (HookPoint_TakeDamage .. HookPoint_CheckJumpButtonModern, source2mod/hooks;
+ * (HookPoint_TakeDamage .. HookPoint_PlayerChat, source2mod/hooks;
  * C++ ISource2ModHookContexts.h).
  *
  * Game functions the core hooks from its own gamedata. A handler gets the
@@ -763,6 +763,30 @@ methodmap ModernJumpContext
 	public native void CallOriginal();
 }
 
+/**
+ * Host_Say: a say / say_team line the game is about to print and send.
+ * Lines a silent chat trigger hid for a Source2Mod command never get here;
+ * "!command" lines do. Pre: Action_Supersede drops the line (no chat, no
+ * player_say). Source2Mod fires no player_chat game event -- this is the
+ * way to see chat.
+ */
+methodmap PlayerChatContext
+{
+	/** Who said it; NULL_ENTITY for the server console. */
+	property CCSPlayerController controller
+	{
+		public native get();
+	}
+	/** say_team. */
+	property bool teamOnly
+	{
+		public native get();
+	}
+	/** The line as typed (the say command's first argument). */
+	public native int GetMessage(char[] buffer, int maxlen);
+	public native void CallOriginal();
+}
+
 /* ---- entity virtuals (SourceMod's SDKHooks) ----------------------------------------
  * Spawn, Use, StartTouch, EndTouch, Blocked, Think and Killed are overridden by most
  * entity classes: hook them on one entity (Source2ModHooks.HookInstance, SDKHook) or
@@ -910,6 +934,7 @@ typedef Source2ModSetupMoveHandler = function Source2ModAction (SetupMoveContext
 typedef Source2ModTryPlayerMoveHandler = function Source2ModAction (TryPlayerMoveContext ctx, bool post);
 typedef Source2ModLegacyJumpHandler = function Source2ModAction (LegacyJumpContext ctx, bool post);
 typedef Source2ModModernJumpHandler = function Source2ModAction (ModernJumpContext ctx, bool post);
+typedef Source2ModPlayerChatHandler = function Source2ModAction (PlayerChatContext ctx, bool post);
 typedef Source2ModSpawnHandler = function Source2ModAction (SpawnContext ctx, bool post);
 typedef Source2ModUseHandler = function Source2ModAction (UseContext ctx, bool post);
 /** StartTouch, EndTouch, Blocked. */

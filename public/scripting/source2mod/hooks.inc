@@ -81,6 +81,7 @@ enum HookPoint
 	HookPoint_OnJumpModern,
 	HookPoint_CheckJumpButtonLegacy,
 	HookPoint_CheckJumpButtonModern,
+	HookPoint_PlayerChat,
 
 	// Entity virtuals (SDKHooks): HookInstance(entity) / HookClass(name); not Hook.
 	HookPoint_Spawn = 50,
@@ -328,6 +329,7 @@ typeset Source2ModHookHandler
 	function Source2ModAction (TryPlayerMoveContext ctx, bool post);
 	function Source2ModAction (LegacyJumpContext ctx, bool post);
 	function Source2ModAction (ModernJumpContext ctx, bool post);
+	function Source2ModAction (PlayerChatContext ctx, bool post);
 	function Source2ModAction (GameFrameContext ctx, bool post);
 	function Source2ModAction (StartupServerContext ctx, bool post);
 	function Source2ModAction (ClientConnectContext ctx, bool post, bool &result);

@@ -54,7 +54,8 @@
  *
  * Points (HookPoint::*):
  *   - game functions with a typed context: TakeDamage, Touch, PostThink,
- *     AcceptInput, the movement functions, ... (ISource2ModHookContexts.h);
+ *     AcceptInput, the movement functions, PlayerChat (Host_Say), ...
+ *     (ISource2ModHookContexts.h);
  *   - entity virtuals with a typed context, hooked on the target's own class
  *     (SourceMod's SDKHooks): Spawn, Use, StartTouch, EndTouch, Blocked,
  *     Think, Killed, WeaponPickup, WeaponSwitch;
@@ -202,6 +203,7 @@ enum class HookPointId : int32_t
     OnJumpModern,
     CheckJumpButtonLegacy,
     CheckJumpButtonModern,
+    PlayerChat,
 
     // Entity virtuals, on the target's class vtable (SDKHooks).
     Spawn = 50,
@@ -401,6 +403,7 @@ namespace HookPoint
     inline constexpr HookPointOf<ModernJumpContext> OnJumpModern{ HookPointId::OnJumpModern };
     inline constexpr HookPointOf<LegacyJumpContext> CheckJumpButtonLegacy{ HookPointId::CheckJumpButtonLegacy };
     inline constexpr HookPointOf<ModernJumpContext> CheckJumpButtonModern{ HookPointId::CheckJumpButtonModern };
+    inline constexpr HookPointOf<PlayerChatContext> PlayerChat{ HookPointId::PlayerChat };
 
     // Entity virtuals (SDKHooks): HookTarget::Instance(entity) or Class(name).
     inline constexpr HookPointOf<SpawnContext> Spawn{ HookPointId::Spawn };

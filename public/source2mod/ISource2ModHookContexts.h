@@ -79,6 +79,7 @@
 #include "entity2/variant.h"
 
 class CBaseEntity;
+class CCommand;
 class CBasePlayerController;
 class CBasePlayerWeapon;
 class CCSPlayer_ItemServices;
@@ -378,6 +379,24 @@ struct ModernJumpContext
 {
     CCSPlayerModernJump* jump;
     CMoveData* moveData;
+
+    SOURCE2MOD_HOOK_CALL_ORIGINAL(void)
+};
+
+/// Host_Say(controller, args, teamOnly, ...): a say / say_team line the game
+/// is about to print and send. Lines a silent chat trigger hid for a
+/// Source2Mod command never get here; "!command" lines do (they stay in chat).
+/// Pre: Supersede drops the line (no chat, no player_say event).
+/// Source2Mod does not fire a player_chat game event (CounterStrikeSharp
+/// does, from its own Host_Say hook): this point is the way to see chat.
+struct PlayerChatContext
+{
+    CCSPlayerController* controller;    // nullptr: the server console
+    CCommand* args;                     // the say command; Arg(1) is the line
+    const char* message;                // the line (Arg(1), or ArgS() for an unquoted one), never nullptr
+    bool teamOnly;                      // say_team
+    int unk1;
+    const char* unk2;
 
     SOURCE2MOD_HOOK_CALL_ORIGINAL(void)
 };
