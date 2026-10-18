@@ -31,6 +31,8 @@ public:
 	CTakeDamageInfo();
 	CTakeDamageInfo(CBaseEntity* pInflictor, CBaseEntity* pAttacker, CBaseEntity* pAbility, float flDamage, DamageTypes_t bitsDamageType);
 
+    /// Where the hit landed, read from the damage's bullet result. Use this,
+    /// not m_iHitGroupId: the game does not fill that field in.
     HitGroup_t GetHitGroup() const;
 
 public:
@@ -62,7 +64,12 @@ private:
 public:
 	CGameTrace* m_pTrace;						// 0x68 | 104
 	TakeDamageFlags_t m_nDamageFlags;			// 0x70 | 112
-	HitGroup_t m_iHitGroupId;					// 0x78 | 120
+
+private:
+	// Not filled in by the game (junk): GetHitGroup() is the hit group.
+	[[maybe_unused]] HitGroup_t m_iHitGroupId;	// 0x78 | 120
+
+public:
 	int32_t m_nNumObjectsPenetrated;			// 0x7c | 124
 	float m_flFriendlyFireDamageReductionRatio; // 0x80 | 128
 	bool m_bStoppedBullet;						// 0x84 | 132

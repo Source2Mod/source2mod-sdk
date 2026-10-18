@@ -85,12 +85,6 @@ methodmap CTakeDamageInfo
 		public native get();
 		public native set(int value);
 	}
-	/** HitGroup_t; also what CTakeDamageInfo::GetHitGroup() answers. */
-	property int m_iHitGroupId
-	{
-		public native get();
-		public native set(int value);
-	}
 	property bool m_bShouldBleed
 	{
 		public native get();
@@ -146,7 +140,11 @@ methodmap CTakeDamageInfo
 	public native void Set_m_vecReportedPosition(const float vec[3]);
 	public native void m_vecDamageDirection(float vec[3]);
 	public native void Set_m_vecDamageDirection(const float vec[3]);
-	/** HitGroup_t, CTakeDamageInfo::GetHitGroup(). */
+	/**
+	 * Where the hit landed (HITGROUP_*, CTakeDamageInfo::GetHitGroup()), read
+	 * from the damage's bullet result. The struct's own m_iHitGroupId is not
+	 * filled in by the game, so there is no property for it.
+	 */
 	public native int GetHitGroup();
 	/** The trace of the hit (m_pTrace), a copy; null when the damage had none. Close it. */
 	public native TraceResult GetTrace();
