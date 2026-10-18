@@ -245,14 +245,16 @@ void CBasePlayerController::ReplicateConVar(const char* pszConVar, const char* p
     {
         static INetworkMessageInternal* pMsg = GetNetworkMessages()->FindNetworkMessagePartial("CNETMsg_SetConVar");
 
-        CNetMessagePB<CNETMsg_SetConVar>* msg = pMsg->AllocateMessage()->ToPB<CNETMsg_SetConVar>();
+        // One message, refilled: SendNetMessage is done with it when it
+        // returns (it used to be deleted right after); a fresh one per call
+        // was about half of what this cost.
+        static CNetMessagePB<CNETMsg_SetConVar>* msg = pMsg->AllocateMessage()->ToPB<CNETMsg_SetConVar>();
+        msg->Clear();
         auto cvar = msg->mutable_convars()->add_cvars();
         cvar->set_name(pszConVar);
         cvar->set_value(pszValue);
 
         pNetChannel->SendNetMessage(msg, BUF_DEFAULT);
-
-        delete msg;
     }
 }
 
