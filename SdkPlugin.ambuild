@@ -218,15 +218,70 @@ class Source2ModSdkPlugin(object):
       raise Exception('The SourcePawn include set is not at {}'.format(path))
     return os.path.abspath(path)
 
-  def FindSpcomp(self, path=None):
-    # The path given (a plugin's --spcomp), else SPCOMP, else spcomp on the
-    # PATH -- the way a C++ plugin finds its compiler. A Source2Mod build or
-    # release has it in addons/source2mod/scripting.
-    for candidate in [path, os.environ.get('SPCOMP'), shutil.which('spcomp'), shutil.which('spcomp64')]:
+  def FindSpcomp(self, path=None, release=None, download=True):
+    # The path given (a plugin's --spcomp), else SPCOMP, else the SDK's own copy
+    # in bin/<linux|windows>/ -- fetched once from a Source2Mod release
+    # (release, else SOURCE2MOD_SPCOMP_RELEASE, else the latest) -- else
+    # spcomp on the PATH, last so an old SourceMod spcomp there does not win.
+    # SdkScripting.cmake does the same for CMake.
+    for candidate in [path, os.environ.get('SPCOMP')]:
       if candidate and os.path.isfile(candidate):
         return os.path.abspath(candidate)
-    raise Exception('spcomp not found: put it on the PATH, set SPCOMP or pass --spcomp '
-                    '(a Source2Mod build or release has it in addons/source2mod/scripting)')
+
+    own = self.SdkSpcomp(release, download)
+    if own:
+      return own
+
+    for candidate in [shutil.which('spcomp'), shutil.which('spcomp64')]:
+      if candidate and os.path.isfile(candidate):
+        return os.path.abspath(candidate)
+    raise Exception('spcomp not found: pass --spcomp, set SPCOMP, let the SDK fetch it (needs network) '
+                    'or put it on the PATH (a Source2Mod build or release has it in addons/source2mod/scripting)')
+
+  def SdkSpcomp(self, release=None, download=True):
+    # The SDK's spcomp, fetched into bin/<os>/ when it has none (or another
+    # release was named): the release's spcomp-<os> asset, or out of its
+    # archive for releases from before those assets.
+    import io, json, re, stat, tarfile, urllib.request
+    windows = os.name == 'nt'
+    folder = os.path.join(self.sourcePath, 'bin', 'windows' if windows else 'linux')
+    name = 'spcomp.exe' if windows else 'spcomp'
+    target = os.path.join(folder, name)
+    stamp = os.path.join(folder, 'release.txt')
+
+    tag = release or os.environ.get('SOURCE2MOD_SPCOMP_RELEASE') or 'latest'
+    have = open(stamp).read().strip() if os.path.isfile(stamp) else ''
+    if os.path.isfile(target) and (tag == 'latest' or tag == have):
+      return target
+    if not download:
+      return None
+
+    repo = 'https://github.com/Source2Mod/source2mod'
+    try:
+      if tag == 'latest':
+        with urllib.request.urlopen('https://api.github.com/repos/Source2Mod/source2mod/releases/latest') as r:
+          tag = json.load(r)['tag_name']
+      os.makedirs(folder, exist_ok=True)
+      asset = 'spcomp-windows.exe' if windows else 'spcomp-linux'
+      try:
+        with urllib.request.urlopen('{0}/releases/download/{1}/{2}'.format(repo, tag, asset)) as r:
+          data = r.read()
+      except urllib.error.HTTPError:
+        archive = 'source2mod_{0}-{1}.tar.gz'.format(tag, 'windows' if windows else 'linux')
+        with urllib.request.urlopen('{0}/releases/download/{1}/{2}'.format(repo, tag, archive)) as r:
+          blob = io.BytesIO(r.read())
+        with tarfile.open(fileobj=blob, mode='r:gz') as tar:
+          member = next(m for m in tar.getmembers() if re.search(r'scripting/' + re.escape(name) + r'$', m.name))
+          data = tar.extractfile(member).read()
+      with open(target, 'wb') as f:
+        f.write(data)
+      os.chmod(target, os.stat(target).st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+      with open(stamp, 'w') as f:
+        f.write(tag + '\n')
+      return target
+    except Exception as e:
+      print('Source2Mod SDK: could not fetch spcomp ({0}): {1}'.format(tag, e))
+      return target if os.path.isfile(target) else None
 
 
 rvalue = Source2ModSdkPlugin()

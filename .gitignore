@@ -562,3 +562,4 @@ deps.cmake
 # where earlier versions of it cloned hl2sdk and the Protobufs
 vendor/hl2sdk-cs2/
 vendor/Protobufs/
+bin/
