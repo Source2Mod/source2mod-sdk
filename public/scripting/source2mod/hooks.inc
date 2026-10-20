@@ -93,6 +93,7 @@ enum HookPoint
 	HookPoint_Killed,
 	HookPoint_WeaponPickup,             /**< Hook works: every player's weapon services */
 	HookPoint_WeaponSwitch,             /**< Hook works: every player's weapon services */
+	HookPoint_GetItemInLoadout,         /**< Hook works: every player's inventory */
 
 	// Engine callbacks.
 	HookPoint_GameFrame = 100,
@@ -319,6 +320,7 @@ typeset Source2ModHookHandler
 	function Source2ModAction (KilledContext ctx, bool post, bool &result);
 	function Source2ModAction (WeaponPickupContext ctx, bool post, int &result);
 	function Source2ModAction (WeaponSwitchContext ctx, bool post, bool &result);
+	function Source2ModAction (GetItemInLoadoutContext ctx, bool post, CEconItemView &result);
 	function Source2ModAction (MovementContext ctx, bool post, bool &result);
 	function Source2ModAction (AirAccelerateContext ctx, bool post);
 	function Source2ModAction (GroundAccelerateContext ctx, bool post);

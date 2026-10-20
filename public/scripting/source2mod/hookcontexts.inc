@@ -870,6 +870,38 @@ methodmap KilledContext
 	public native bool CallOriginal();
 }
 
+/**
+ * CCSPlayerInventory::GetItemInLoadout(team, slot) -> CEconItemView: the item a
+ * player has in a loadout slot, asked whenever the game needs it (weapons,
+ * gloves, agents, music kits, the scoreboard). Answer another item with
+ * Action_Supersede (pre) or Action_Override (post) and `result`.
+ */
+methodmap GetItemInLoadoutContext
+{
+	/** The inventory itself (no schema class: an opaque object). */
+	property SchemaObject inventory
+	{
+		public native get();
+	}
+	/** Whose inventory it is; NULL_ENTITY for one no player in the game has. */
+	property CCSPlayerController controller
+	{
+		public native get();
+	}
+	/** CS_TEAM_T or CS_TEAM_CT. */
+	property int team
+	{
+		public native get();
+	}
+	/** The loadout position. */
+	property int slot
+	{
+		public native get();
+	}
+	/** The game's own answer (the inventory's item); null when the slot is empty. */
+	public native CEconItemView CallOriginal();
+}
+
 /** CCSPlayer_WeaponServices::PickupWeapon(weapon) -> 0 refused, 1 taken, 2 taken as ammo. */
 methodmap WeaponPickupContext
 {
@@ -942,4 +974,5 @@ typedef Source2ModEntityOtherHandler = function Source2ModAction (EntityOtherCon
 typedef Source2ModThinkHandler = function Source2ModAction (ThinkContext ctx, bool post);
 typedef Source2ModKilledHandler = function Source2ModAction (KilledContext ctx, bool post, bool &result);
 typedef Source2ModWeaponPickupHandler = function Source2ModAction (WeaponPickupContext ctx, bool post, int &result);
+typedef Source2ModGetItemInLoadoutHandler = function Source2ModAction (GetItemInLoadoutContext ctx, bool post, CEconItemView &result);
 typedef Source2ModWeaponSwitchHandler = function Source2ModAction (WeaponSwitchContext ctx, bool post, bool &result);

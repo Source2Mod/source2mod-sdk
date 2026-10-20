@@ -86,6 +86,7 @@ class CCSPlayer_ItemServices;
 class CCSPlayer_MovementServices;
 class CCSPlayer_WeaponServices;
 class CCSPlayerController;
+class CCSPlayerInventory;
 class CCSPlayerLegacyJump;
 class CCSPlayerModernJump;
 class CCSPlayerPawn;
@@ -492,6 +493,24 @@ struct WeaponSwitchContext
     bool result;
 
     SOURCE2MOD_HOOK_CALL_ORIGINAL(bool)
+};
+
+/// CCSPlayerInventory::GetItemInLoadout(team, slot) -> CEconItemView* -- the
+/// item a player has in a loadout slot (team CS_TEAM_T / CS_TEAM_CT, slot a
+/// loadout position), asked whenever the game needs it: giving weapons,
+/// gloves, agents, music kits, the scoreboard. Answer another item with
+/// Supersede (pre) or Override (post) and `result`. Every player:
+/// HookTarget::All() works.
+struct GetItemInLoadoutContext
+{
+    CCSPlayerInventory* inventory;
+    /// Whose inventory it is; nullptr for one no player in the game has.
+    CCSPlayerController* controller;
+    std::int32_t team;
+    std::int32_t slot;
+    CEconItemView* result;
+
+    SOURCE2MOD_HOOK_CALL_ORIGINAL(CEconItemView*)
 };
 
 /* =========================

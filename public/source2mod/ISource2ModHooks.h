@@ -58,7 +58,8 @@
  *     (ISource2ModHookContexts.h);
  *   - entity virtuals with a typed context, hooked on the target's own class
  *     (SourceMod's SDKHooks): Spawn, Use, StartTouch, EndTouch, Blocked,
- *     Think, Killed, WeaponPickup, WeaponSwitch;
+ *     Think, Killed, WeaponPickup, WeaponSwitch; and GetItemInLoadout (a
+ *     player inventory's virtual, HookTarget::All() works);
  *   - engine callbacks: GameFrame, StartupServer, ClientConnect, ClientConnected,
  *     ClientPutInServer, ClientDisconnect, ClientVoice, ClientSettingsChanged,
  *     the Steam API, LoadEventsFromFile;
@@ -215,6 +216,7 @@ enum class HookPointId : int32_t
     Killed,
     WeaponPickup,
     WeaponSwitch,
+    GetItemInLoadout,   // CCSPlayerInventory, not an entity: All() covers every player
 
     // Engine callbacks.
     GameFrame = 100,
@@ -415,6 +417,7 @@ namespace HookPoint
     inline constexpr HookPointOf<KilledContext> Killed{ HookPointId::Killed };
     inline constexpr HookPointOf<WeaponPickupContext> WeaponPickup{ HookPointId::WeaponPickup };
     inline constexpr HookPointOf<WeaponSwitchContext> WeaponSwitch{ HookPointId::WeaponSwitch };
+    inline constexpr HookPointOf<GetItemInLoadoutContext> GetItemInLoadout{ HookPointId::GetItemInLoadout };
 
     // Engine callbacks.
     inline constexpr HookPointOf<GameFrameContext> GameFrame{ HookPointId::GameFrame };
