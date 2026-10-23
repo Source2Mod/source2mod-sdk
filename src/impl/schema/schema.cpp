@@ -140,11 +140,11 @@ static bool IsFieldNetworked(CNetworkSerializerCodeGenDatabase* pDatabase, const
 // (e.g. CCSGameRules -> CTeamplayRules -> CMultiplayRules -> CGameRules, in this case it's in CGameRules)
 static SchemaClassFieldData_t* FindChainField(SchemaClassInfoData_t* pClassInfo)
 {
-    for (; pClassInfo; pClassInfo = pClassInfo->m_nBaseClassCount ? pClassInfo->m_pBaseClasses[0].m_pClass : nullptr)
+    for (; pClassInfo; pClassInfo = pClassInfo->m_nNumBaseClasses ? pClassInfo->m_pBaseClasses[0].m_pClass : nullptr)
     {
-        for (int i = 0; i < pClassInfo->m_nFieldCount; ++i)
+        for (int i = 0; i < pClassInfo->m_nNumFields; ++i)
         {
-            if (V_strcmp(pClassInfo->m_pFields[i].m_pszName, "__m_pChainEntity") == 0)
+            if (V_strcmp(pClassInfo->m_pFields[i].m_pName, "__m_pChainEntity") == 0)
                 return &pClassInfo->m_pFields[i];
         }
     }
@@ -162,15 +162,15 @@ static void BuildClassEntry(SchemaClassEntry& entry)
     // The class' own fields, then its base classes' (single inheritance offsets stay
     // valid for the derived class), so a derived type can look up inherited fields.
     for (SchemaClassInfoData_t* pDeclaring = pClassInfo; pDeclaring;
-         pDeclaring = pDeclaring->m_nBaseClassCount ? pDeclaring->m_pBaseClasses[0].m_pClass : nullptr)
-    for (int i = 0; i < pDeclaring->m_nFieldCount; ++i)
+         pDeclaring = pDeclaring->m_nNumBaseClasses ? pDeclaring->m_pBaseClasses[0].m_pClass : nullptr)
+    for (int i = 0; i < pDeclaring->m_nNumFields; ++i)
     {
         SchemaClassFieldData_t& field = pDeclaring->m_pFields[i];
 
         SchemaKey key;
         key.offset = field.m_nSingleInheritanceOffset;
         // Asked on the class that declares the field.
-        key.networked = IsFieldNetworked(pDatabase, pDeclaring->m_pszName, field.m_pszName);
+        key.networked = IsFieldNetworked(pDatabase, pDeclaring->m_pName, field.m_pName);
 
         // Atomic collections publish their own element accessor; without it a
         // CUtlVectorEmbeddedNetworkVar cannot be indexed correctly.
@@ -183,8 +183,8 @@ static void BuildClassEntry(SchemaClassEntry& entry)
 
         // Field names are unique within a class, so a clash there is a hash collision.
         // A base class field is only skipped when the derived class already has the key.
-        if (!entry.fields.emplace(hash_32_fnv1a_const(field.m_pszName), key).second && pDeclaring == pClassInfo)
-            SchemaWarn("schema: hash collision on '%s' in '%s', the field resolves to another one!", field.m_pszName, pClassInfo->m_pszName);
+        if (!entry.fields.emplace(hash_32_fnv1a_const(field.m_pName), key).second && pDeclaring == pClassInfo)
+            SchemaWarn("schema: hash collision on '%s' in '%s', the field resolves to another one!", field.m_pName, pClassInfo->m_pName);
     }
 
     // Does not overwrite the class' own __m_pChainEntity, when it has one.
@@ -260,11 +260,11 @@ int32_t schema::GetServerOffset(const char* pszClassName, const char* pszPropNam
 {
     // The class, then up its base classes.
     for (SchemaClassInfoData_t* pClassInfo = FindServerClass(pszClassName); pClassInfo;
-         pClassInfo = pClassInfo->m_nBaseClassCount ? pClassInfo->m_pBaseClasses[0].m_pClass : nullptr)
+         pClassInfo = pClassInfo->m_nNumBaseClasses ? pClassInfo->m_pBaseClasses[0].m_pClass : nullptr)
     {
-        for (int i = 0; i < pClassInfo->m_nFieldCount; i++)
+        for (int i = 0; i < pClassInfo->m_nNumFields; i++)
         {
-            if (V_strcmp(pClassInfo->m_pFields[i].m_pszName, pszPropName) == 0)
+            if (V_strcmp(pClassInfo->m_pFields[i].m_pName, pszPropName) == 0)
                 return pClassInfo->m_pFields[i].m_nSingleInheritanceOffset;
         }
     }
@@ -275,7 +275,7 @@ int32_t schema::GetServerOffset(const char* pszClassName, const char* pszPropNam
 int32_t schema::GetClassSize(const char* className)
 {
     SchemaClassInfoData_t* pClassInfo = FindServerClass(className);
-    return pClassInfo ? pClassInfo->m_nSize : -1;
+    return pClassInfo ? pClassInfo->m_nSizeOf : -1;
 }
 
 void schema::SetStateChanged(CEntityInstance* entity, const char* className, const char* propName)
