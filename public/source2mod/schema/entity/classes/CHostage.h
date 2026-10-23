@@ -99,6 +99,7 @@ public:
     SCHEMA_FIELD(bool, m_bHandsHaveBeenCut);
     SCHEMA_FIELD(CHandle<CCSPlayerPawn>, m_hHostageGrabber);
     SCHEMA_FIELD(float, m_fLastGrabTime);
+    SCHEMA_FIELD(float, m_flGrabStartTime);
     SCHEMA_FIELD(Vector, m_vecPositionWhenStartedDroppingToGround);
     SCHEMA_FIELD(Vector, m_vecGrabbedPos);
     SCHEMA_FIELD(float, m_flRescueStartTime);
