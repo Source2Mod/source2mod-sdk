@@ -47,7 +47,6 @@
 #include "source2mod/ISource2ModPlugin.h"
 #include "source2mod/ISource2ModFunctions.h"
 
-
 SOURCE2MOD_GLOBALVARS();
 
 namespace

@@ -327,13 +327,16 @@ static bool IsInModuleText(const void* p, const void* pModuleAddress)
 
 // The NetworkVar_<field> wrapper the engine puts around an embedded object
 // forwards NetworkStateChanged to the owner. That slot is the one whose first
-// 32 bytes check the data's path index, `cmp dword ptr [reg+0x38], -1`
+// 16 bytes check the data's path index, `cmp dword ptr [reg+0x38], -1`
 // (NetworkStateChangedData::m_nPathIndex): 83 /7 with a disp8 of 0x38 and an
 // imm8 of -1, whatever register holds the data. Same test as s2binlib's
 // find_networkvar_vtable_statechanged, no signature needed.
 static bool ChecksPathIndex(const unsigned char* pCode)
 {
-    for (int i = 0; i + 4 <= 32; ++i)
+    // 16 bytes: the hit is at byte 0 or 12 (2026-10-23 binaries); a wider window
+    // ran past a tiny function's ret / jmp into the next one (CHitboxComponent,
+    // the CPlayer_*Services thunk) and matched there.
+    for (int i = 0; i + 4 <= 16; ++i)
     {
         const unsigned char modrm = pCode[i + 1];
         // mod 01 (disp8), reg 111 (/7 = cmp), rm not 100 (that one takes a SIB byte)

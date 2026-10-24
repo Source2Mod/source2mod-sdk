@@ -29,7 +29,8 @@ class CTakeDamageInfo;
  */
 class CTakeDamageResult
 {
-	DECLARE_SCHEMA_CLASS(CTakeDamageResult);
+	// Not an entity: a networked write would take the embedded route.
+	DECLARE_SCHEMA_CLASS_INLINE(CTakeDamageResult);
 
 public:
 	SCHEMA_FIELD(CTakeDamageInfo*, m_pOriginatingInfo)

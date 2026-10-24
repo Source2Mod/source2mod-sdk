@@ -65,7 +65,8 @@ class CCSPlayerPawn;
  */
 class CTakeDamageInfo
 {
-	DECLARE_SCHEMA_CLASS(CTakeDamageInfo);
+	// Not an entity: a networked write would take the embedded route.
+	DECLARE_SCHEMA_CLASS_INLINE(CTakeDamageInfo);
 
 public:
 	CTakeDamageInfo();
