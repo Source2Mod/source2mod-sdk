@@ -56,6 +56,10 @@
 // The engine callbacks on ISource2ModListener take the engine's own types.
 #include "engine2/isource2server.h"
 #include "engine2/ivengineserver2.h"
+// s2sdk's netmessages.h by its full path first: gamesessionconfiguration.h (via networkgameserverbase.h) includes
+// it as "netmessages.h", and MSVC searches the directories of every open include for that, so from under
+// source2mod/schema/ it would get our schema/netmessages.h instead and miss CBaseCmdKeyValues.
+#include "common/netmessages.h"
 #include "engine2/networkgameserverbase.h"
 #include "engine2/inetworkserverservice.h"
 
