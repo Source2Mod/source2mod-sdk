@@ -95,6 +95,7 @@ class ISource2ModHooks;
 class ISource2ModTranslations;
 class ISource2ModUtils;
 class ISource2ModCommands;
+class ISource2ModConfigs;
 class ISource2ModConVars;
 class ISource2ModEntities;
 class ISource2ModEvents;
@@ -125,6 +126,7 @@ class ISource2ModSchemaMethods;
 
 #include "ISource2ModAddresses.h"
 #include "ISource2ModCommands.h"
+#include "ISource2ModConfigs.h"
 #include "ISource2ModConVars.h"
 #include "ISource2ModCookies.h"
 #include "ISource2ModCustomHud.h"
@@ -539,6 +541,7 @@ Globals
     const char*                 g_Source2ModCoreKHookHeader  = nullptr; \
     ISource2ModAddresses*       g_pSource2ModAddresses       = nullptr; \
     ISource2ModCommands*        g_pSource2ModCommands        = nullptr; \
+    ISource2ModConfigs*         g_pSource2ModConfigs         = nullptr; \
     ISource2ModConVars*         g_pSource2ModConVars         = nullptr; \
     ISource2ModCookies*         g_pSource2ModCookies         = nullptr; \
     ISource2ModCustomHud*       g_pSource2ModCustomHud       = nullptr; \
@@ -596,6 +599,7 @@ Globals
     extern const char*                 g_Source2ModCoreKHookHeader; \
     extern ISource2ModAddresses*       g_pSource2ModAddresses; \
     extern ISource2ModCommands*        g_pSource2ModCommands; \
+    extern ISource2ModConfigs*         g_pSource2ModConfigs; \
     extern ISource2ModConVars*         g_pSource2ModConVars; \
     extern ISource2ModCookies*         g_pSource2ModCookies; \
     extern ISource2ModCustomHud*       g_pSource2ModCustomHud; \
@@ -639,6 +643,7 @@ Globals
 #define SOURCE2MOD_FILLVARS(api) \
     g_pSource2ModAddresses       = (ISource2ModAddresses*)      (api)->Source2ModFactory(SOURCE2MOD_ADDRESSES_INTERFACE,       nullptr, nullptr); \
     g_pSource2ModCommands        = (ISource2ModCommands*)       (api)->Source2ModFactory(SOURCE2MOD_COMMANDS_INTERFACE,        nullptr, nullptr); \
+    g_pSource2ModConfigs         = (ISource2ModConfigs*)        (api)->Source2ModFactory(SOURCE2MOD_CONFIGS_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModConVars         = (ISource2ModConVars*)        (api)->Source2ModFactory(SOURCE2MOD_CONVARS_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModCookies         = (ISource2ModCookies*)        (api)->Source2ModFactory(SOURCE2MOD_COOKIES_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModCustomHud       = (ISource2ModCustomHud*)      (api)->Source2ModFactory(SOURCE2MOD_CUSTOMHUD_INTERFACE,       nullptr, nullptr); \
