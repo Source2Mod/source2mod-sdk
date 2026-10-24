@@ -64,21 +64,8 @@
 Forward declarations
 ========================= */
 
-/**
- * @brief The filter TraceShapeEx expects when you have an entity to ignore.
- *
- * Source2Mod uses this one internally; it is here because a plugin calling
- * TraceShapeEx needs a CTraceFilter of its own and this covers the ordinary
- * case -- ignore an entity, its owner and everything sharing its hierarchy.
- */
-class CTraceFilterEx : public CTraceFilter
-{
-public:
-    // Defined out of line: CBaseEntity.h includes ISource2ModPlugin.h, which
-    // includes this header, so CBaseEntity is still incomplete here.
-    explicit CTraceFilterEx(CBaseEntity* pEntityToIgnore);
-    CTraceFilterEx();
-};
+// TraceShapeEx takes any CTraceFilter: the game's own filters are in
+// source2mod/schema/tracefilter.h (CTraceFilterSimple to ignore one entity).
 class CBaseEntity;
 class CEntityInstance;
 
