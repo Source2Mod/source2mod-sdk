@@ -98,7 +98,7 @@ methodmap Source2ModSchema
 	public static native void GetColor(any instance, const char[] className, const char[] field, int color[4]);
 	public static native void SetColor(any instance, const char[] className, const char[] field, const int color[4]);
 
-	/** char arrays, CUtlSymbolLarge, CUtlString; only char arrays can be set. */
+	/** char arrays, CUtlSymbolLarge, CUtlString, CGlobalSymbol; char arrays and CGlobalSymbol (the engine's symbol for the text) can be set. */
 	public static native int GetString(any instance, const char[] className, const char[] field, char[] buffer, int maxlen);
 	public static native void SetString(any instance, const char[] className, const char[] field, const char[] value);
 

@@ -70,6 +70,7 @@
 #include <schemasystem.h>
 #include <schemasystem/baseschema.h>
 #include <schemalib/schemaclassinfo_data.h>
+#include <tier0/globalsymbol.h>
 #include <tier0/dbg.h>
 #include <utlmap.h>
 
@@ -108,96 +109,8 @@ class GameSessionConfiguration_t;
 typedef void (*CEntityNameString)(void);
 
 
-struct CGlobalSymbol
-{
-private:
-    const char* m_pszString;
-
-    static constexpr std::size_t BLOCK_SIZE = 8192;
-
-    static std::unordered_map<std::string, const char*>& Cache()
-    {
-        static std::unordered_map<std::string, const char*> s_cache;
-        return s_cache;
-    }
-
-    static std::shared_mutex& PoolMutex()
-    {
-        static std::shared_mutex s_mtx;
-        return s_mtx;
-    }
-
-    static char*& CurrentBlock()
-    {
-        static char* s_block = nullptr;
-        return s_block;
-    }
-
-    static std::size_t& RemainingBytes()
-    {
-        static std::size_t s_remaining = 0;
-        return s_remaining;
-    }
-
-    static const char* Allocate(const char* str)
-    {
-        if (str == nullptr) return nullptr;
-
-        const std::size_t byteCount = std::strlen(str);
-        const std::size_t neededSize = byteCount + 1; // + '\0'
-
-        {
-            std::shared_lock<std::shared_mutex> rlock(PoolMutex());
-            auto& cache = Cache();
-            auto it = cache.find(std::string(str, byteCount));
-            if (it != cache.end())
-                return it->second;
-        }
-
-        std::unique_lock<std::shared_mutex> wlock(PoolMutex());
-
-        std::string key(str, byteCount);
-        auto& cache = Cache();
-
-        if (auto it = cache.find(key); it != cache.end())
-            return it->second;
-
-        char* addr;
-
-        if (neededSize > BLOCK_SIZE / 2)
-        {
-            addr = static_cast<char*>(std::malloc(neededSize));
-        }
-        else
-        {
-            if (RemainingBytes() < neededSize)
-            {
-                CurrentBlock() = static_cast<char*>(std::malloc(BLOCK_SIZE));
-                RemainingBytes() = BLOCK_SIZE;
-            }
-            addr = CurrentBlock();
-            CurrentBlock() += neededSize;
-            RemainingBytes() -= neededSize;
-        }
-
-        std::memcpy(addr, str, byteCount);
-        addr[byteCount] = '\0';
-
-        cache.emplace(std::move(key), addr);
-        return addr;
-    }
-
-public:
-    const char* Get() const
-    {
-        return (m_pszString == nullptr) ? "" : m_pszString;
-    }
-
-    void Set(const char* value)
-    {
-        m_pszString = Allocate(value);
-    }
-};
+// The engine's pooled string (s2sdk tier0/globalsymbol.h): compared by pointer,
+// so a value has to come from MakeGlobalSymbol(), not from a pool of our own.
 
 // Referenced as a field type by locksound_t, CFuncMoveLinear, CFuncRotating and
 // CMessage, but absent from the schema dump, so the generator never emits it and
