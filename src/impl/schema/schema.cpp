@@ -278,6 +278,12 @@ int32_t schema::GetClassSize(const char* className)
     return pClassInfo ? pClassInfo->m_nSizeOf : -1;
 }
 
+SchemaGenClassOpsFn_t schema::GetClassOps(const char* className)
+{
+    SchemaClassInfoData_t* pClassInfo = FindServerClass(className);
+    return pClassInfo ? pClassInfo->m_pClassOpsFn : nullptr;
+}
+
 void schema::SetStateChanged(CEntityInstance* entity, const char* className, const char* propName)
 {
     if (!entity || !className || !propName)

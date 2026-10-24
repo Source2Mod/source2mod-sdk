@@ -12,7 +12,6 @@
 #include "source2mod/utils/virtual.h"
 #include "source2mod/schema/takedamageinfo.h"
 #include "source2mod/ISource2ModAddresses.h"
-#include "source2mod/schema/takedamageresult.h"
 #include "source2mod/schema/entity/classes/CAttributeList.h"
 #include "source2mod/schema/entity/classes/CBaseEntity.h"
 #include "source2mod/ISource2ModEntities.h"
@@ -35,6 +34,7 @@
 #include "source2mod/ISource2ModMenus.h"
 #include "source2mod/schema/entity/classes/CCSObserverPawn.h"
 #include "source2mod/schema/entity/classes/CCSPlayer_ItemServices.h"
+#include "source2mod/schema/takedamageresult.h"
 #include "source2mod/schema/entity/classes/CCSPlayerLegacyJump.h"
 #include "source2mod/schema/entity/classes/CCSPlayer_MovementServices.h"
 #include "source2mod/schema/entity/classes/CCSWeaponBaseVData.h"
@@ -1791,18 +1791,6 @@ HitGroup_t CTakeDamageInfo::GetHitGroup() const
     return s_fn(this);
 }
 
-void CTakeDamageResult::CopyFrom(CTakeDamageInfo* pInfo)
-{
-    using Fn = void (*)(CTakeDamageResult*, CTakeDamageInfo*);
-    static Fn s_fn = nullptr;
-    static bool s_resolved = false;
-    if (!s_resolved)
-        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CTakeDamageResult::CopyFrom(CTakeDamageInfo*)", s_resolved));
-    if (!s_fn)
-        return Source2ModSchemaMissing<void>();
-    return s_fn(this, pInfo);
-}
-
 void ChainNetworkStateChanged(uintptr_t pNetworkVarChainer, uint nLocalOffset)
 {
     using Fn = void (*)(uintptr_t, uint);
@@ -1861,6 +1849,18 @@ int16_t schema::FindChainOffset(const char* className, uint32_t classNameHash)
     if (!s_fn)
         return Source2ModSchemaMissing<int16_t>();
     return s_fn(className, classNameHash);
+}
+
+SchemaGenClassOpsFn_t schema::GetClassOps(const char* className)
+{
+    using Fn = SchemaGenClassOpsFn_t (*)(const char*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("schema::GetClassOps(const char*)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<SchemaGenClassOpsFn_t>();
+    return s_fn(className);
 }
 
 int32_t schema::GetClassSize(const char* className)

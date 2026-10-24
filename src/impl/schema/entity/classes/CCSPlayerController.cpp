@@ -150,10 +150,10 @@ void CCSPlayerController::TakeDamage(CCSPlayerController* pAttacker, int iDamage
     auto flDamage = static_cast<float>(iDamage);
 
     CTakeDamageInfo info(pVictimPawn, pAttackerPawn, nullptr, flDamage, bitsDamageType);
-    info.m_nDamageFlags = static_cast<TakeDamageFlags_t>(static_cast<int>(info.m_nDamageFlags) | static_cast<int>(TakeDamageFlags_t::DFLAG_SUPPRESS_DAMAGE_MODIFICATION));
+    // 64-bit flags: the old int casts dropped everything above bit 31.
+    info.m_nDamageFlags = static_cast<TakeDamageFlags_t>(static_cast<uint64_t>(info.m_nDamageFlags()) | DFLAG_SUPPRESS_DAMAGE_MODIFICATION);
 
-    CTakeDamageResult result(iDamage);
-    result.CopyFrom(&info);
+    CTakeDamageResult result(&info);
 
     // Bypass by default: damage Source2Mod was asked to deal is not the game
     // dealing damage, so a plugin hooking TakeDamage to police the game's own

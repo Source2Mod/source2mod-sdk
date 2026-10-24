@@ -69,6 +69,7 @@
 #include <igameevents.h>
 #include <schemasystem.h>
 #include <schemasystem/baseschema.h>
+#include <schemalib/schemaclassinfo_data.h>
 #include <tier0/dbg.h>
 #include <utlmap.h>
 
@@ -345,6 +346,12 @@ namespace schema
      * @brief Gets class size.
      */
     int32_t GetClassSize(const char* className);
+
+    /**
+     * @brief The class's schema class ops (allocate, construct, destruct, ...),
+     * null when the class is not in the schema or has none.
+     */
+    SchemaGenClassOpsFn_t GetClassOps(const char* className);
 
     /**
      * @brief Marks field as changed (network update).
@@ -875,12 +882,34 @@ Schema class macros
 * @brief Declares schema-enabled class.
 * * offset != 0 marks a non-entity (embedded) class; the value itself is not used any more
   */
+/*
+ * SchemaCreate() / SchemaConstruct() / SchemaDestruct() / SchemaFree() go
+ * through the class's own schema class ops (SchemaClassInfoData_t::
+ * m_pClassOpsFn) -- the game's constructor and destructor, no signature
+ * needed. SchemaCreate() returns null and the others do nothing when the
+ * running game has no ops for the class.
+ */
 #define DECLARE_SCHEMA_CLASS_BASE(ClassName, offset)								\
 	private:																		\
 		typedef ClassName ThisClass;												\
 		static constexpr const char* m_className = #ClassName;						\
 		static constexpr uint32_t m_classNameHash = hash_32_fnv1a_const(#ClassName);\
 		static constexpr int m_networkStateChangedOffset = offset;					\
+		static void* SchemaClassOps(SchemaClassManipulatorAction_t eAction, void* pObject) \
+		{																			\
+			static const SchemaGenClassOpsFn_t s_fn = schema::GetClassOps(m_className); \
+			return s_fn ? s_fn(eAction, pObject) : nullptr;							\
+		}																			\
+	public:																			\
+		/*Allocated on the game's heap and constructed; SchemaFree() releases it.*/ \
+		static ThisClass* SchemaCreate()											\
+		{																			\
+			return static_cast<ThisClass*>(SchemaClassOps(SCHEMA_CLASS_MANIPULATOR_ACTION_ALLOCATE, nullptr)); \
+		}																			\
+		void SchemaFree() { SchemaClassOps(SCHEMA_CLASS_MANIPULATOR_ACTION_DEALLOCATE, this); } \
+		/*The game's default constructor / destructor on this object's memory.*/	\
+		void SchemaConstruct() { SchemaClassOps(SCHEMA_CLASS_MANIPULATOR_ACTION_CONSTRUCT_IN_PLACE, this); } \
+		void SchemaDestruct() { SchemaClassOps(SCHEMA_CLASS_MANIPULATOR_ACTION_DESCTRUCT_IN_PLACE, this); } \
 	public:
 #define DECLARE_SCHEMA_CLASS(className) DECLARE_SCHEMA_CLASS_BASE(className, 0)
 /**

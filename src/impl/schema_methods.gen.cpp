@@ -12,7 +12,6 @@
 #include "source2mod/utils/virtual.h"
 #include "source2mod/schema/takedamageinfo.h"
 #include "source2mod/ISource2ModAddresses.h"
-#include "source2mod/schema/takedamageresult.h"
 #include "source2mod/schema/entity/classes/CAttributeList.h"
 #include "source2mod/schema/entity/classes/CBaseEntity.h"
 #include "source2mod/ISource2ModEntities.h"
@@ -35,6 +34,7 @@
 #include "source2mod/ISource2ModMenus.h"
 #include "source2mod/schema/entity/classes/CCSObserverPawn.h"
 #include "source2mod/schema/entity/classes/CCSPlayer_ItemServices.h"
+#include "source2mod/schema/takedamageresult.h"
 #include "source2mod/schema/entity/classes/CCSPlayerLegacyJump.h"
 #include "source2mod/schema/entity/classes/CCSPlayer_MovementServices.h"
 #include "source2mod/schema/entity/classes/CCSWeaponBaseVData.h"
@@ -778,34 +778,34 @@ namespace
         return self->GetHitGroup();
     }
 
-    void Thunk145(CTakeDamageResult* self, CTakeDamageInfo* pInfo)
-    {
-        return self->CopyFrom(pInfo);
-    }
-
-    void Thunk146(uintptr_t pNetworkVarChainer, uint nLocalOffset)
+    void Thunk145(uintptr_t pNetworkVarChainer, uint nLocalOffset)
     {
         return ChainNetworkStateChanged(pNetworkVarChainer, nLocalOffset);
     }
 
-    void Thunk147(uintptr_t pEntity, uint nOffset)
+    void Thunk146(uintptr_t pEntity, uint nOffset)
     {
         return EntityNetworkStateChanged(pEntity, nOffset);
     }
 
-    void Thunk148(uintptr_t pNetworkVar, uint32_t nOffset, uint32 p2)
+    void Thunk147(uintptr_t pNetworkVar, uint32_t nOffset, uint32 p2)
     {
         return NetworkVarStateChanged(pNetworkVar, nOffset, p2);
     }
 
-    int16_t Thunk149(const char* className)
+    int16_t Thunk148(const char* className)
     {
         return schema::FindChainOffset(className);
     }
 
-    int16_t Thunk150(const char* className, uint32_t classNameHash)
+    int16_t Thunk149(const char* className, uint32_t classNameHash)
     {
         return schema::FindChainOffset(className, classNameHash);
+    }
+
+    SchemaGenClassOpsFn_t Thunk150(const char* className)
+    {
+        return schema::GetClassOps(className);
     }
 
     int32_t Thunk151(const char* className)
@@ -982,12 +982,12 @@ extern const Source2ModSchemaMethodEntry g_Source2ModSchemaMethodTable[] = {
     { "CPointWorldText::SetMessage(const char*)", reinterpret_cast<void*>(&Thunk142) },
     { "CSmokeGrenadeProjectile::EmitGrenade(const Vector&,const QAngle&,const Vector&,int,CBaseEntity*,uint32_t,HookChain)", reinterpret_cast<void*>(&Thunk143) },
     { "CTakeDamageInfo::GetHitGroup() const", reinterpret_cast<void*>(&Thunk144) },
-    { "CTakeDamageResult::CopyFrom(CTakeDamageInfo*)", reinterpret_cast<void*>(&Thunk145) },
-    { "ChainNetworkStateChanged(uintptr_t,uint)", reinterpret_cast<void*>(&Thunk146) },
-    { "EntityNetworkStateChanged(uintptr_t,uint)", reinterpret_cast<void*>(&Thunk147) },
-    { "NetworkVarStateChanged(uintptr_t,uint32_t,uint32)", reinterpret_cast<void*>(&Thunk148) },
-    { "schema::FindChainOffset(const char*)", reinterpret_cast<void*>(&Thunk149) },
-    { "schema::FindChainOffset(const char*,uint32_t)", reinterpret_cast<void*>(&Thunk150) },
+    { "ChainNetworkStateChanged(uintptr_t,uint)", reinterpret_cast<void*>(&Thunk145) },
+    { "EntityNetworkStateChanged(uintptr_t,uint)", reinterpret_cast<void*>(&Thunk146) },
+    { "NetworkVarStateChanged(uintptr_t,uint32_t,uint32)", reinterpret_cast<void*>(&Thunk147) },
+    { "schema::FindChainOffset(const char*)", reinterpret_cast<void*>(&Thunk148) },
+    { "schema::FindChainOffset(const char*,uint32_t)", reinterpret_cast<void*>(&Thunk149) },
+    { "schema::GetClassOps(const char*)", reinterpret_cast<void*>(&Thunk150) },
     { "schema::GetClassSize(const char*)", reinterpret_cast<void*>(&Thunk151) },
     { "schema::GetOffset(const char*,uint32_t,const char*,uint32_t)", reinterpret_cast<void*>(&Thunk152) },
     { "schema::GetServerOffset(const char*,const char*)", reinterpret_cast<void*>(&Thunk153) },
