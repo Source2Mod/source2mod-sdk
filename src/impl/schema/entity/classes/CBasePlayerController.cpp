@@ -158,15 +158,11 @@ CServerSideClient* CBasePlayerController::GetServerSideClient()
     if (!pServer)
         return nullptr;
 
-    static int offset = g_pSource2ModGameConfig->GetOffset("CNetworkGameServer::ClientList");
-
-    auto* pClients = reinterpret_cast<CUtlVector<CServerSideClient*>*>(reinterpret_cast<uint8_t*>(pServer) + offset);
-
     const int index = GetSlot();
-    if (index < 0 || index >= pClients->Count())
+    if (index < 0 || index >= pServer->m_Clients.Count())
         return nullptr;
 
-    return pClients->Element(index);
+    return static_cast<CServerSideClient*>(pServer->m_Clients.Element(index));
 }
 
 CEntityIndex CBasePlayerController::GetPlayerIndex()
