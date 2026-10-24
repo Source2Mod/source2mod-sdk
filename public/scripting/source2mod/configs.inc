@@ -9,6 +9,9 @@
  * every key the defaults have is there -- and the callback runs again
  * whenever the file changes or "s2m config reload" re-reads it.
  *
+ * The defaults are JSON text, or built key by key with Source2ModConfigDefaults
+ * (below), which writes the text for you -- comments included.
+ *
  * The JSON values Root() and Find() hand out belong to the current document:
  * a reload or a Set* makes a new one and the old values are gone. Read what
  * you need in the callback; do not keep the values.
@@ -115,4 +118,43 @@ methodmap Source2ModConfig < Handle
 
 	/** Reads the file again; the callback runs (ConfigChange_Reload) when it went live. */
 	public native bool Reload(char[] error = "", int maxlen = 0);
+};
+
+/**
+ * Config defaults built key by key instead of written as JSON text.
+ *
+ * A key is a plain member name ("RelayControl") or a JSON pointer into
+ * nested objects ("/Feature/Enabled"), whose objects are created on the way.
+ * Keys keep the order they were added in; adding one again replaces its
+ * value. A comment, when given, goes above the key in the generated text and
+ * so into <name>.example.json and the first <name>.json.
+ *
+ *     Source2ModConfigDefaults defaults = new Source2ModConfigDefaults();
+ *     defaults.AddString("RelayControl", "127.0.0.1:27100");
+ *     defaults.AddInt("RelayTimeoutMs", 300, "milliseconds");
+ *     defaults.AddBool("/Feature/Enabled", true);
+ *     defaults.AddJSON("Admins", "[]");
+ *     g_Config = defaults.Register("config", OnConfig);
+ *     delete defaults;
+ */
+methodmap Source2ModConfigDefaults < Handle
+{
+	public native Source2ModConfigDefaults();
+
+	public native void AddString(const char[] key, const char[] value, const char[] comment = "");
+	public native void AddInt(const char[] key, int value, const char[] comment = "");
+	public native void AddFloat(const char[] key, float value, const char[] comment = "");
+	public native void AddBool(const char[] key, bool value, const char[] comment = "");
+	/** Any JSON value as text: an array, an object, null. */
+	public native void AddJSON(const char[] key, const char[] json, const char[] comment = "");
+
+	/** The defaults as JSON text, comments included. Returns the bytes written. */
+	public native int ToString(char[] buffer, int maxlen);
+
+	/**
+	 * Source2ModConfig.Register() with these defaults. The defaults are copied:
+	 * delete this handle afterwards.
+	 */
+	public native Source2ModConfig Register(const char[] name, Source2ModConfigCallback callback = INVALID_FUNCTION,
+	                                        int flags = SOURCE2MOD_CONFIG_DEFAULT);
 };

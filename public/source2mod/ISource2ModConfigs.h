@@ -78,6 +78,9 @@
 * }
 * @endcode
 *
+* The defaults can also be built key by key (Source2ModConfigDefaults below)
+* instead of written as one JSON text.
+*
 * Everything here runs on the game thread.
 */
 
@@ -88,6 +91,10 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "ISource2ModJSON.h"
 
@@ -300,5 +307,226 @@ public:
 
 /// This plugin's config by name.
 #define PLUGIN_CONFIG(name) g_pSource2ModConfigs->Get(g_PluginID, name)
+
+/**
+* @brief Config defaults built key by key instead of written as JSON text.
+*
+* Header-only: it only produces the text Add() / Register() take. A key is a
+* plain member name ("RelayControl") or a JSON pointer into nested objects
+* ("/Feature/Enabled"), whose objects are created on the way; keys keep the
+* order they were added in, and adding one again replaces its value. An
+* optional comment goes into the generated text above the key, so it shows in
+* <name>.example.json and the first <name>.json.
+*
+* @code
+* Source2ModConfigDefaults defaults;
+* defaults.Add("RelayControl", "127.0.0.1:27100")
+*         .Add("RelayTimeoutMs", 300, "milliseconds")
+*         .Add("/Feature/Enabled", true)
+*         .AddJSON("Admins", "[]");
+* configs->Add("config", defaults.Json());
+* @endcode
+*/
+class Source2ModConfigDefaults
+{
+public:
+    Source2ModConfigDefaults& Add(const char* key, const char* value, const char* comment = nullptr)
+    {
+        return Set(key, Quote(value ? value : ""), comment);
+    }
+
+    Source2ModConfigDefaults& Add(const char* key, const std::string& value, const char* comment = nullptr)
+    {
+        return Set(key, Quote(value), comment);
+    }
+
+    Source2ModConfigDefaults& Add(const char* key, bool value, const char* comment = nullptr)
+    {
+        return Set(key, value ? "true" : "false", comment);
+    }
+
+    Source2ModConfigDefaults& Add(const char* key, int value, const char* comment = nullptr)
+    {
+        return Set(key, std::to_string(value), comment);
+    }
+
+    Source2ModConfigDefaults& Add(const char* key, int64_t value, const char* comment = nullptr)
+    {
+        return Set(key, std::to_string(value), comment);
+    }
+
+    Source2ModConfigDefaults& Add(const char* key, double value, const char* comment = nullptr)
+    {
+        char text[64];
+        snprintf(text, sizeof(text), "%.15g", value);
+        std::string number(text);
+        // Written as a fraction even when whole, so it reads as the float it is.
+        if (number.find_first_of(".eEn") == std::string::npos)
+            number += ".0";
+        return Set(key, number, comment);
+    }
+
+    Source2ModConfigDefaults& Add(const char* key, float value, const char* comment = nullptr)
+    {
+        return Add(key, static_cast<double>(value), comment);
+    }
+
+    /// Any JSON value as text: an array, an object, null. Invalid text makes
+    /// the whole defaults invalid, which Add() / Register() report.
+    Source2ModConfigDefaults& AddJSON(const char* key, const char* json, const char* comment = nullptr)
+    {
+        return Set(key, json && *json ? json : "null", comment);
+    }
+
+    /// The defaults as JSON text, comments included.
+    const char* Json()
+    {
+        m_text.clear();
+        Write(m_root, 0);
+        m_text += "\n";
+        return m_text.c_str();
+    }
+
+private:
+    struct Node
+    {
+        std::string comment;
+        bool object = true;
+        std::string value;    // JSON text of a leaf
+        std::vector<std::pair<std::string, Node>> members;
+    };
+
+    static std::string Quote(const std::string& in)
+    {
+        std::string out = "\"";
+        for (unsigned char c : in)
+        {
+            switch (c)
+            {
+                case '"':  out += "\\\""; break;
+                case '\\': out += "\\\\"; break;
+                case '\n': out += "\\n"; break;
+                case '\r': out += "\\r"; break;
+                case '\t': out += "\\t"; break;
+                default:
+                    if (c < 0x20)
+                    {
+                        char esc[8];
+                        snprintf(esc, sizeof(esc), "\\u%04x", c);
+                        out += esc;
+                    }
+                    else
+                    {
+                        out += static_cast<char>(c);
+                    }
+            }
+        }
+        return out + "\"";
+    }
+
+    static Node& Member(Node& parent, const std::string& key)
+    {
+        for (auto& member : parent.members)
+        {
+            if (member.first == key)
+                return member.second;
+        }
+        parent.members.emplace_back(key, Node());
+        return parent.members.back().second;
+    }
+
+    Source2ModConfigDefaults& Set(const char* key, const std::string& value, const char* comment)
+    {
+        if (!key || !*key)
+            return *this;
+
+        // "/a/b" walks objects; "a" is a member of the root. ~1 and ~0 are
+        // '/' and '~' as in a JSON pointer.
+        std::vector<std::string> path;
+        if (*key == '/')
+        {
+            std::string token;
+            for (const char* p = key + 1;; p++)
+            {
+                if (*p == '/' || !*p)
+                {
+                    path.push_back(token);
+                    token.clear();
+                    if (!*p)
+                        break;
+                }
+                else if (p[0] == '~' && p[1] == '1') { token += '/'; p++; }
+                else if (p[0] == '~' && p[1] == '0') { token += '~'; p++; }
+                else
+                    token += *p;
+            }
+        }
+        else
+        {
+            path.emplace_back(key);
+        }
+
+        Node* node = &m_root;
+        for (size_t i = 0; i < path.size(); i++)
+        {
+            node = &Member(*node, path[i]);
+            if (i + 1 < path.size() && !node->object)
+            {
+                // A leaf on the way becomes an object.
+                node->object = true;
+                node->value.clear();
+            }
+        }
+
+        node->object = false;
+        node->members.clear();
+        node->value = value;
+        if (comment && *comment)
+            node->comment = comment;
+        return *this;
+    }
+
+    void Write(const Node& node, int depth)
+    {
+        if (!node.object)
+        {
+            m_text += node.value;
+            return;
+        }
+
+        if (node.members.empty())
+        {
+            m_text += "{}";
+            return;
+        }
+
+        const std::string indent(static_cast<size_t>(depth + 1) * 4, ' ');
+        m_text += "{\n";
+        for (size_t i = 0; i < node.members.size(); i++)
+        {
+            const auto& member = node.members[i];
+            if (!member.second.comment.empty())
+            {
+                // One "//" line per line of the comment.
+                size_t start = 0;
+                for (;;)
+                {
+                    const size_t end = member.second.comment.find('\n', start);
+                    m_text += indent + "// " + member.second.comment.substr(start, end == std::string::npos ? std::string::npos : end - start) + "\n";
+                    if (end == std::string::npos)
+                        break;
+                    start = end + 1;
+                }
+            }
+            m_text += indent + Quote(member.first) + ": ";
+            Write(member.second, depth + 1);
+            m_text += (i + 1 < node.members.size()) ? ",\n" : "\n";
+        }
+        m_text += std::string(static_cast<size_t>(depth) * 4, ' ') + "}";
+    }
+
+    Node m_root;
+    std::string m_text;
+};
 
 #endif //_INCLUDE_ISOURCE2MOD_CONFIGS_H
