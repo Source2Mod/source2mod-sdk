@@ -34,6 +34,7 @@
 #include <source2mod/gamesystems>
 #include <source2mod/addresses>
 #include <source2mod/json>
+#include <source2mod/configs>
 #include <source2mod/http>
 #include <source2mod/sql>
 #include <source2mod/menus>
