@@ -390,6 +390,8 @@ public:
 
     virtual IGameEventSystem* GetGameEventSystem() = 0;
     virtual IGameEventManager2* GetGameEventManager() = 0;
+    // These two are read from the engine on every call (the entity system is
+    // null before the first map), so ask each time rather than keep the pointer.
     virtual CGameEntitySystem* GetEntitySystem() = 0;
     virtual CGlobalVars* GetGlobalVars() = 0;
 
