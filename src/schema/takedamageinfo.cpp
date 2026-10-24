@@ -34,21 +34,19 @@
  * Project: Source2Mod
  */
 
-// Constructors and destructors stay in every binary (a plugin builds the
-// object itself). The default constructor and the destructors are the game's
+// Constructors and the destructor stay in every binary (a plugin builds the
+// object itself). The default constructor and the destructor are the game's
 // own through the schema class ops; the damage constructor is the game's
 // CTakeDamageInfo constructor from gamedata, which also fills m_AttackerInfo
 // from the attacker (pawn, world, slot, team) exactly as the game does.
 
 #include "source2mod/schema/takedamageinfo.h"
-#include "source2mod/schema/takedamageresult.h"
 #include "source2mod/ISource2ModAddresses.h"
 #include "source2mod/ISource2ModApi.h"
 #include "source2mod/ISource2ModGameConfig.h"
 #include "source2mod/ISource2ModPlugin.h"
 #include "source2mod/ISource2ModFunctions.h"
 
-#include <cstring>
 
 SOURCE2MOD_GLOBALVARS();
 
@@ -96,41 +94,5 @@ CTakeDamageInfo::CTakeDamageInfo(CBaseEntity* pInflictor, CBaseEntity* pAttacker
 CTakeDamageInfo::~CTakeDamageInfo()
 {
     // Without the class ops there is no game destructor to call, as before.
-    SchemaDestruct();
-}
-
-CTakeDamageResult::CTakeDamageResult(float damage)
-{
-    Init(nullptr, damage);
-}
-
-CTakeDamageResult::CTakeDamageResult(CTakeDamageInfo* pInfo)
-{
-    Init(pInfo, pInfo ? static_cast<float>(pInfo->m_flDamage) : 0.f);
-}
-
-void CTakeDamageResult::Init(CTakeDamageInfo* pInfo, float damage)
-{
-    static const bool s_bHasOps = (CheckStorage("CTakeDamageResult", sizeof(*this)), HasClassOps("CTakeDamageResult"));
-
-    // The game's defaults first; the old hand-made layout left the rest of
-    // the object uninitialised.
-    if (s_bHasOps)
-        SchemaConstruct();
-    else
-        std::memset(static_cast<void*>(this), 0, sizeof(*this));
-
-    m_pOriginatingInfo = pInfo;
-    m_nHealthLost = static_cast<int32_t>(damage);
-    m_nHealthBefore = 0;
-    m_flDamageDealt = damage;
-    m_flPreModifiedDamage = damage;
-    m_nTotalledHealthLost = static_cast<int32_t>(damage);
-    m_flTotalledDamageDealt = damage;
-    m_bWasDamageSuppressed = false;
-}
-
-CTakeDamageResult::~CTakeDamageResult()
-{
     SchemaDestruct();
 }
