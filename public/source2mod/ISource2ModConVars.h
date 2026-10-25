@@ -89,7 +89,7 @@ Core Source2Mod ConVars
 using ConVarChangeHandler = Source2ModCallback<void(ConVarRefAbstract* ref, CSplitScreenSlot slot,
                                                   const char* pszNewValue, const char* pszOldValue)>;
 
-#define SOURCE2MOD_CONVARS_INTERFACE "ISource2ModConVars002"
+#define SOURCE2MOD_CONVARS_INTERFACE "ISource2ModConVars003"
 
 /// Access index meaning "no such ConVar" -- the engine's own invalid index.
 /// 0 is a real ConVar, so test against this, never against zero.
@@ -279,6 +279,26 @@ public:
     * @brief Deletes a ConVar.
       */
     virtual void DeleteConVar(uint16 accessIndex) = 0;
+
+    /**
+
+    * @brief A ConVar of a plugin's own (a ConVar<T> it defines), reported by
+    *        the ConVar_Register in SOURCE2MOD_SAVEVARS().
+    *
+    * When the plugin unloads it is taken out of the engine the way Metamod's
+    * META_CONVAR_REGISTER does: its callbacks go and its data is invalidated,
+    * so it is gone from the console and the next registration of the name
+    * (the plugin loading again) sets it up anew.
+      */
+    virtual void TrackConVar(PluginId owner, ConVarRefAbstract* ref) = 0;
+
+    /**
+
+    * @brief A ConCommand of a plugin's own, as TrackConVar(). When the plugin
+    *        unloads its callbacks go and it is hidden (FCVAR_DEVELOPMENTONLY):
+    *        the engine cannot remove a command, only make it unreachable.
+      */
+    virtual void TrackConCommand(PluginId owner, ConCommandRef* ref) = 0;
 };
 
 #define CVAR_IDX(name)                  g_pSource2ModConVars->GetConvarAccessIndexByName(name)

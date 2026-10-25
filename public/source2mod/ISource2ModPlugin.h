@@ -715,6 +715,27 @@ Globals
 * @note Must be called in plugin Load(), with its parameters under their
 *       declared names (id, api, error, maxlen).
   */
+/// The flags SOURCE2MOD_SAVEVARS() registers the plugin's ConVars and
+/// ConCommands with; define it before including the SDK for others.
+#ifndef SOURCE2MOD_CONVAR_FLAGS
+#define SOURCE2MOD_CONVAR_FLAGS (FCVAR_RELEASE | FCVAR_CLIENT_CAN_EXECUTE | FCVAR_GAMEDLL)
+#endif
+
+/**
+
+* @brief Registers the plugin's ConVar<T>s and ConCommands with the engine and
+* reports each to the core, which takes them out again when the plugin
+* unloads (ISource2ModConVars::TrackConVar / TrackConCommand) -- what Metamod's
+* META_CONVAR_REGISTER does for a metamod plugin. Part of SOURCE2MOD_SAVEVARS():
+* a plugin calls neither ConVar_Register nor ConVar_Unregister itself. Ones
+* made later (a ConCommand created at runtime) are registered and reported
+* the moment they are made.
+  */
+#define SOURCE2MOD_CONVAR_REGISTER() \
+    ConVar_Register(SOURCE2MOD_CONVAR_FLAGS, \
+        [](ConVarRefAbstract* ref) { if (g_pSource2ModConVars) g_pSource2ModConVars->TrackConVar(g_PluginID, ref); }, \
+        [](ConCommandRef* ref) { if (g_pSource2ModConVars) g_pSource2ModConVars->TrackConCommand(g_PluginID, ref); });
+
 // The KHook check is not here: a plugin that never hooks (nothing but the
 // source2mod's own interfaces) does not care which KHook the core runs.
 // KHOOK_INIT() makes it, the first time KHook is used, from the two values
@@ -727,7 +748,8 @@ Globals
     KHook::__exported__khook = static_cast<KHook::IKHook*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_INTERFACE, nullptr, nullptr)); \
     g_Source2ModCoreKHookCommit = static_cast<const char*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_VERSION_INTERFACE, nullptr, nullptr)); \
     g_Source2ModCoreKHookHeader = static_cast<const char*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_HEADER_INTERFACE, nullptr, nullptr)); \
-    SOURCE2MOD_FILLVARS(api)
+    SOURCE2MOD_FILLVARS(api) \
+    SOURCE2MOD_CONVAR_REGISTER()
 
 /* =========================
 Logging helpers
