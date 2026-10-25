@@ -1,4 +1,4 @@
-﻿/**
+/**
 * vim: set ts=4 sw=4 tw=99 noet:
  * =============================================================================
  * Source2Mod
@@ -37,28 +37,120 @@
 /**
 
 * @file ISource2ModGameSystems.h
-* @brief Interface for registering game systems with the engine.
+* @brief Game systems: the engine's per-session event set (IGameSystem) for
+* plugins, through Source2Mod.
 *
-* A game system is how the engine lets code run at fixed points of a session --
-* BuildGameSessionManifest for precaching, ServerGamePostSimulate per frame, and
-* the rest of the IGameSystem event set. Registering one means getting a factory
-* into the engine's own linked list, whose head lives in a static the engine
-* never exports.
-*
-* Source2Mod finds that head once, by signature, and hands it over here. It has
-* to be handed over rather than used directly, because
-* CBaseGameSystemFactory::sm_pFirst is a static member: every binary that
-* includes the s2sdk header gets its own copy, so a plugin's copy is null until
-* it is pointed at the engine's.
+* A game system is how the engine runs code at fixed points of a session --
+* BuildGameSessionManifest for precaching, SpawnGroupPrecache for a spawn group's
+* resources, GameFrameBoundary once a frame, and the rest of the IGameSystem
+* events. The engine only calls a system for the events it overrides (it
+* compares the system's vtable with the default one), and a system it holds
+* cannot go away under it -- so a plugin never registers one of its own: the
+* engine sees one game system of Source2Mod's, and a plugin's system is a set of
+* handlers on it. A plugin can unload whenever; its systems go with it.
   */
 
 #ifndef _INCLUDE_ISOURCE2MOD_GAMESYSTEMS_H
 #define _INCLUDE_ISOURCE2MOD_GAMESYSTEMS_H
 
 #pragma once
-#include "ISource2ModPlugin.h"
+#include "ISource2ModTypes.h"
 
-#include <igamesystemfactory.h>
+#include <igamesystem.h>
+
+/// A game system made with ISource2ModGameSystems::Create(); 0 is none.
+using Source2ModGameSystemId = int;
+
+/**
+
+* @brief The IGameSystem events a game system can hook: the value is the
+* event's vtable slot in IGameSystem, the id the engine dispatches it by.
+*
+* Not hookable: the three slots whose event is unknown, client-only events a
+* server never posts, and OutOfGameFrameBoundary (another dispatcher).
+  */
+enum class GameSystemEvent : int
+{
+    GameInit = 3,
+    GameShutdown = 4,
+    GamePostInit = 5,
+    GamePreShutdown = 6,
+    BuildGameSessionManifest = 7,
+    GameActivate = 8,
+    ClientFullySignedOn = 9,
+    ClientDisconnect = 10,
+    GameDeactivate = 12,
+    SpawnGroupPrecache = 13,
+    SpawnGroupUncache = 14,
+    PreSpawnGroupLoad = 15,
+    PostSpawnGroupLoad = 16,
+    PreSpawnGroupUnload = 17,
+    PostSpawnGroupUnload = 18,
+    ActiveSpawnGroupChanged = 19,
+    ServerPreEntityThink = 31,
+    ServerPostEntityThink = 32,
+    ServerPostPhysicsSimulate = 33,
+    ServerPreClientUpdate = 34,
+    ServerAdvanceTick = 35,
+    ServerGamePostSimulate = 37,
+    ServerPostAdvanceTick = 39,
+    ServerBeginAsyncPostTickWork = 41,
+    ServerGameBeginAsyncPostTickWork = 42,
+    ServerPreEndAsyncPostTickWork = 43,
+    ServerPostEndAsyncPostTickWork = 44,
+    GameFrameBoundary = 48,
+    SaveGame = 50,
+    RestoreGame = 51,
+    NewLevelPlayerConnect = 52,
+    WorldGroupCreated = 53,
+    WorldGroupDestroyed = 54,
+    ServerPrePackEntities = 58,
+};
+
+/// The event a message type belongs to, for the typed Hook<EVENT>().
+template <typename EVENT>
+struct GameSystemEventOf;
+
+#define SOURCE2MOD_GAMESYSTEM_EVENT(name) \
+    template <> struct GameSystemEventOf<Event##name##_t> { static constexpr GameSystemEvent value = GameSystemEvent::name; };
+SOURCE2MOD_GAMESYSTEM_EVENT(GameInit)
+SOURCE2MOD_GAMESYSTEM_EVENT(GameShutdown)
+SOURCE2MOD_GAMESYSTEM_EVENT(GamePostInit)
+SOURCE2MOD_GAMESYSTEM_EVENT(GamePreShutdown)
+SOURCE2MOD_GAMESYSTEM_EVENT(BuildGameSessionManifest)
+SOURCE2MOD_GAMESYSTEM_EVENT(GameActivate)
+SOURCE2MOD_GAMESYSTEM_EVENT(ClientFullySignedOn)
+SOURCE2MOD_GAMESYSTEM_EVENT(ClientDisconnect)
+SOURCE2MOD_GAMESYSTEM_EVENT(GameDeactivate)
+SOURCE2MOD_GAMESYSTEM_EVENT(SpawnGroupPrecache)
+SOURCE2MOD_GAMESYSTEM_EVENT(SpawnGroupUncache)
+SOURCE2MOD_GAMESYSTEM_EVENT(PreSpawnGroupLoad)
+SOURCE2MOD_GAMESYSTEM_EVENT(PostSpawnGroupLoad)
+SOURCE2MOD_GAMESYSTEM_EVENT(PreSpawnGroupUnload)
+SOURCE2MOD_GAMESYSTEM_EVENT(PostSpawnGroupUnload)
+SOURCE2MOD_GAMESYSTEM_EVENT(ActiveSpawnGroupChanged)
+SOURCE2MOD_GAMESYSTEM_EVENT(ServerPreEntityThink)
+SOURCE2MOD_GAMESYSTEM_EVENT(ServerPostEntityThink)
+SOURCE2MOD_GAMESYSTEM_EVENT(ServerPostPhysicsSimulate)
+SOURCE2MOD_GAMESYSTEM_EVENT(ServerPreClientUpdate)
+SOURCE2MOD_GAMESYSTEM_EVENT(ServerAdvanceTick)
+SOURCE2MOD_GAMESYSTEM_EVENT(ServerGamePostSimulate)
+SOURCE2MOD_GAMESYSTEM_EVENT(ServerPostAdvanceTick)
+SOURCE2MOD_GAMESYSTEM_EVENT(ServerBeginAsyncPostTickWork)
+SOURCE2MOD_GAMESYSTEM_EVENT(ServerGameBeginAsyncPostTickWork)
+SOURCE2MOD_GAMESYSTEM_EVENT(ServerPreEndAsyncPostTickWork)
+SOURCE2MOD_GAMESYSTEM_EVENT(ServerPostEndAsyncPostTickWork)
+SOURCE2MOD_GAMESYSTEM_EVENT(GameFrameBoundary)
+SOURCE2MOD_GAMESYSTEM_EVENT(SaveGame)
+SOURCE2MOD_GAMESYSTEM_EVENT(RestoreGame)
+SOURCE2MOD_GAMESYSTEM_EVENT(NewLevelPlayerConnect)
+SOURCE2MOD_GAMESYSTEM_EVENT(WorldGroupCreated)
+SOURCE2MOD_GAMESYSTEM_EVENT(WorldGroupDestroyed)
+SOURCE2MOD_GAMESYSTEM_EVENT(ServerPrePackEntities)
+#undef SOURCE2MOD_GAMESYSTEM_EVENT
+
+/// A hooked event: `msg` is the event's message (Event<Name>_t), never null.
+using GameSystemHandler = Source2ModCallback<void(const void* msg)>;
 
 /* =========================
 Core Source2Mod Game Systems
@@ -66,52 +158,28 @@ Core Source2Mod Game Systems
 
 /**
 
-* @brief Access to the engine's game system registry.
-*
-* Registering a game system of your own is three steps:
+* @brief Game systems owned by Source2Mod, with the events a plugin hooks.
 *
 * @code
-* // 1. Declare it, the way s2sdk expects.
-* class MyGameSystem : public CAutoGameSystem
+* Source2ModGameSystemId gs = g_pSource2ModGameSystems->Create(g_PluginID, "MyPlugin");
+* g_pSource2ModGameSystems->Hook<EventBuildGameSessionManifest_t>(gs, [](const EventBuildGameSessionManifest_t* msg)
 * {
-* public:
-*     DECLARE_GAME_SYSTEM();
-*     GS_EVENT(BuildGameSessionManifest);
-*
-*     void SetGameSystemGlobalPtrs(void* pValue) override
-*     {
-*         if (sm_Factory) sm_Factory->SetGlobalPtr(pValue);
-*     }
-*     bool DoesGameSystemReallocate() override { return sm_Factory->ShouldAutoAdd(); }
-*
-*     // Not IGameSystemFactory*: that is abstract and has no virtual
-*     // destructor, so deleting your factory through it is undefined. Hold a
-*     // final type of your own instead.
-*     static MyGameSystemFactory* sm_Factory;
-* };
-*
-* class MyGameSystemFactory final : public CGameSystemStaticFactory<MyGameSystem>
-* {
-* public:
-*     using CGameSystemStaticFactory<MyGameSystem>::CGameSystemStaticFactory;
-* };
-*
-* MyGameSystem g_MyGameSystem;
-* MyGameSystemFactory* MyGameSystem::sm_Factory = nullptr;
-* CBaseGameSystemFactory** CBaseGameSystemFactory::sm_pFirst = nullptr;
-*
-* // 2. Point this binary's copy of sm_pFirst at the engine's list, in Load().
-* CBaseGameSystemFactory::sm_pFirst = api->GameSystems()->GetFactoryListHead();
-*
-* // 3. Register. The factory adds itself to the list its constructor sees.
-* MyGameSystem::sm_Factory =
-*     new MyGameSystemFactory("MyPlugin_GameSystem", &g_MyGameSystem);
+*     msg->m_pResourceManifest->AddResource("models/example/thing.vmdl");
+* });
+* g_pSource2ModGameSystems->Register(gs);
+* // Destroy(gs) -- or nothing: it goes with the plugin
 * @endcode
 *
-* @note Registration only takes effect for sessions started afterwards; the
-*       engine walks the list when it initialises all systems.
+* A registered system gets its events from now on (the ones of the running map
+* that are still to come) and on every map after. The engine is only told about
+* the events that have a handler, so an unhooked event costs nothing. Hooking an
+* event on a registered system, or unhooking its last handler, takes effect
+* right away. Everything a plugin made goes when it unloads.
+*
+* @note Handlers run on the thread the engine posts the event on; the
+*       Server*AsyncPostTickWork ones may be a worker thread.
   */
-#define SOURCE2MOD_GAMESYSTEMS_INTERFACE "ISource2ModGameSystems001"
+#define SOURCE2MOD_GAMESYSTEMS_INTERFACE "ISource2ModGameSystems002"
 
 class ISource2ModGameSystems
 {
@@ -120,31 +188,64 @@ public:
 
     /**
 
-    * @brief Whether the factory list head was found.
+    * @brief Whether game systems work: the engine's lists were found.
     *
-    * False means the signature scan failed -- usually a game update -- and
-    * registering a game system cannot work. Check before registering.
+    * False usually means a game update moved them; Register() then fails.
       */
     virtual bool IsAvailable() const = 0;
 
     /**
 
-    * @brief The engine's game system factory list head.
-    *
-    * Assign this to your own binary's CBaseGameSystemFactory::sm_pFirst before
-    * constructing any factory. Returns nullptr when IsAvailable() is false.
+    * @brief One of the engine's own game systems, by the name its factory has
+    *        ("CCSGameRulesGameSystem", ...); nullptr when there is none.
       */
-    virtual CBaseGameSystemFactory** GetFactoryListHead() = 0;
+    virtual IGameSystem* FindByName(const char* name) = 0;
 
     /**
 
-    * @brief Finds an already-registered game system by the name it was
-    *        registered under.
-    *
-    * @param name Registration name, e.g. "MyPlugin_GameSystem".
-    * @return The system, or nullptr if nothing is registered under that name.
+    * @brief Makes a game system for @p owner, not registered yet.
+    * @param name What GetName() answers, for logs.
+    * @return Its id, 0 on failure.
       */
-    virtual IGameSystem* FindByName(const char* name) = 0;
+    virtual Source2ModGameSystemId Create(PluginId owner, const char* name) = 0;
+
+    /**
+
+    * @brief Adds a handler for @p event. Several are called in the order
+    *        they were added.
+    * @return The handler's id (for Unhook()), 0 on failure.
+      */
+    virtual Source2ModHookId Hook(Source2ModGameSystemId system, GameSystemEvent event, GameSystemHandler handler) = 0;
+
+    /// Removes a handler by the id Hook() returned.
+    virtual bool Unhook(Source2ModHookId hook) = 0;
+
+    /// Hands the system to the engine. False when unavailable or unknown.
+    virtual bool Register(Source2ModGameSystemId system) = 0;
+
+    /// Takes it out of the engine again; it can be registered later.
+    virtual bool Unregister(Source2ModGameSystemId system) = 0;
+
+    virtual bool IsRegistered(Source2ModGameSystemId system) = 0;
+
+    /// Unregisters it and removes it with its handlers.
+    virtual bool Destroy(Source2ModGameSystemId system) = 0;
+
+    /**
+
+    * @brief Hook() with the event taken from the message type.
+    *
+    * @code
+    * g_pSource2ModGameSystems->Hook<EventGameFrameBoundary_t>(gs, [](const EventGameFrameBoundary_t*) { ... });
+    * @endcode
+      */
+    template <typename EVENT>
+    Source2ModHookId Hook(Source2ModGameSystemId system, Source2ModCallback<void(const EVENT*)> handler)
+    {
+        GameSystemHandler wrapped = [handler](const void* msg) { handler(static_cast<const EVENT*>(msg)); };
+        wrapped.OwnedAs(handler);
+        return Hook(system, GameSystemEventOf<EVENT>::value, std::move(wrapped));
+    }
 };
 
 #endif //_INCLUDE_ISOURCE2MOD_GAMESYSTEMS_H
