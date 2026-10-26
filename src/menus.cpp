@@ -8,7 +8,7 @@
 #include "source2mod/ISource2ModApi.h"
 #include "source2mod/ISource2ModMenus.h"
 #include "source2mod/ISource2ModPlugin.h"
-#include "source2mod/schema/entity/classes/CCSPlayerController.h"
+#include "source2mod/sdk/schema/classes/CCSPlayerController.h"
 SOURCE2MOD_GLOBALVARS();
 
 std::function<bool(CCSPlayerController*)> IBaseMenu::s_canSelect =

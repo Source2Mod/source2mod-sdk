@@ -1,7 +1,7 @@
 /**
  * Source2Mod SourcePawn API: entities and the schema classes.
  *
- * Every class of the SDK's schema (schema/entity/classes) is a methodmap of
+ * Every class of the SDK's schema (sdk/schema/classes) is a methodmap of
  * the same name deriving from the same base (schema/classes.inc, generated).
  * Entity classes -- CEntityInstance and everything under it -- hold an
  * entity handle (C++ CEntityHandle: the index and a serial), not the index:

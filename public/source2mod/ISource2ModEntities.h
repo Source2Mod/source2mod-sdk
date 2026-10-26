@@ -53,7 +53,7 @@
 
 #pragma once
 #include "ISource2ModPlugin.h"
-#include "source2mod/schema/schema.h"
+#include "source2mod/sdk/schemasystem_helper.h"
 
 #include <engine2/isource2server.h>
 #include <engine2/ivengineserver2.h>

@@ -153,7 +153,7 @@ jobs:
             echo "Header changes: \`git diff --stat\` below."
             echo
             echo '```'
-            git diff --stat -- public/source2mod/schema/entity | tail -25
+            git diff --stat -- public/source2mod/sdk/schema | tail -25
             echo '```'
             echo
             echo "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
@@ -170,6 +170,6 @@ jobs:
             tools/schemagen/schemas.json
             tools/schemadump/manifest
             tools/schemadump/version
-            public/source2mod/schema/entity/**
+            public/source2mod/sdk/schema/**
             vendor/s2sdk
           delete-branch: true

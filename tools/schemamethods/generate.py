@@ -186,7 +186,7 @@ def parse_head(head, prefix, path):
     if not ret or parts[-1].startswith('~') or (len(parts) >= 2 and parts[-1] == parts[-2]):
         # A plugin builds its objects itself: a constructor (or destructor)
         # has to be in every binary, outside src/impl.
-        sys.exit('%s: %s is a constructor / destructor -- keep it outside src/impl (src/schema)'
+        sys.exit('%s: %s is a constructor / destructor -- keep it outside src/impl (src/sdk)'
                  % (os.path.relpath(path, ROOT), qual))
     if prefix:
         qual = '::'.join(prefix + [qual])

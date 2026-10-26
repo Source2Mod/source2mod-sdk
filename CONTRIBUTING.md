@@ -61,7 +61,7 @@ all welcome. Contributions go through pull requests from your own fork, against
 
 ## Things specific to the SDK
 
-- **Generated files are not edited by hand.** `public/source2mod/schema/entity/`
+- **Generated files are not edited by hand.** `public/source2mod/sdk/schema/`
   is written by `tools/schemagen` from the game's schema (a workflow refreshes it
   on every CS2 update); change the generator instead.
 - **`vendor/khook` is pinned** to the commit Metamod:Source is built with. Do not

@@ -36,7 +36,7 @@ Original: tools/schemagen/Program.cs (and related files)
 Usage:
     python generator.py [output_path]
 
-Default output_path: ../../public/source2mod/schema/entity
+Default output_path: ../../public/source2mod/sdk/schema
 Reads schemas.json -- DumpSource2's dump, see tools/schemadump -- from the
 same directory as this script.
 """
@@ -1110,8 +1110,8 @@ def write_class(
     # Own/project headers ("..."): generated siblings and Source2Mod's own.
     own_includes: set[str] = {
         "source2mod/ISource2ModPlugin.h",
-        "source2mod/schema/entityio.h",
-        "source2mod/schema/schema.h",
+        "source2mod/sdk/game/server/entityio.h",
+        "source2mod/sdk/schemasystem_helper.h",
     }
     # External SDK headers (<...>).
     external_includes: set[str] = {
@@ -1231,7 +1231,7 @@ def write_class(
 def main() -> None:
     script_dir = os.path.dirname(os.path.abspath(__file__))
     output_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
-        script_dir, "../../public/source2mod/schema/entity"
+        script_dir, "../../public/source2mod/sdk/schema"
     )
 
     enums, classes = load_schema(script_dir)

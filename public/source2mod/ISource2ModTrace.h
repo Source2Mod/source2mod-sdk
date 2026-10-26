@@ -53,7 +53,7 @@
 
 #pragma once
 #include "ISource2ModPlugin.h"
-#include "schema/navarea.h"
+#include "source2mod/sdk/game/server/navarea.h"
 
 #include <bspflags.h>
 #include <engine2/isource2server.h>
@@ -65,7 +65,7 @@ Forward declarations
 ========================= */
 
 // TraceShapeEx takes any CTraceFilter: the game's own filters are in
-// source2mod/schema/tracefilter.h (CTraceFilterSimple to ignore one entity).
+// source2mod/sdk/game/shared/tracefilter.h (CTraceFilterSimple to ignore one entity).
 class CBaseEntity;
 class CEntityInstance;
 

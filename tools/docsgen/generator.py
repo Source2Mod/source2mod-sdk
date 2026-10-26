@@ -36,7 +36,7 @@ API reference generator for the Source2Mod website.
 
 Writes, under the destination:
     core-api/   one page per ISource2Mod*.h (+ Schema, utils/*), and meta.json
-    schema/     hand-written schema structs, entity/classes, entity/enums, meta.json
+    schema/     hand-written structs (sdk/game), classes/, enums/, meta.json
 Everything else in the destination is left alone. The website's sync workflow
 deletes core-api/, schema/ and enums/ before running this, so the folders are
 always exactly what the SDK headers say.
@@ -103,14 +103,14 @@ def page_for(rel):
         return f'core-api/{stem}.mdx', f'/docs/core-api/{stem}', 'api'
     if parts[0] == 'utils':
         return f'core-api/utils/{pascal(stem)}.mdx', f'/docs/core-api/utils/{pascal(stem)}', 'api'
-    if parts[0] == 'schema':
-        if len(parts) == 2:
-            if stem == 'schema':
-                return 'core-api/Schema.mdx', '/docs/core-api/Schema', 'api'
+    if parts[0] == 'sdk':
+        if len(parts) == 2 and stem == 'schemasystem_helper':
+            return 'core-api/Schema.mdx', '/docs/core-api/Schema', 'api'
+        if parts[1] == 'game' and len(parts) == 4:
             return f'schema/{pascal(stem)}.mdx', f'/docs/schema/{pascal(stem)}', 'schema'
-        if parts[1] == 'entity' and len(parts) == 4:
-            return (f'schema/entity/{parts[2]}/{stem}.mdx',
-                    f'/docs/schema/entity/{parts[2]}/{stem}',
+        if parts[1] == 'schema' and len(parts) == 4:
+            return (f'schema/{parts[2]}/{stem}.mdx',
+                    f'/docs/schema/{parts[2]}/{stem}',
                     'entity-class' if parts[2] == 'classes' else 'entity-enum')
     return None
 
@@ -413,7 +413,7 @@ def api_page(rel, parsed, url, title):
 
     fdoc = parsed['file_doc']
     description = fdoc['brief'] or (primary['doc']['brief'] if primary else '')
-    if not description and rel.replace('\\', '/').split('/')[-2:-1] == ['schema']:
+    if not description and rel.replace('\\', '/').split('/')[-3:-1] in (['game', 'shared'], ['game', 'server']):
         names = ', '.join(c['name'] for c in parsed['classes'][:4]) or title
         description = f'Engine structures the SDK declares by hand: {names}.'
     out = [frontmatter(title, description)]
@@ -538,11 +538,9 @@ def write_navigation(api_pages, schema_pages):
         'title': 'Schema', 'description': 'Entity classes, enums and engine structures', 'root': True,
         'icon': 'Database',
         'pages': ['index', '---Structures---'] + sorted(schema_pages, key=str.lower)
-                 + ['---Entity system---', 'entity']})
-    write_json(os.path.join(DEST_DIR, 'schema', 'entity', 'meta.json'),
-               {'title': 'Entity system', 'defaultOpen': True, 'pages': ['classes', 'enums']})
-    write_json(os.path.join(DEST_DIR, 'schema', 'entity', 'classes', 'meta.json'), {'title': 'Classes'})
-    write_json(os.path.join(DEST_DIR, 'schema', 'entity', 'enums', 'meta.json'), {'title': 'Enums'})
+                 + ['---Entity system---', 'classes', 'enums']})
+    write_json(os.path.join(DEST_DIR, 'schema', 'classes', 'meta.json'), {'title': 'Classes'})
+    write_json(os.path.join(DEST_DIR, 'schema', 'enums', 'meta.json'), {'title': 'Enums'})
 
 
 def copy_static_pages():
@@ -616,7 +614,7 @@ def main():
         else:
             if kind == 'schema':
                 title = SCHEMA_TITLES.get(stem, pascal(stem))
-            elif stem == 'schema':
+            elif out_rel == 'core-api/Schema.mdx':
                 title = 'Schema'
             elif out_rel.startswith('core-api/utils/'):
                 title = f'utils/{stem}.h'
