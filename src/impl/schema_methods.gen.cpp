@@ -47,7 +47,7 @@
 #include "source2mod/sdk/schema/classes/CPlayer_WeaponServices.h"
 #include "source2mod/sdk/schema/classes/CPointWorldText.h"
 #include "source2mod/sdk/schema/classes/CSmokeGrenadeProjectile.h"
-#include "source2mod/sdk/game/server/navarea.h"
+#include "source2mod/sdk/navlib/navarea.h"
 
 #include <utility>
 

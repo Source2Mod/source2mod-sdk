@@ -53,7 +53,7 @@
 
 #pragma once
 #include "ISource2ModPlugin.h"
-#include "source2mod/sdk/game/server/navarea.h"
+#include "source2mod/sdk/navlib/navarea.h"
 
 #include <bspflags.h>
 #include <engine2/isource2server.h>

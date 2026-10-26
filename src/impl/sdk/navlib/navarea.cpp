@@ -4,7 +4,7 @@
 //
 //=============================================================================
 
-#include "source2mod/sdk/game/server/navarea.h"
+#include "source2mod/sdk/navlib/navarea.h"
 
 #include "source2mod/ISource2ModApi.h"
 #include "source2mod/ISource2ModGameConfig.h"

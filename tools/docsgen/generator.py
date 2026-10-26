@@ -36,7 +36,7 @@ API reference generator for the Source2Mod website.
 
 Writes, under the destination:
     core-api/   one page per ISource2Mod*.h (+ Schema, utils/*), and meta.json
-    schema/     hand-written structs (sdk/game), classes/, enums/, meta.json
+    schema/     hand-written structs (sdk/game, sdk/navlib), classes/, enums/, meta.json
 Everything else in the destination is left alone. The website's sync workflow
 deletes core-api/, schema/ and enums/ before running this, so the folders are
 always exactly what the SDK headers say.
@@ -106,7 +106,7 @@ def page_for(rel):
     if parts[0] == 'sdk':
         if len(parts) == 2 and stem == 'schemasystem_helper':
             return 'core-api/Schema.mdx', '/docs/core-api/Schema', 'api'
-        if parts[1] == 'game' and len(parts) == 4:
+        if (parts[1] == 'game' and len(parts) == 4) or (parts[1] == 'navlib' and len(parts) == 3):
             return f'schema/{pascal(stem)}.mdx', f'/docs/schema/{pascal(stem)}', 'schema'
         if parts[1] == 'schema' and len(parts) == 4:
             return (f'schema/{parts[2]}/{stem}.mdx',
@@ -413,7 +413,7 @@ def api_page(rel, parsed, url, title):
 
     fdoc = parsed['file_doc']
     description = fdoc['brief'] or (primary['doc']['brief'] if primary else '')
-    if not description and rel.replace('\\', '/').split('/')[-3:-1] in (['game', 'shared'], ['game', 'server']):
+    if not description and rel.replace('\\', '/').split('/')[-3:-1] in (['game', 'shared'], ['game', 'server'], ['sdk', 'navlib']):
         names = ', '.join(c['name'] for c in parsed['classes'][:4]) or title
         description = f'Engine structures the SDK declares by hand: {names}.'
     out = [frontmatter(title, description)]
