@@ -11,7 +11,7 @@
  * 32..63), with Bits64_* stocks to test and change them.
  *
  * The game's schema enums (CSWeaponType, gear_slot_t, loadout_slot_t, ...)
- * are generated into <source2mod/schema/enums>.
+ * are generated into <source2mod/sdk/schema/enums/>.
  */
 
 #if defined _source2mod_consts_included

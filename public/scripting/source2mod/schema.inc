@@ -2,7 +2,7 @@
  * Source2Mod SourcePawn API: entities and the schema classes.
  *
  * Every class of the SDK's schema (sdk/schema/classes) is a methodmap of
- * the same name deriving from the same base (schema/classes.inc, generated).
+ * the same name deriving from the same base (sdk/schema/classes/<Class>.inc, generated).
  * Entity classes -- CEntityInstance and everything under it -- hold an
  * entity handle (C++ CEntityHandle: the index and a serial), not the index:
  * a value kept after its entity is removed stays bound to that entity, so
@@ -172,5 +172,4 @@ methodmap Source2ModSchema
 	public static native SchemaObject GetUtlVectorElement(any instance, const char[] className, const char[] field, int index, int elementSize);
 }
 
-#include <source2mod/schema/classes>
-#include <source2mod/schema/enums>
+#include <source2mod/sdk/schema>
