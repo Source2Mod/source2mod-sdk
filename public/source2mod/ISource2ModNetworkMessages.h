@@ -437,11 +437,11 @@ public:
 /**
  * @brief Hook macros, matching HOOK_GAME_EVENT and HOOK_CONVAR_CHANGE.
  */
-#define HOOK_SERVER_MESSAGE(handler)             g_pSource2ModNetworkMessages->HookServerMessage(handler)
-#define UNHOOK_SERVER_MESSAGE(handler)           g_pSource2ModNetworkMessages->UnhookServerMessage(handler)
-#define HOOK_CLIENT_MESSAGE(handler)             g_pSource2ModNetworkMessages->HookClientMessage(handler)
-#define UNHOOK_CLIENT_MESSAGE(handler)           g_pSource2ModNetworkMessages->UnhookClientMessage(handler)
-#define HOOK_SERVER_INTERNAL_MESSAGE(handler)    g_pSource2ModNetworkMessages->HookServerInternalMessage(handler)
-#define UNHOOK_SERVER_INTERNAL_MESSAGE(handler)  g_pSource2ModNetworkMessages->UnhookServerInternalMessage(handler)
+#define HOOK_SERVER_MESSAGE(...)             g_pSource2ModNetworkMessages->HookServerMessage(__VA_ARGS__)
+#define UNHOOK_SERVER_MESSAGE(...)           g_pSource2ModNetworkMessages->UnhookServerMessage(__VA_ARGS__)
+#define HOOK_CLIENT_MESSAGE(...)             g_pSource2ModNetworkMessages->HookClientMessage(__VA_ARGS__)
+#define UNHOOK_CLIENT_MESSAGE(...)           g_pSource2ModNetworkMessages->UnhookClientMessage(__VA_ARGS__)
+#define HOOK_SERVER_INTERNAL_MESSAGE(...)    g_pSource2ModNetworkMessages->HookServerInternalMessage(__VA_ARGS__)
+#define UNHOOK_SERVER_INTERNAL_MESSAGE(...)  g_pSource2ModNetworkMessages->UnhookServerInternalMessage(__VA_ARGS__)
 
 #endif //_INCLUDE_ISOURCE2MOD_NETWORK_MESSAGES_H

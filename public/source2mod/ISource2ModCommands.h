@@ -310,7 +310,7 @@ public:
 /// RegisterConCommand(name, handler) or RegisterConCommand(name, handler, permission).
 #define REGISTER_CHAT_LISTENER(pchName, ...) g_pSource2ModCommands->RegisterChatListener(pchName, __VA_ARGS__)
 #define REGISTER_CON_COMMAND(pchName, ...)   g_pSource2ModCommands->RegisterConCommand(pchName, __VA_ARGS__)
-#define HOOK_CON_COMMAND(pchName, handler, post) g_pSource2ModCommands->HookConCommand(pchName, handler, post)
+#define HOOK_CON_COMMAND(pchName, ...) g_pSource2ModCommands->HookConCommand(pchName, __VA_ARGS__)
 
 /// ReplyToCommand() with printf formatting.
 #define REPLY_TO_COMMAND(ctx, fmt, ...) \

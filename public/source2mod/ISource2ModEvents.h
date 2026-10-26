@@ -133,14 +133,14 @@ public:
 /**
  * @brief Macro for hooking a game event.
  */
-#define HOOK_GAME_EVENT(passname, passfunc, post) \
-    g_pSource2ModEvents->HookGameEvent(passname, passfunc, post)
+#define HOOK_GAME_EVENT(passname, ...) \
+    g_pSource2ModEvents->HookGameEvent(passname, __VA_ARGS__)
 
 /**
  * @brief Macro for dropping a game event hook (a function or an object and a
  * method; a lambda goes by the id HOOK_GAME_EVENT returned).
  */
-#define UNHOOK_GAME_EVENT(passname, passfunc, post) \
-    g_pSource2ModEvents->UnhookGameEvent(passname, passfunc, post)
+#define UNHOOK_GAME_EVENT(passname, ...) \
+    g_pSource2ModEvents->UnhookGameEvent(passname, __VA_ARGS__)
 
 #endif //_INCLUDE_ISOURCE2MOD_EVENTS_H

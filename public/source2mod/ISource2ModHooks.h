@@ -105,7 +105,7 @@
  *     });
  *
  * // Every tick, after the game's own work.
- * g_pSource2ModHooks->Hook(HookPoint::GameFrame, HookTarget::All(), SOURCE2MOD_MEMBER(this, &Plugin::OnGameFrame), true);
+ * g_pSource2ModHooks->Hook(HookPoint::GameFrame, HookTarget::All(), { this, &Plugin::OnGameFrame }, true);
  *
  * // One input of one kind of entity.
  * g_pSource2ModHooks->Hook(HookPoint::AcceptInput, HookTarget::All(), OnRelayInput, false, HookFilter{ "logic_relay", "Trigger" });
@@ -363,7 +363,7 @@ struct HookReturn<void>
 };
 
 /// A handler: the context, and whether this is the post pass. A function, an
-/// object and a method (SOURCE2MOD_MEMBER), or a lambda.
+/// object and a method ({ this, &Plugin::Method }), or a lambda.
 template <typename CONTEXT>
 using HookHandler = Source2ModCallback<HookReturn<typename CONTEXT::Return>(CONTEXT& ctx, bool post)>;
 

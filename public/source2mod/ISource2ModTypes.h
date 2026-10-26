@@ -110,12 +110,12 @@ class Source2ModCallback;
 
 /**
  * @brief A source2mod handler: a lambda, a free or static function, or an
- * object and one of its methods -- SourceHook's SH_STATIC / SH_MEMBER.
+ * object and one of its methods.
  *
  * @code
  * g_pSource2ModCommands->RegisterConCommand("jbtestend", TestEndRound);               // function
  * g_pSource2ModCommands->RegisterConCommand("jbtestend", &Commands::TestEndRound);    // static method
- * g_pSource2ModCommands->RegisterConCommand("jbtestend", SOURCE2MOD_MEMBER(this, &Plugin::OnTest));
+ * g_pSource2ModCommands->RegisterConCommand("jbtestend", { this, &Plugin::OnTest });
  * g_pSource2ModCommands->RegisterConCommand("jbtestend", [](auto&, auto&, bool) {});  // lambda
  * @endcode
  *
@@ -223,23 +223,6 @@ private:
     unsigned char m_key[16] = {};
     bool m_keyed = false;
 };
-
-/**
- * @brief SourceHook's SH_STATIC / SH_MEMBER, for a source2mod handler argument.
- *
- * @code
- * g_pSource2ModEvents->HookGameEvent("round_end", SOURCE2MOD_STATIC(OnRoundEnd), true);
- * g_pSource2ModEvents->HookGameEvent("round_end", SOURCE2MOD_MEMBER(this, &Plugin::OnRoundEnd), true);
- * // ... and later the same delegate takes it off again:
- * g_pSource2ModEvents->UnhookGameEvent("round_end", SOURCE2MOD_MEMBER(this, &Plugin::OnRoundEnd), true);
- * @endcode
- *
- * Plain `OnRoundEnd` / `{ this, &Plugin::OnRoundEnd }` do the same; these
- * only spell it the SourceHook way. The owner is the plugin whose code the
- * function or method is, as for every handler.
- */
-#define SOURCE2MOD_STATIC(func) (func)
-#define SOURCE2MOD_MEMBER(inst, func) { inst, func }
 
 /* =========================
 Hook control

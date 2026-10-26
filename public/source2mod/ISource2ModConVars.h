@@ -322,15 +322,15 @@ public:
  *
  * @param passfunc Callback function.
  */
-#define HOOK_CONVAR_CHANGE(passfunc) \
-    g_pSource2ModConVars->HookConVarChange(passfunc)
+#define HOOK_CONVAR_CHANGE(...) \
+    g_pSource2ModConVars->HookConVarChange(__VA_ARGS__)
 
 /**
  * @brief Macro for dropping a ConVar change hook (a function or an object
  * and a method; a lambda goes by the id HOOK_CONVAR_CHANGE returned).
  */
-#define UNHOOK_CONVAR_CHANGE(passfunc) \
-    g_pSource2ModConVars->UnhookConVarChange(passfunc)
+#define UNHOOK_CONVAR_CHANGE(...) \
+    g_pSource2ModConVars->UnhookConVarChange(__VA_ARGS__)
 
 
 /* =========================

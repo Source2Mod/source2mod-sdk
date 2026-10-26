@@ -520,7 +520,7 @@ inline SoundRecipients SoundRecipientOf(CPlayerSlot slot)
 #define SOUND_EMIT_FROM_ENTITY(entity, ...) g_pSource2ModSounds->EmitSoundFromEntity(entity, __VA_ARGS__)
 #define SOUND_STOP(guid)                    g_pSource2ModSounds->StopSound(guid)
 
-#define HOOK_SOUND(handler)   g_pSource2ModSounds->HookSound(handler)
-#define UNHOOK_SOUND(handler) g_pSource2ModSounds->UnhookSound(handler)
+#define HOOK_SOUND(...)   g_pSource2ModSounds->HookSound(__VA_ARGS__)
+#define UNHOOK_SOUND(...) g_pSource2ModSounds->UnhookSound(__VA_ARGS__)
 
 #endif //_INCLUDE_ISOURCE2MOD_SOUNDS_H

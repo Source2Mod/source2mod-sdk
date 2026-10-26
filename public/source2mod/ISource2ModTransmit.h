@@ -342,7 +342,7 @@ Helpers
 #define TRANSMIT_SET_VISIBLE(entity, ...)   g_pSource2ModTransmit->SetVisible(entity, __VA_ARGS__)
 #define TRANSMIT_SET_BLOCK_ALL(entity, on)  g_pSource2ModTransmit->SetBlockAll(entity, on)
 
-#define HOOK_CHECK_TRANSMIT(handler)   g_pSource2ModTransmit->HookCheckTransmit(handler)
-#define UNHOOK_CHECK_TRANSMIT(handler) g_pSource2ModTransmit->UnhookCheckTransmit(handler)
+#define HOOK_CHECK_TRANSMIT(...)   g_pSource2ModTransmit->HookCheckTransmit(__VA_ARGS__)
+#define UNHOOK_CHECK_TRANSMIT(...) g_pSource2ModTransmit->UnhookCheckTransmit(__VA_ARGS__)
 
 #endif //_INCLUDE_ISOURCE2MOD_TRANSMIT_H

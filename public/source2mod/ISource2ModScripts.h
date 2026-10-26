@@ -229,7 +229,7 @@ public:
 #define SCRIPTS_RUN_FILE(name, file, persistent)          g_pSource2ModScripts->RunFile(g_PluginID, name, file, persistent)
 #define SCRIPTS_FIRE_INPUT(name, input)                   g_pSource2ModScripts->FireInput(name, input)
 
-#define HOOK_SCRIPT_MESSAGE(channel, handler)   g_pSource2ModScripts->HookScriptMessage(channel, handler)
-#define UNHOOK_SCRIPT_MESSAGE(channel, handler) g_pSource2ModScripts->UnhookScriptMessage(channel, handler)
+#define HOOK_SCRIPT_MESSAGE(channel, ...)   g_pSource2ModScripts->HookScriptMessage(channel, __VA_ARGS__)
+#define UNHOOK_SCRIPT_MESSAGE(channel, ...) g_pSource2ModScripts->UnhookScriptMessage(channel, __VA_ARGS__)
 
 #endif //_INCLUDE_ISOURCE2MOD_SCRIPTS_H

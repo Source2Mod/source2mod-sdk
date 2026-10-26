@@ -134,8 +134,8 @@ public:
 /**
  * @brief Hook macros, matching HOOK_GAME_EVENT.
  */
-#define HOOK_CUSTOM_HUD_CLICK(pLayout, handler) \
-    g_pSource2ModCustomHud->HookCustomHudClick(pLayout, handler)
+#define HOOK_CUSTOM_HUD_CLICK(pLayout, ...) \
+    g_pSource2ModCustomHud->HookCustomHudClick(pLayout, __VA_ARGS__)
 
 #define UNHOOK_CUSTOM_HUD_CLICK(pLayout) \
     g_pSource2ModCustomHud->UnhookCustomHudClick(pLayout)
