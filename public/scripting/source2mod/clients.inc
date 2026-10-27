@@ -1,8 +1,11 @@
 /**
- * Source2Mod SourcePawn API: player helpers (ISource2ModClients).
+ * Source2Mod SourcePawn API: a player by slot (ISource2ModClients), off the
+ * engine's own client -- the CServerSideClient methodmap below.
  *
- * What the controller methodmaps already do (name, IP, SteamID64, user id,
- * console commands, team changes, Disconnect) stays there.
+ * Nothing here needs a controller, so it also answers for a client that has
+ * none (yet). The controller methodmaps' per-client calls (PrintTo*,
+ * ReplicateConVar, GetIpAddress, Disconnect, ...) are these with their slot;
+ * what only the entity has (networked name and SteamID, pawn, team) stays there.
  */
 
 #if defined _source2mod_clients_included
@@ -12,6 +15,13 @@
 
 #include <source2mod/types>
 #include <source2mod/events>
+
+/**
+ * The server's player slots (-maxplayers, at most 64): slots are 0 to
+ * MaxClients - 1. Set when the script loads and again at every level init;
+ * 0 for a script loaded before the server existed, until the first map.
+ */
+public const int MaxClients;
 
 /** SteamID forms (ESource2ModAuthId). */
 enum Source2ModAuthIdForm

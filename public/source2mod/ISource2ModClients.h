@@ -36,11 +36,14 @@
 
 /**
  * @file ISource2ModClients.h
- * @brief Player helpers the controller classes do not have: SteamIDs in every
- *        form, connection details, client cvars, kicking with a message.
+ * @brief A player by slot, off the engine's own client (CServerSideClient):
+ *        state, SteamIDs in every form, connection details, client cvars and
+ *        ConVar queries, messages and commands to one client, disconnecting.
  *
- * What a CBasePlayerController already does (name, IP, SteamID64, user id,
- * console commands, team changes, Disconnect) stays there.
+ * Nothing here needs a controller, so it also answers for a client that has
+ * none (yet). The controllers' per-client helpers (PrintTo*, ReplicateConVar,
+ * GetIpAddress, Disconnect, ...) call these with their slot; what only the
+ * entity has (networked name and SteamID, pawn, team) stays on it.
  */
 
 #ifndef _INCLUDE_ISOURCE2MOD_CLIENTS_H
