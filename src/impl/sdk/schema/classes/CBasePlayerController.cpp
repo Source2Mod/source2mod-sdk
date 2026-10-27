@@ -53,33 +53,6 @@ SOURCE2MOD_GLOBALVARS();
 #include "networksystem/inetworkmessages.h"
 #include "usermessages.pb.h"
 
-enum class HudDestination
-{
-    Notify = 1,
-    Console = 2,
-    Chat = 3,
-    Center = 4,
-    Alert = 6
-};
-
-static void ClientPrint(int slot, int hudDestination, const char* message)
-{
-    INetworkMessageInternal* pNetMsg = GetNetworkMessages()->FindNetworkMessagePartial("TextMsg");
-    auto data = pNetMsg->AllocateMessage()->ToPB<CUserMessageTextMsg>();
-
-    data->set_dest(hudDestination);
-    data->add_param(message);
-
-    CPlayerBitVec recipients;
-    recipients.Set(slot);
-
-    GetGameEventSystem()->PostEventAbstract(CSplitScreenSlot(-1), false, ABSOLUTE_PLAYER_LIMIT,
-                                                reinterpret_cast<const uint64*>(recipients.Base()), pNetMsg, data, 0,
-                                                NetChannelBufType_t::BUF_RELIABLE);
-
-    delete data;
-}
-
 void CBasePlayerController::SetPawn(CBasePlayerPawn* pPawn, HookChain eChain){
     SOURCE2MOD_CALL_FUNCTION(void(CBasePlayerController*, CBasePlayerPawn*, bool, bool, bool, bool), "CBasePlayerController::SetPawn", eChain,
                              this, pPawn, true, false, false, false);
@@ -87,26 +60,22 @@ void CBasePlayerController::SetPawn(CBasePlayerPawn* pPawn, HookChain eChain){
 
 void CBasePlayerController::PrintToConsole(const char* pszMessage)
 {
-    std::string pszSanitizedMessage;
-    pszSanitizedMessage.reserve(strlen(pszMessage) + 2);
-    pszSanitizedMessage = pszMessage;
-    pszSanitizedMessage += '\n';
-    ClientPrint(GetSlot(), (int)HudDestination::Console, pszSanitizedMessage.c_str());
+    g_pSource2ModClients->PrintToConsole(GetPlayerSlot(), pszMessage);
 }
 
 void CBasePlayerController::PrintToChat(const char* pszMessage)
 {
-    ClientPrint(GetSlot(), (int)HudDestination::Chat, pszMessage);
+    g_pSource2ModClients->PrintToChat(GetPlayerSlot(), pszMessage);
 }
 
 void CBasePlayerController::PrintToCenter(const char* pszMessage)
 {
-    ClientPrint(GetSlot(), (int)HudDestination::Center, pszMessage);
+    g_pSource2ModClients->PrintToCenter(GetPlayerSlot(), pszMessage);
 }
 
 void CBasePlayerController::PrintToCenterAlert(const char* pszMessage)
 {
-    ClientPrint(GetSlot(), (int)HudDestination::Alert, pszMessage);
+    g_pSource2ModClients->PrintToCenterAlert(GetPlayerSlot(), pszMessage);
 }
 
 bool CBasePlayerController::IsBot()
@@ -116,53 +85,22 @@ bool CBasePlayerController::IsBot()
 
 void CBasePlayerController::Disconnect(ENetworkDisconnectionReason eReason, const char* pszInternalReason)
 {
-    if (m_iConnected() != PlayerConnectedState::Connected)
-        return;
-
-    // The disconnect happens next frame, by which time a reason built on the
-    // spot -- fmt::format(...).c_str() -- is gone. The lambda keeps its own copy.
-    const bool bHasReason = pszInternalReason != nullptr;
-    std::string sInternalReason = bHasReason ? pszInternalReason : "";
-
-    CLOSE_ACTIVE_MENU(reinterpret_cast<CCSPlayerController*>(this));
-    g_pSource2ModScheduler->NextFrame([hPlayer = this->GetHandle(), eReason, bHasReason, sInternalReason = std::move(sInternalReason)]
-    {
-        if (!hPlayer || hPlayer->m_iConnected() != PlayerConnectedState::Connected)
-            return;
-
-        GetEngineServer()->DisconnectClient(hPlayer->GetSlot(), eReason, bHasReason ? sInternalReason.c_str() : nullptr);
-    });
+    g_pSource2ModClients->Disconnect(GetPlayerSlot(), eReason, pszInternalReason);
 }
 
 void CBasePlayerController::ExecuteClientCommand(const char* pszCommand)
 {
-    GetEngineServer()->ClientCommand(GetPlayerSlot(), "%s", pszCommand);
+    g_pSource2ModClients->ExecuteClientCommand(GetPlayerSlot(), pszCommand);
 }
 
 void CBasePlayerController::ExecuteClientCommandFromServer(const char* pszCommand)
 {
-    CCommand args;
-    args.Tokenize(pszCommand);
-
-    auto handle = GetCVar()->FindConCommand(args.Arg(0));
-    if (!handle.IsValidRef()) return;
-
-    CCommandContext context(CommandTarget_t::CT_NO_TARGET, GetPlayerSlot());
-
-    GetCVar()->DispatchConCommand(handle, context, args);
+    g_pSource2ModClients->ExecuteClientCommandFromServer(GetPlayerSlot(), pszCommand);
 }
 
 CServerSideClient* CBasePlayerController::GetServerSideClient()
 {
-    CNetworkGameServerBase* pServer = GetNetworkServerService()->GetIGameServer();
-    if (!pServer)
-        return nullptr;
-
-    const int index = GetSlot();
-    if (index < 0 || index >= pServer->m_Clients.Count())
-        return nullptr;
-
-    return static_cast<CServerSideClient*>(pServer->m_Clients.Element(index));
+    return g_pSource2ModClients->GetServerSideClient(GetPlayerSlot());
 }
 
 CEntityIndex CBasePlayerController::GetPlayerIndex()
@@ -207,63 +145,17 @@ const char* CBasePlayerController::GetPlayerName()
 
 CUtlString CBasePlayerController::GetIpAddress()
 {
-    if (const auto* netInfo = GetEngineServer()->GetPlayerNetInfo(GetPlayerSlot()))
-    {
-        uint32_t ip = netInfo->GetRemoteAddress().GetIP();
-
-        ip = ((ip & 0x000000FF) << 24) |
-             ((ip & 0x0000FF00) << 8)  |
-             ((ip & 0x00FF0000) >> 8)  |
-             ((ip & 0xFF000000) >> 24);
-
-        char buffer[64];
-
-        std::snprintf(
-            buffer,
-            sizeof(buffer),
-            "%u.%u.%u.%u",
-            (ip >> 24) & 0xFF,
-            (ip >> 16) & 0xFF,
-            (ip >> 8) & 0xFF,
-            ip & 0xFF
-        );
-
-        return CUtlString(buffer);
-    }
-
-    return CUtlString();
+    return CUtlString(g_pSource2ModClients->GetIpAddress(GetPlayerSlot()).c_str());
 }
 
 void CBasePlayerController::ReplicateConVar(const char* pszConVar, const char* pszValue)
 {
-    INetChannel* pNetChannel = reinterpret_cast<INetChannel*>(GetEngineServer()->GetPlayerNetInfo(GetPlayerSlot()));
-    if (pNetChannel)
-    {
-        static INetworkMessageInternal* pMsg = GetNetworkMessages()->FindNetworkMessagePartial("CNETMsg_SetConVar");
-
-        // One message, refilled: SendNetMessage is done with it when it
-        // returns (it used to be deleted right after); a fresh one per call
-        // was about half of what this cost.
-        static CNetMessagePB<CNETMsg_SetConVar>* msg = pMsg->AllocateMessage()->ToPB<CNETMsg_SetConVar>();
-        msg->Clear();
-        auto cvar = msg->mutable_convars()->add_cvars();
-        cvar->set_name(pszConVar);
-        cvar->set_value(pszValue);
-
-        pNetChannel->SendNetMessage(msg, BUF_DEFAULT);
-    }
+    g_pSource2ModClients->ReplicateConVar(GetPlayerSlot(), pszConVar, pszValue);
 }
 
 void CBasePlayerController::FireEventToClient(IGameEvent* pEvent)
 {
-    if (!pEvent) return;
-
-    // CPlayerSlot is one int, passed like one.
-    IGameEventListener2* pListener = SOURCE2MOD_CALL_FUNCTION(IGameEventListener2*(int), "LegacyGameEventListener", HookChain::Run,
-                                                              GetPlayerSlot().Get());
-    if (!pListener) return;
-
-    pListener->FireGameEvent(pEvent);
+    g_pSource2ModClients->FireEventToClient(GetPlayerSlot(), pEvent);
 }
 
 // m_hPawn is typed CHandle<CBasePlayerPawn>, but every pawn this game puts on a

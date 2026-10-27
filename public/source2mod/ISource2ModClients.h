@@ -60,21 +60,51 @@ enum ESource2ModAuthId
     SOURCE2MOD_AUTHID_STEAMID64,     ///< 76561197960290418
 };
 
+/// What a client answered a QueryClientConVar (SourceMod's ConVarQueryResult).
+enum ESource2ModConVarQueryResult
+{
+    SOURCE2MOD_CVARQUERY_CANCELLED = -1, ///< the client left before it answered
+    SOURCE2MOD_CVARQUERY_OKAY = 0,       ///< the value is the client's
+    SOURCE2MOD_CVARQUERY_NOTFOUND,       ///< the client has no such ConVar
+    SOURCE2MOD_CVARQUERY_NOTVALID,       ///< a ConCommand, not a ConVar
+    SOURCE2MOD_CVARQUERY_PROTECTED,      ///< FCVAR_PROTECTED, the value is withheld
+};
+
+/**
+ * @brief The answer to a QueryClientConVar.
+ * @param cookie What QueryClientConVar returned.
+ * @param value  The client's value; empty unless the result is OKAY.
+ */
+using ClientConVarQueryCallback = Source2ModCallback<void(CPlayerSlot slot, int cookie, ESource2ModConVarQueryResult result,
+                                                         const char* name, const char* value)>;
+
+class CServerSideClient;
+class IGameEvent;
+
 /* =========================
 Core Source2Mod Clients
 ========================= */
 
-#define SOURCE2MOD_CLIENTS_INTERFACE "ISource2ModClients001"
+#define SOURCE2MOD_CLIENTS_INTERFACE "ISource2ModClients002"
 
 class ISource2ModClients
 {
 public:
     virtual ~ISource2ModClients() = default;
 
+    /**
+     * @brief The engine's client of a slot: signon state, net channel, fake
+     * flag, what the server knows of it before (and after) it has a controller.
+     * @return nullptr when the slot has no client (the engine keeps the slot's
+     *         object between clients; that one does not count).
+     */
+    virtual CServerSideClient* GetServerSideClient(CPlayerSlot slot) = 0;
+
     /// A slot has a client (connecting or in game).
     virtual bool IsConnected(CPlayerSlot slot) = 0;
     /// A slot's client is fully in game.
     virtual bool IsInGame(CPlayerSlot slot) = 0;
+    /// A bot, by the engine client's own flag (true before it has a controller).
     virtual bool IsFakeClient(CPlayerSlot slot) = 0;
     /// Steam has confirmed the client's SteamID.
     virtual bool IsAuthorized(CPlayerSlot slot) = 0;
@@ -86,6 +116,8 @@ public:
      */
     virtual std::string GetAuthId(CPlayerSlot slot, ESource2ModAuthId form, bool validated = true) = 0;
 
+    /// The client's IPv4 address without the port; empty for a bot or no client.
+    virtual std::string GetIpAddress(CPlayerSlot slot) = 0;
     /// Average round trip in seconds (0 for a bot or no client).
     virtual float GetLatency(CPlayerSlot slot) = 0;
     /// Seconds connected (0 for a bot or no client).
@@ -94,9 +126,60 @@ public:
     /// A cvar the client sent (cl_language, ...); empty when it did not.
     virtual std::string GetClientConVar(CPlayerSlot slot, const char* name) = 0;
 
-    /// Disconnects a client. CS2 shows them the kick reason's own text;
-    /// @p message is the reason the server logs.
-    virtual void Kick(CPlayerSlot slot, const char* message) = 0;
+    /**
+     * @brief Asks a client for any of its ConVars (SVC_GetCvarValue).
+     *
+     * Unlike GetClientConVar, which reads the copy of a FCVAR_USERINFO cvar
+     * the client sent on its own, this goes over the wire and back: the
+     * callback runs when the client answers, or with CANCELLED when it
+     * disconnects first. A client that never answers never calls it, so a
+     * caller that needs an answer keeps its own timeout.
+     *
+     * @return A cookie the callback is handed back, or -1 (a bot, no client,
+     *         no net channel) -- the callback is then never called.
+     */
+    virtual int QueryClientConVar(CPlayerSlot slot, const char* name, ClientConVarQueryCallback callback) = 0;
+
+    /**
+     * @brief Sets a replicated ConVar's value on one client only (NET_SetConVar);
+     * the server's own value and every other client stay as they are.
+     * @return false when the slot has no net channel (a bot, no client).
+     */
+    virtual bool ReplicateConVar(CPlayerSlot slot, const char* name, const char* value) = 0;
+
+    /// Text on one client (TextMsg): its console (a newline is added), chat,
+    /// center text or center alert.
+    virtual void PrintToConsole(CPlayerSlot slot, const char* message) = 0;
+    virtual void PrintToChat(CPlayerSlot slot, const char* message) = 0;
+    virtual void PrintToCenter(CPlayerSlot slot, const char* message) = 0;
+    virtual void PrintToCenterAlert(CPlayerSlot slot, const char* message) = 0;
+
+    /**
+     * @brief CS2's HTML center text (show_survival_respawn_status) on one client.
+     * @param menu false: left out while the player has a menu open, so the
+     *             text cannot paint over it; a menu draws itself with true.
+     */
+    virtual void PrintToCenterHtml(CPlayerSlot slot, const char* message, int duration = 5, bool menu = false) = 0;
+
+    /// Runs a command on the client's own console, as if typed there.
+    virtual void ExecuteClientCommand(CPlayerSlot slot, const char* command) = 0;
+    /// Runs a server ConCommand on the client's behalf (its slot as the
+    /// command context); nothing goes over the wire.
+    virtual void ExecuteClientCommandFromServer(CPlayerSlot slot, const char* command) = 0;
+
+    /// Fires @p event to this client's legacy listener only. Does not take
+    /// ownership: the caller still frees it.
+    virtual void FireEventToClient(CPlayerSlot slot, IGameEvent* event) = 0;
+
+    /**
+     * @brief Disconnects a client, on the next frame: safe to call from inside
+     * that client's own hooks (its string commands, its net messages). Its open
+     * menu is closed right away.
+     * @param reason         What CS2 shows the client, in its own text
+     *                       (NETWORK_DISCONNECT_KICKED for a kick).
+     * @param internalReason What the server logs; nullptr for none.
+     */
+    virtual void Disconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason, const char* internalReason = nullptr) = 0;
 
     /// Clients on the server, bots included.
     virtual int GetClientCount(bool inGameOnly = true) = 0;

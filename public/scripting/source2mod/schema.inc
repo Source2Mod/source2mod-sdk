@@ -30,6 +30,7 @@
 #include <source2mod/types>
 #include <source2mod/events>
 #include <source2mod/adt>
+#include <source2mod/clients>
 
 /**
  * A schema object that is not an entity (services, the scene node, the game

@@ -122,18 +122,7 @@ CCSPlayerController *CCSPlayerController::FromSteamId(CSteamID steamId)
 
 void CCSPlayerController::PrintToCenterHtml(const char* pszMessage, int iDuration, bool bMenu)
 {
-    if (!bMenu && g_pSource2ModMenus->GetActiveMenu(this))
-        return;
-
-    IGameEvent *event = GetGameEventManager()->CreateEvent("show_survival_respawn_status", true);
-    if (!event) return;
-
-    event->SetString("loc_token", pszMessage);
-    event->SetInt("duration", iDuration);
-    event->SetPlayer("userid", GetPlayerSlot());
-
-    FireEventToClient(event);
-    GetGameEventManager()->FreeEvent(event);
+    g_pSource2ModClients->PrintToCenterHtml(GetPlayerSlot(), pszMessage, iDuration, bMenu);
 }
 
 void CCSPlayerController::TakeDamage(CCSPlayerController* pAttacker, int iDamage, DamageTypes_t bitsDamageType, HookChain eChain)
