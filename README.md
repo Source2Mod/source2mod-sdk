@@ -157,6 +157,16 @@ the same name with its fields as properties.
 - **SourcePawn include set** -- `public/scripting` (`#include <source2mod/api>`), shipped by the core in `addons/source2mod/scripting/include`  
 - **Preconfigured compiler flags & linking**  
 
+### Interface revisions
+
+Each interface is one class (`ISource2ModCommands`) whose version string
+carries a revision (`SOURCE2MOD_COMMANDS_INTERFACE` = `"ISource2ModCommands004"`);
+`SOURCE2MOD_SAVEVARS()` asks the core for the revision the plugin was built
+against. A newer core keeps serving the revisions it froze through compat
+adapters, so a plugin does not have to be rebuilt when an interface changes;
+an older core than the plugin needs refuses it with `update the core`. See
+[Compatibility](https://www.source2mod.net/docs/development/compatibility).
+
 ---
 
 ## Helper API
