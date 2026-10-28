@@ -78,6 +78,16 @@ methodmap Source2ModTranslations
 	public static native int Translate(const char[] phrase, CPlayerSlot target, char[] buffer, int maxlen);
 
 	/**
+	 * The raw text in a language of the script's choosing ({n} left in), for
+	 * one that keeps a language itself rather than asking for a player's.
+	 * Falls back like Translate: the server's language, English, the phrase name.
+	 *
+	 * @param language A language index (FindLanguage); -1 for the server's
+	 * @return Bytes written
+	 */
+	public static native int TranslateLanguage(const char[] phrase, int language, char[] buffer, int maxlen);
+
+	/**
 	 * The text for a target with its {1}..{n} filled from the arguments, each
 	 * formatted by the phrase's #format spec (as %t does).
 	 * @return Bytes written

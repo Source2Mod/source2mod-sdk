@@ -33,18 +33,6 @@
 #include <source2mod/clients>
 
 /**
- * A schema object that is not an entity (services, the scene node, the game
- * rules). 0 is null.
- */
-methodmap SchemaObject
-{
-	property bool IsNull
-	{
-		public get() { return view_as<int>(this) == 0; }
-	}
-}
-
-/**
  * The root of every entity class.
  */
 methodmap CEntityInstance

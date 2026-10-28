@@ -97,3 +97,17 @@ stock bool PlayerMask_Has(const int mask[2], int slot)
 {
 	return (mask[slot >> 5] & (1 << (slot & 31))) != 0;
 }
+
+/**
+ * A schema object that is not an entity (services, the scene node, the game
+ * rules) -- or any other address in the game's memory (Source2ModModule,
+ * Source2ModMemory, a gamedata signature): Source2ModSchema's *At natives read
+ * and write at it. 0 is null.
+ */
+methodmap SchemaObject
+{
+	property bool IsNull
+	{
+		public get() { return view_as<int>(this) == 0; }
+	}
+}

@@ -159,4 +159,15 @@ methodmap Source2ModSQL
 	 */
 	public static native ISource2ModSQLConnection CreateNamedConnection(const char[] name);
 	public static native ISource2ModSQLServerless CreateNamedServerless(const char[] name);
+
+	/**
+	 * The details of a connection named in configs/databases.json ("" =
+	 * "default"), without connecting: for a script that connects itself, or
+	 * shows or checks the settings. host, user and pass are "" for SQLite.
+	 *
+	 * @return false when there is no such entry (nothing is written)
+	 */
+	public static native bool GetNamedConnection(const char[] name, char[] host, int hostLen, char[] user, int userLen,
+	                                             char[] pass, int passLen, char[] database, int databaseLen,
+	                                             int &port = 0, int &timeout = 0, Source2ModSQLDriver &driver = SQLDriver_MySQL);
 }

@@ -57,6 +57,36 @@ methodmap Source2ModCommandArgs
 	public native int GetCommandString(char[] buffer, int maxlen);
 }
 
+/**
+ * A line of text split by the engine's own tokenizer (CCommand::Tokenize) --
+ * exactly as the engine splits it before it looks the ConCommand up. It also
+ * breaks on { } ( ) ' : so "say:hello" is the command say, which a split on
+ * spaces would miss. Close it (delete) when done.
+ *
+ *   Source2ModCommandLine line = new Source2ModCommandLine(text);
+ *   bool chat = line.IsCommand("say") || line.IsCommand("say_team");
+ *   delete line;
+ */
+methodmap Source2ModCommandLine < Handle
+{
+	public native Source2ModCommandLine(const char[] text);
+
+	/** Arguments, the command included; 0 for an empty line. */
+	public native int ArgC();
+
+	/** @return Bytes written; "" past the end */
+	public native int Arg(int index, char[] buffer, int maxlen);
+
+	/** Everything after the command, as one string. */
+	public native int ArgS(char[] buffer, int maxlen);
+
+	/** The whole line as tokenized. */
+	public native int GetCommandString(char[] buffer, int maxlen);
+
+	/** Arg(0) is `name`, case-insensitively -- how the engine matches a ConCommand ("SAY" runs say). */
+	public native bool IsCommand(const char[] name);
+}
+
 /** A command of the plugin's own, or a chat listener. */
 typedef Source2ModChatHandler = function void (Source2ModCommandContext context, Source2ModCommandArgs args, bool post);
 
@@ -98,10 +128,10 @@ methodmap Source2ModCommands
 
 	/** Answers where the command came from: the caller's console or chat. Formatted. */
 	public static native void ReplyToCommand(Source2ModCommandContext context, const char[] format, any ...);
-}
 
 	/** CServerSideClient.ExecuteClientCommand: runs a command on the client's own console, as if typed there. */
 	public static native void ExecuteClientCommand(CPlayerSlot slot, const char[] command);
 
 	/** CServerSideClient.ExecuteClientCommandFromServer: runs a server ConCommand on the client's behalf; nothing goes over the wire. */
 	public static native void ExecuteClientCommandFromServer(CPlayerSlot slot, const char[] command);
+}

@@ -130,16 +130,21 @@ methodmap Source2ModNetworkMessages
 	 * Unhook* take only an id of their own kind that this plugin got back;
 	 * anything else is false.
 	 *
+	 * messageId hooks one message only (net_StringCmd, clc_Move, a user
+	 * message id, ...): the core leaves every other message out before it
+	 * reaches the script -- no call, no handle -- which matters for those
+	 * every client sends every tick. -1 is every message.
+	 *
 	 * @return The id UnhookServerMessage takes
 	 */
-	public static native int HookServerMessage(Source2ModServerMessageHook handler);
+	public static native int HookServerMessage(Source2ModServerMessageHook handler, int messageId = -1);
 	public static native bool UnhookServerMessage(int id);
 
 	/** @return The id UnhookClientMessage takes */
-	public static native int HookClientMessage(Source2ModClientMessageHook handler);
+	public static native int HookClientMessage(Source2ModClientMessageHook handler, int messageId = -1);
 	public static native bool UnhookClientMessage(int id);
 
 	/** Messages the server sends itself (a bot's commands, ...). */
-	public static native int HookServerInternalMessage(Source2ModClientMessageHook handler);
+	public static native int HookServerInternalMessage(Source2ModClientMessageHook handler, int messageId = -1);
 	public static native bool UnhookServerInternalMessage(int id);
 }

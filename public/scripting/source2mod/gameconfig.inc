@@ -79,6 +79,84 @@ methodmap Source2ModGameConfig
 	public static native bool SignatureMatches(const char[] module, const char[] signature, const char[] section = "");
 
 	public static native Source2ModPlatform GetPlatform();
+
+	/**
+	 * Where the entry's signature or symbol is on the running game, as an
+	 * address (C++ ResolveSignature): read and write at it with
+	 * Source2ModSchema's *At natives, step from it with Source2ModMemory.
+	 *
+	 * @return 0 when the entry does not resolve
+	 */
+	public static native SchemaObject ResolveSignature(const char[] name);
+}
+
+/**
+ * A module of the game ("server", "engine2", "tier0", ...), for what gamedata
+ * does not have (ISource2ModModule). Addresses come back as SchemaObjects, 0
+ * when there is nothing. Close it (delete) when done.
+ *
+ *   Source2ModModule server = new Source2ModModule("server");
+ *   SchemaObject insn = server.FindPattern("48 8B 05 ? ? ? ? 48 8B 08");
+ *   SchemaObject globals = Source2ModMemory.Deref(Source2ModMemory.ResolveRelativeAddress(insn, 3, 7));
+ *   delete server;
+ */
+methodmap Source2ModModule < Handle
+{
+	/** null when no such module is loaded. */
+	public native Source2ModModule(const char[] name);
+
+	/** The first match of an IDA-style pattern ("48 8B ? ? 89"), optionally in one section (".text"). */
+	public native SchemaObject FindPattern(const char[] pattern, const char[] section = "");
+
+	/** An exported or debug symbol. */
+	public native SchemaObject GetFunctionByName(const char[] symbol);
+
+	/** The vtable of a class by its RTTI name ("CCSPlayerController"); decorated: the name is mangled. */
+	public native SchemaObject GetVirtualTable(const char[] className, bool decorated = false);
+
+	/** The vtable of a non-virtual base's sub-object, found through the RTTI. */
+	public native SchemaObject GetVirtualTableByBase(const char[] className, const char[] baseName, bool decorated = false);
+
+	/** The vtable of the sub-object at an offset inside the class. */
+	public native SchemaObject GetVirtualTableByOffset(const char[] className, int offset, bool decorated = false);
+
+	/** Where the module is loaded. */
+	property SchemaObject Base
+	{
+		public native get();
+	}
+
+	/** @return Bytes written */
+	public native int GetName(char[] buffer, int maxlen);
+	public native int GetPath(char[] buffer, int maxlen);
+
+	/** A section (".text", ".rdata", ".data"): where it starts and how many bytes it has. @return false when there is none */
+	public native bool GetSection(const char[] name, SchemaObject &start, int &size);
+}
+
+/**
+ * Steps from an address (ISource2ModMemory). Every one takes and gives a
+ * SchemaObject; a null one is an error.
+ */
+methodmap Source2ModMemory
+{
+	/** The address `offset` bytes on (negative goes back). */
+	public static native SchemaObject Offset(SchemaObject address, int offset);
+
+	/** The pointer stored at the address, `times` over; 0 when one is null. */
+	public static native SchemaObject Deref(SchemaObject address, int times = 1);
+
+	/** The target of the call / jmp rel32 at the address. */
+	public static native SchemaObject FollowNearCall(SchemaObject address, int opcodeOffset = 1, int nextInstructionOffset = 5);
+
+	/** What a rip-relative operand at registerOffset points at (lea/mov reg, [rip+x]: 3 and 7). */
+	public static native SchemaObject ResolveRelativeAddress(SchemaObject address, int registerOffset = 0, int nextInstructionOffset = 4);
+
+	/** "0x7f12..." for a log line; "0x0" for null. @return Bytes written */
+	public static native int Format(SchemaObject address, char[] buffer, int maxlen);
+
+	/** to - from in bytes (an offset inside one module or object). */
+	public static native int Distance(SchemaObject from, SchemaObject to);
 }
 
 /**
@@ -136,6 +214,38 @@ methodmap Source2ModFunction < Handle
 
 	/** The next parameter; `this` of a member function is the first. */
 	public native void AddParam(Source2ModType type);
+
+	/**
+	 * What the function is: for one from Find, as its gamedata entry has it;
+	 * for one the script built, as built (FromVirtual* are virtuals and
+	 * members). `this` of a member function is parameter 0.
+	 */
+	property Source2ModType ReturnType
+	{
+		public native get();
+	}
+
+	property int ParamCount
+	{
+		public native get();
+	}
+
+	public native Source2ModType GetParamType(int index);
+
+	/** Called through the vtable of the object it is called on. */
+	property bool IsVirtual
+	{
+		public native get();
+	}
+
+	/** A member function: `this` is its first parameter. */
+	property bool IsMember
+	{
+		public native get();
+	}
+
+	/** The gamedata name; "" for one the script built. @return Bytes written */
+	public native int GetName(char[] buffer, int maxlen);
 
 	/**
 	 * Whether every Call* goes past the hooks on the function (all plugins',
