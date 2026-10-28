@@ -40,10 +40,12 @@
 * @brief Interface for HTTP requests.
 *
 * Requests go out through Steam's own HTTP client, which the game server already
-* has, so there is no curl to link and nothing to pump. Steam only hands that
-* client over once the API has activated, which happens after level startup --
-* requests made before then are queued and sent when it does, so a plugin does
-* not have to care whether it is early.
+* has. Where Steam cannot take one, the core's own client (Boost.Beast) does:
+* before the Steam API has activated (after level startup), when Steam refuses
+* a request, and when Steam loses a GET, HEAD, PUT or DELETE without an answer
+* (a POST or PATCH is never sent twice). A plugin does not have to care whether
+* it is early. With core.json's HttpFallback off it is Steam only, and requests
+* made before the API activates are queued until it does.
 *
 * Responses come back on the main thread.
   */
@@ -52,11 +54,31 @@
 #define _INCLUDE_ISOURCE2MOD_HTTP_H
 
 #pragma once
+#include <string>
+#include <utility>
+#include <vector>
+
+// Before ISource2ModJSON.h and ISource2ModPlugin.h: ISource2ModWebSockets.h,
+// which they pull in, uses it too.
+
+/**
+
+* @brief One request or response header.
+  */
+struct Source2ModHTTPHeader
+{
+    Source2ModHTTPHeader() = default;
+    Source2ModHTTPHeader(std::string name, std::string value)
+        : m_sName(std::move(name)), m_sValue(std::move(value))
+    {
+    }
+
+    std::string m_sName;
+    std::string m_sValue;
+};
+
 #include "ISource2ModJSON.h"
 #include "ISource2ModPlugin.h"
-
-#include <string>
-#include <vector>
 
 /* =========================
 Request types
@@ -76,21 +98,6 @@ enum class ESource2ModHTTPMethod : int
     Head,
 };
 
-/**
-
-* @brief One request or response header.
-  */
-struct Source2ModHTTPHeader
-{
-    Source2ModHTTPHeader() = default;
-    Source2ModHTTPHeader(std::string name, std::string value)
-        : m_sName(std::move(name)), m_sValue(std::move(value))
-    {
-    }
-
-    std::string m_sName;
-    std::string m_sValue;
-};
 
 /**
 
@@ -126,7 +133,8 @@ Core Source2Mod HTTP
 
 /**
 
-* @brief Issues HTTP requests through Steam's HTTP client.
+* @brief Issues HTTP requests through Steam's HTTP client, or the core's own
+*        where Steam cannot (see the file comment).
 *
 * @code
 * HTTP_GET("https://example.com/api", [](const Source2ModHTTPResponse& r)
@@ -147,16 +155,18 @@ public:
 
     /**
 
-    * @brief Whether Steam's HTTP client is available yet.
+    * @brief Whether a request goes out right away.
     *
-    * Requests made while this is false are queued, not dropped, so checking is
-    * only worth it to avoid building a body you cannot send.
+    * Always true unless HttpFallback is off and Steam's HTTP client is not
+    * there yet. Requests made while this is false are queued, not dropped, so
+    * checking is only worth it to avoid building a body you cannot send.
       */
     virtual bool IsAvailable() const = 0;
 
     /**
 
-    * @brief Number of requests waiting for Steam's HTTP client.
+    * @brief Number of requests waiting for Steam's HTTP client (only ever
+    *        non-zero with HttpFallback off).
       */
     virtual int PendingCount() const = 0;
 

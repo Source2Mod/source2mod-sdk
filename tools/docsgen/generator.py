@@ -1,6 +1,6 @@
 """
 Source2Mod
-Copyright (C) 2025-2026 Michal "Slynx (˙·٠● S l y n x ●٠·˙)" Přikryl.
+Copyright (C) 2025-2026 Michal "Slynx (˙·٠● S l y n x ●٠·˙)" Přikryl.
 All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under
@@ -15,7 +15,7 @@ details.
 You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 
-As a special exception, Michal "Slynx (˙·٠● S l y n x ●٠·˙)" Přikryl
+As a special exception, Michal "Slynx (˙·٠● S l y n x ●٠·˙)" Přikryl
 gives you permission to link the code of this program
 (as well as its derivative works) to "Counter-Strike 2," "Source 2,"
 "Steam," and any Game MODs or server software running on software by
@@ -26,7 +26,7 @@ Additionally, this exception applies to all derivative works unless
 otherwise stated in LICENSE.txt.
 
 Authors:
-    - Michal "Slynx (˙·٠● S l y n x ●٠·˙)" Přikryl
+    - Michal "Slynx (˙·٠● S l y n x ●٠·˙)" Přikryl
 
 Project: Source2Mod
 
@@ -81,7 +81,7 @@ API_GROUPS = [
                   'ISource2ModScripts', 'ISource2ModMaps', 'ISource2ModFeatures']),
     ('Engine', ['ISource2ModHooks', 'ISource2ModHookContexts', 'ISource2ModFunctions', 'ISource2ModAddresses', 'ISource2ModKHook',
                 'ISource2ModGameConfig', 'ISource2ModGameSystems', 'ISource2ModMemory', 'ISource2ModModule', 'ISource2ModSchemaMethods', 'Schema', 'consts']),
-    ('Services', ['ISource2ModHTTP', 'ISource2ModJSON', 'ISource2ModConfigs', 'ISource2ModSQL', 'ISource2ModCookies', 'ISource2ModGeoIP',
+    ('Services', ['ISource2ModHTTP', 'ISource2ModWebSockets', 'ISource2ModJSON', 'ISource2ModConfigs', 'ISource2ModSQL', 'ISource2ModCookies', 'ISource2ModGeoIP',
                   'ISource2ModFiles', 'ISource2ModPaths', 'ISource2ModUtils']),
 ]
 

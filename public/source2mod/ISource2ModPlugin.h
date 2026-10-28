@@ -94,6 +94,7 @@ class ISource2ModFunctions;
 class ISource2ModHooks;
 class ISource2ModTranslations;
 class ISource2ModUtils;
+class ISource2ModWebSockets;
 class ISource2ModCommands;
 class ISource2ModConfigs;
 class ISource2ModConVars;
@@ -156,6 +157,7 @@ class ISource2ModSchemaMethods;
 #include "ISource2ModFunctions.h"
 #include "ISource2ModTranslations.h"
 #include "ISource2ModUtils.h"
+#include "ISource2ModWebSockets.h"
 
 /* =========================
 Interface status
@@ -570,6 +572,7 @@ Globals
     ISource2ModFunctions*       g_pSource2ModFunctions       = nullptr; \
     ISource2ModTranslations*    g_pSource2ModTranslations    = nullptr; \
     ISource2ModUtils*           g_pSource2ModUtils           = nullptr; \
+    ISource2ModWebSockets*      g_pSource2ModWebSockets      = nullptr; \
     ISource2ModTransmit*        g_pSource2ModTransmit        = nullptr; \
     ISource2ModNatives*         g_pSource2ModNatives         = nullptr; \
     ISource2ModSchemaMethods*   g_pSource2ModSchemaMethods   = nullptr;
@@ -628,6 +631,7 @@ Globals
     extern ISource2ModFunctions*       g_pSource2ModFunctions; \
     extern ISource2ModTranslations*    g_pSource2ModTranslations; \
     extern ISource2ModUtils*           g_pSource2ModUtils; \
+    extern ISource2ModWebSockets*      g_pSource2ModWebSockets; \
     extern ISource2ModTransmit*        g_pSource2ModTransmit; \
     extern ISource2ModNatives*         g_pSource2ModNatives; \
     extern ISource2ModSchemaMethods*   g_pSource2ModSchemaMethods; \
@@ -672,6 +676,7 @@ Globals
     g_pSource2ModFunctions       = (ISource2ModFunctions*)      (api)->Source2ModFactory(SOURCE2MOD_FUNCTIONS_INTERFACE,       nullptr, nullptr); \
     g_pSource2ModTranslations    = (ISource2ModTranslations*)   (api)->Source2ModFactory(SOURCE2MOD_TRANSLATIONS_INTERFACE,    nullptr, nullptr); \
     g_pSource2ModUtils           = (ISource2ModUtils*)          (api)->Source2ModFactory(SOURCE2MOD_UTILS_INTERFACE,           nullptr, nullptr); \
+    g_pSource2ModWebSockets      = (ISource2ModWebSockets*)     (api)->Source2ModFactory(SOURCE2MOD_WEBSOCKETS_INTERFACE,      nullptr, nullptr); \
     g_pSource2ModTransmit        = (ISource2ModTransmit*)       (api)->Source2ModFactory(SOURCE2MOD_TRANSMIT_INTERFACE,        nullptr, nullptr); \
     g_pSource2ModNatives         = (ISource2ModNatives*)        (api)->Source2ModFactory(SOURCE2MOD_NATIVES_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModSchemaMethods   = (ISource2ModSchemaMethods*)  (api)->Source2ModFactory(SOURCE2MOD_SCHEMAMETHODS_INTERFACE,   nullptr, nullptr);
