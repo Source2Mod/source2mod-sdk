@@ -63,24 +63,6 @@ enum ESource2ModAuthId
     SOURCE2MOD_AUTHID_STEAMID64,     ///< 76561197960290418
 };
 
-/// What a client answered a QueryClientConVar (SourceMod's ConVarQueryResult).
-enum ESource2ModConVarQueryResult
-{
-    SOURCE2MOD_CVARQUERY_CANCELLED = -1, ///< the client left before it answered
-    SOURCE2MOD_CVARQUERY_OKAY = 0,       ///< the value is the client's
-    SOURCE2MOD_CVARQUERY_NOTFOUND,       ///< the client has no such ConVar
-    SOURCE2MOD_CVARQUERY_NOTVALID,       ///< a ConCommand, not a ConVar
-    SOURCE2MOD_CVARQUERY_PROTECTED,      ///< FCVAR_PROTECTED, the value is withheld
-};
-
-/**
- * @brief The answer to a QueryClientConVar.
- * @param cookie What QueryClientConVar returned.
- * @param value  The client's value; empty unless the result is OKAY.
- */
-using ClientConVarQueryCallback = Source2ModCallback<void(CPlayerSlot slot, int cookie, ESource2ModConVarQueryResult result,
-                                                         const char* name, const char* value)>;
-
 class CServerSideClient;
 class IGameEvent;
 
@@ -137,6 +119,7 @@ public:
      * callback runs when the client answers, or with CANCELLED when it
      * disconnects first. A client that never answers never calls it, so a
      * caller that needs an answer keeps its own timeout.
+     * ISource2ModConVars::QueryClientConVar is the same call.
      *
      * @return A cookie the callback is handed back, or -1 (a bot, no client,
      *         no net channel) -- the callback is then never called.
@@ -146,6 +129,7 @@ public:
     /**
      * @brief Sets a replicated ConVar's value on one client only (NET_SetConVar);
      * the server's own value and every other client stay as they are.
+     * ISource2ModConVars::ReplicateConVar is the same call.
      * @return false when the slot has no net channel (a bot, no client).
      */
     virtual bool ReplicateConVar(CPlayerSlot slot, const char* name, const char* value) = 0;
@@ -167,11 +151,13 @@ public:
     /// Runs a command on the client's own console, as if typed there.
     virtual void ExecuteClientCommand(CPlayerSlot slot, const char* command) = 0;
     /// Runs a server ConCommand on the client's behalf (its slot as the
-    /// command context); nothing goes over the wire.
+    /// command context); nothing goes over the wire. Both are on
+    /// ISource2ModCommands too.
     virtual void ExecuteClientCommandFromServer(CPlayerSlot slot, const char* command) = 0;
 
     /// Fires @p event to this client's legacy listener only. Does not take
-    /// ownership: the caller still frees it.
+    /// ownership: the caller still frees it. ISource2ModEvents::FireEventToClient
+    /// is the same call.
     virtual void FireEventToClient(CPlayerSlot slot, IGameEvent* event) = 0;
 
     /**

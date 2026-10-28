@@ -171,4 +171,7 @@ methodmap Source2ModEvents
 	public static native int HookGameEvent(const char[] name, Source2ModGameEventHandler handler, bool post);
 
 	public static native bool UnhookGameEvent(int id);
+
+	/** CServerSideClient.FireEventToClient: to this client's legacy listener only; the event stays the script's. */
+	public static native void FireEventToClient(CPlayerSlot slot, IGameEvent event);
 }

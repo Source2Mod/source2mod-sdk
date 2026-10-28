@@ -52,6 +52,30 @@
 #define _INCLUDE_ISOURCE2MOD_CONVARS_H
 
 #pragma once
+#include "ISource2ModTypes.h"
+
+#include <playerslot.h>
+
+// Before ISource2ModPlugin.h: ISource2ModClients.h, which it pulls in, uses them too.
+
+/// What a client answered a QueryClientConVar (SourceMod's ConVarQueryResult).
+enum ESource2ModConVarQueryResult
+{
+    SOURCE2MOD_CVARQUERY_CANCELLED = -1, ///< the client left before it answered
+    SOURCE2MOD_CVARQUERY_OKAY = 0,       ///< the value is the client's
+    SOURCE2MOD_CVARQUERY_NOTFOUND,       ///< the client has no such ConVar
+    SOURCE2MOD_CVARQUERY_NOTVALID,       ///< a ConCommand, not a ConVar
+    SOURCE2MOD_CVARQUERY_PROTECTED,      ///< FCVAR_PROTECTED, the value is withheld
+};
+
+/**
+ * @brief The answer to a QueryClientConVar.
+ * @param cookie What QueryClientConVar returned.
+ * @param value  The client's value; empty unless the result is OKAY.
+ */
+using ClientConVarQueryCallback = Source2ModCallback<void(CPlayerSlot slot, int cookie, ESource2ModConVarQueryResult result,
+                                                         const char* name, const char* value)>;
+
 #include "ISource2ModPlugin.h"
 
 #include <convar.h>
@@ -89,7 +113,7 @@ Core Source2Mod ConVars
 using ConVarChangeHandler = Source2ModCallback<void(ConVarRefAbstract* ref, CSplitScreenSlot slot,
                                                   const char* pszNewValue, const char* pszOldValue)>;
 
-#define SOURCE2MOD_CONVARS_INTERFACE "ISource2ModConVars003"
+#define SOURCE2MOD_CONVARS_INTERFACE "ISource2ModConVars004"
 
 /// Access index meaning "no such ConVar" -- the engine's own invalid index.
 /// 0 is a real ConVar, so test against this, never against zero.
@@ -299,6 +323,24 @@ public:
     *        the engine cannot remove a command, only make it unreachable.
       */
     virtual void TrackConCommand(PluginId owner, ConCommandRef* ref) = 0;
+
+    /**
+     * @brief ISource2ModClients::QueryClientConVar: asks a client for any of
+     * its ConVars (SVC_GetCvarValue); the callback runs when it answers, or
+     * with CANCELLED when it disconnects first.
+     *
+     * @return A cookie the callback is handed back, or -1 (a bot, no client,
+     *         no net channel) -- the callback is then never called.
+     */
+    virtual int QueryClientConVar(CPlayerSlot slot, const char* name, ClientConVarQueryCallback callback) = 0;
+
+    /**
+     * @brief ISource2ModClients::ReplicateConVar: sets a replicated ConVar's
+     * value on one client only (NET_SetConVar); the server's own value and
+     * every other client stay as they are.
+     * @return false when the slot has no net channel (a bot, no client).
+     */
+    virtual bool ReplicateConVar(CPlayerSlot slot, const char* name, const char* value) = 0;
 };
 
 #define CVAR_IDX(name)                  g_pSource2ModConVars->GetConvarAccessIndexByName(name)

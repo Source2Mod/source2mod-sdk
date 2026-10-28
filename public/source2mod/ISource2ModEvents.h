@@ -91,7 +91,7 @@ Core Source2Mod Events
 * * Modify event data
 * * Block event propagation
     */
-#define SOURCE2MOD_EVENTS_INTERFACE "ISource2ModEvents002"
+#define SOURCE2MOD_EVENTS_INTERFACE "ISource2ModEvents003"
 
 class ISource2ModEvents
 {
@@ -128,6 +128,10 @@ public:
      * @return true when it was still there
      */
     virtual bool UnhookGameEvent(Source2ModEventHookId id) = 0;
+
+    /// ISource2ModClients::FireEventToClient: fires @p event to this client's
+    /// legacy listener only. Does not take ownership: the caller still frees it.
+    virtual void FireEventToClient(CPlayerSlot slot, IGameEvent* event) = 0;
 };
 
 /**

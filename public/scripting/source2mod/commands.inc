@@ -99,3 +99,9 @@ methodmap Source2ModCommands
 	/** Answers where the command came from: the caller's console or chat. Formatted. */
 	public static native void ReplyToCommand(Source2ModCommandContext context, const char[] format, any ...);
 }
+
+	/** CServerSideClient.ExecuteClientCommand: runs a command on the client's own console, as if typed there. */
+	public static native void ExecuteClientCommand(CPlayerSlot slot, const char[] command);
+
+	/** CServerSideClient.ExecuteClientCommandFromServer: runs a server ConCommand on the client's behalf; nothing goes over the wire. */
+	public static native void ExecuteClientCommandFromServer(CPlayerSlot slot, const char[] command);

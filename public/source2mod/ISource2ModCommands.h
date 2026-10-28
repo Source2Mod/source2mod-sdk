@@ -186,7 +186,7 @@ Core Source2Mod Commands
 *
 * @note Every registration belongs to the plugin whose handler it is.
   */
-#define SOURCE2MOD_COMMANDS_INTERFACE "ISource2ModCommands004"
+#define SOURCE2MOD_COMMANDS_INTERFACE "ISource2ModCommands005"
 
 class ISource2ModCommands
 {
@@ -305,6 +305,14 @@ public:
      * newline is added.
      */
     virtual void ReplyToCommand(const Source2ModCommandContext& ctx, const char* pszMessage) = 0;
+
+    /// ISource2ModClients::ExecuteClientCommand: runs a command on the
+    /// client's own console, as if typed there.
+    virtual void ExecuteClientCommand(CPlayerSlot slot, const char* command) = 0;
+    /// ISource2ModClients::ExecuteClientCommandFromServer: runs a server
+    /// ConCommand on the client's behalf (its slot as the command context);
+    /// nothing goes over the wire.
+    virtual void ExecuteClientCommandFromServer(CPlayerSlot slot, const char* command) = 0;
 };
 
 /// RegisterConCommand(name, handler) or RegisterConCommand(name, handler, permission).

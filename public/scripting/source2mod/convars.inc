@@ -29,6 +29,7 @@
 
 #include <source2mod/core>
 #include <source2mod/types>
+#include <source2mod/clients>
 
 // ConVar / command flags, CS2's values (s2sdk tier0/convar.h). The 64-bit
 // ones above bit 31 go through Source2ModConVars.GetFlags / SetFlags.
@@ -301,6 +302,23 @@ methodmap Source2ModConVars
 	public static native int HookConVarChange(Source2ModConVarChangeHandler handler);
 
 	public static native bool UnhookConVarChange(int id);
+
+	/**
+	 * CServerSideClient.QueryConVar on a slot's client: asks it for any of its
+	 * ConVars; callback runs when it answers (CANCELLED when it leaves first).
+	 *
+	 * @return A cookie the callback is handed back, -1 when the slot has no
+	 *         net channel (the callback is then never called)
+	 */
+	public static native int QueryClientConVar(CPlayerSlot slot, const char[] name, ConVarQueryFinished callback, any value = 0);
+
+	/**
+	 * CServerSideClient.ReplicateConVar on a slot's client: a replicated
+	 * ConVar's value on that client only; the server's and everyone else's stay.
+	 *
+	 * @return false when the slot has no net channel (a bot, no client)
+	 */
+	public static native bool ReplicateConVar(CPlayerSlot slot, const char[] name, const char[] value);
 
 	/**
 	 * The ISource2ModConVars accessors ConVar's own properties do not cover;
