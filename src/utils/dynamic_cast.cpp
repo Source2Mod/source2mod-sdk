@@ -322,7 +322,7 @@ namespace
         t_InModuleLookup = true;
 
         bool described = false;
-        if (ISource2ModModule* module = ISource2ModModule::New(address))
+        if (ISource2ModModule* module = g_pSource2ModModules->GetFromAddress(address.GetPtr()))
         {
             while (g_RttiSectionsLock.test_and_set(std::memory_order_acquire))
                 ;
@@ -344,7 +344,6 @@ namespace
             }
 
             g_RttiSectionsLock.clear(std::memory_order_release);
-            g_pSource2ModAPI->FreeModule(module);
         }
 
         t_InModuleLookup = false;

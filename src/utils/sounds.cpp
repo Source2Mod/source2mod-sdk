@@ -41,5 +41,5 @@ SOURCE2MOD_GLOBALVARS();
 
 ISource2ModSound* ISource2ModSound::New(const char* name)
 {
-    return g_pSource2ModSounds ? g_pSource2ModSounds->CreateSound(g_PluginID, name) : nullptr;
+    return g_pSource2ModSounds ? g_pSource2ModSounds->CreateSound(name) : nullptr;
 }

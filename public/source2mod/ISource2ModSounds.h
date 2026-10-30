@@ -61,6 +61,8 @@
 #define _INCLUDE_ISOURCE2MOD_SOUNDS_H
 
 #pragma once
+
+#include <source2mod/ISource2ModTypes.h>
 #include "ISource2ModPlugin.h"
 #include "ISource2ModTypes.h"
 
@@ -294,7 +296,7 @@ public:
     /**
      * @brief Creates a sound: listener-sourced, volume and pitch 1, no recipients.
      *
-     * Equivalent to `g_pSource2ModSounds->CreateSound(g_PluginID, name)`. Release
+     * Equivalent to `g_pSource2ModSounds->CreateSound(name)`. Release
      * with `delete` or `g_pSource2ModSounds->DestroySound()`.
      *
      *     ISource2ModSound* music = ISource2ModSound::New("jb.duel");
@@ -334,7 +336,7 @@ using SoundHook = Source2ModCallback<Action(ISource2ModSound* sound)>;
 Core Source2Mod Sounds
 ========================= */
 
-#define SOURCE2MOD_SOUNDS_INTERFACE "ISource2ModSounds002"
+#define SOURCE2MOD_SOUNDS_INTERFACE "ISource2ModSounds003"
 
 class ISource2ModSounds
 {
@@ -354,7 +356,7 @@ public:
      * @param owner Plugin ID that owns the sound
      * @param name  Sound event name, may be set later
      */
-    virtual ISource2ModSound* CreateSound(PluginId owner, const char* name = nullptr) = 0;
+    virtual ISource2ModSound* CreateSound(const char* name = nullptr) = 0;
     virtual void DestroySound(ISource2ModSound* sound) = 0;
 
     /* =========================

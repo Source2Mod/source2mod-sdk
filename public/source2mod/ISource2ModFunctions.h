@@ -38,6 +38,9 @@
 
 #pragma once
 
+#include <source2mod/ISource2ModTypes.h>
+
+#include "ISource2ModModule.h"
 #include "ISource2ModTypes.h"
 
 #include <cstddef>
@@ -99,7 +102,7 @@ class QAngle;
  * on the console and returns a value-initialised result.
  */
 
-#define SOURCE2MOD_FUNCTIONS_INTERFACE "ISource2ModFunctions002"
+#define SOURCE2MOD_FUNCTIONS_INTERFACE "ISource2ModFunctions003"
 
 /**
  * How a value crosses into a game function and back. The numbers are
@@ -348,18 +351,21 @@ public:
     virtual ~ISource2ModFunctions() = default;
 
     /**
-     * The function a gamedata entry with a "function" object describes.
+     * The function a gamedata entry with a "function" object describes: its
+     * signature, or a virtual's offset ("this" required). A virtual hooks per
+     * instance or class; "vtable": { "module", "class", "base" } in the object
+     * ties it to one class's vtable, for HookTarget::All().
      *
      * @return nullptr when there is no such entry, it has no "function", or
-     *         its signature does not match the running game (the reason is on
-     *         the console).
+     *         its signature or vtable does not match the running game (the
+     *         reason is on the console).
      */
     virtual ISource2ModFunction* Find(const char* name) = 0;
 
     /**
      * A function described here instead of in gamedata.
      *
-     * @param owner       The plugin it belongs to (g_PluginID); freed when it unloads.
+     * @param owner       The plugin it belongs to; the overload without it passes this plugin; freed when it unloads.
      * @param address     The function; nullptr for a virtual.
      * @param vtable      For a virtual called through one class's vtable whatever the
      *                    object's class; nullptr to use the object's own.
@@ -367,7 +373,7 @@ public:
      * @param isMember    Whether the first parameter is `this` (a virtual always is).
      * @param params      The parameter types, `this` included.
      */
-    virtual ISource2ModFunction* Create(PluginId owner, void* address, void** vtable, int vtableIndex, bool isMember,
+    virtual ISource2ModFunction* Create(void* address, void** vtable, int vtableIndex, bool isMember,
                                         Source2ModType returnType, const Source2ModType* params, int count) = 0;
 
     /** Frees one from Create() / From*(). One from Find() is left alone. */
@@ -381,33 +387,33 @@ public:
 
     /// A gamedata entry (its signature, symbol or -- a virtual -- offset),
     /// with the types given here instead of in a "function" object.
-    virtual ISource2ModFunction* FromGameConfig(PluginId owner, const char* name, const FunctionTypes& types) = 0;
+    virtual ISource2ModFunction* FromGameConfig(const char* name, const FunctionTypes& types) = 0;
 
     /// A signature of the plugin's own in a module ("server"), optionally only
     /// in one section (".text").
-    virtual ISource2ModFunction* FromSignature(PluginId owner, const char* module, const char* signature,
+    virtual ISource2ModFunction* FromSignature(ISource2ModModule* module, const char* signature,
                                                const FunctionTypes& types, const char* section = "") = 0;
 
     /// The function a matched call / jmp / lea refers to: the rel32 at
     /// @p offset from the match, relative to the next instruction at
     /// @p nextInstructionOffset (a call or jmp at the start: 1, 5).
-    virtual ISource2ModFunction* FromSignatureRelative(PluginId owner, const char* module, const char* signature, int offset,
+    virtual ISource2ModFunction* FromSignatureRelative(ISource2ModModule* module, const char* signature, int offset,
                                                        int nextInstructionOffset, const FunctionTypes& types,
                                                        const char* section = "") = 0;
 
     /// An exported or debug symbol in a module.
-    virtual ISource2ModFunction* FromSymbol(PluginId owner, const char* module, const char* symbol, const FunctionTypes& types) = 0;
+    virtual ISource2ModFunction* FromSymbol(ISource2ModModule* module, const char* symbol, const FunctionTypes& types) = 0;
 
     /// Slot @p index of one class's vtable (an RTTI name in a module; @p baseName
     /// picks a secondary base's vtable): called on any object, hooked on that
     /// class.
-    virtual ISource2ModFunction* FromVirtualTable(PluginId owner, const char* module, const char* className, int index,
+    virtual ISource2ModFunction* FromVirtualTable(ISource2ModModule* module, const char* className, int index,
                                                   const FunctionTypes& types, const char* baseName = "") = 0;
 
     /// Slot @p index of whatever object it is called / hooked on (an engine
-    /// interface: FromVirtual(g_PluginID, KHook::GetVtableIndex(&ISource2Server::GameFrame), ...)
+    /// interface: FromVirtual(KHook::GetVtableIndex(&ISource2Server::GameFrame), ...)
     /// with HookTarget::Instance(g_pSource2Server)).
-    virtual ISource2ModFunction* FromVirtual(PluginId owner, int index, const FunctionTypes& types) = 0;
+    virtual ISource2ModFunction* FromVirtual(int index, const FunctionTypes& types) = 0;
 };
 
 /**

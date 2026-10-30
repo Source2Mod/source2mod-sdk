@@ -50,12 +50,12 @@
  *
  * @code
  * auto* tr = g_pSource2ModTranslations;
- * tr->AddPhrase(g_PluginID, "Welcome", "en", "Welcome, {1}!", "{1:s}");
- * tr->AddPhrase(g_PluginID, "Welcome", "cze", "Vítej, {1}!");
+ * tr->AddPhrase("Welcome", "en", "Welcome, {1}!", "{1:s}");
+ * tr->AddPhrase("Welcome", "cze", "Vítej, {1}!");
  *
  * const char* args[] = { player->GetPlayerName() };
  * char text[256];
- * tr->FormatPhrase(g_PluginID, "Welcome", player->GetPlayerSlot(), args, 1, text, sizeof(text));
+ * tr->FormatPhrase("Welcome", player->GetPlayerSlot(), args, 1, text, sizeof(text));
  * @endcode
  */
 
@@ -63,6 +63,8 @@
 #define _INCLUDE_ISOURCE2MOD_TRANSLATIONS_H
 
 #pragma once
+
+#include <source2mod/ISource2ModTypes.h>
 #include "ISource2ModPlugin.h"
 
 #include <cstddef>
@@ -74,7 +76,7 @@
 Core Source2Mod Translations
 ========================= */
 
-#define SOURCE2MOD_TRANSLATIONS_INTERFACE "ISource2ModTranslations002"
+#define SOURCE2MOD_TRANSLATIONS_INTERFACE "ISource2ModTranslations003"
 
 class ISource2ModTranslations
 {
@@ -120,14 +122,14 @@ public:
      *        for every language (SourceMod's phrase files) into @p owner's phrases.
      * @return false (and why in @p error) when the base file is missing or broken.
      */
-    virtual bool LoadPhraseFile(PluginId owner, const char* file, char* error, size_t maxlen) = 0;
+    virtual bool LoadPhraseFile(const char* file, char* error, size_t maxlen) = 0;
 
     /**
      * @brief Loads phrases from JSON: {"<phrase>": {"#format": "{1:s}",
      *        "<code>": "<text>", ...}, ...}. Unknown language codes are added.
      * @return false (and why in @p error) for text that is not such an object.
      */
-    virtual bool LoadPhrasesJson(PluginId owner, const char* json, char* error, size_t maxlen) = 0;
+    virtual bool LoadPhrasesJson(const char* json, char* error, size_t maxlen) = 0;
 
     /**
      * @brief Adds or replaces one text of a phrase.
@@ -136,20 +138,20 @@ public:
      * @param format   The phrase's placeholder format ("{1:s},{2:d}"); nullptr
      *                 keeps the one it has.
      */
-    virtual void AddPhrase(PluginId owner, const char* phrase, const char* language, const char* text, const char* format = nullptr) = 0;
+    virtual void AddPhrase(const char* phrase, const char* language, const char* text, const char* format = nullptr) = 0;
 
     /**
      * @brief Removes a phrase's text in one language, or the whole phrase for
      *        a null / empty @p language.
      * @return false when there was nothing to remove.
      */
-    virtual bool RemovePhrase(PluginId owner, const char* phrase, const char* language = nullptr) = 0;
+    virtual bool RemovePhrase(const char* phrase, const char* language = nullptr) = 0;
 
     /// Drops every phrase of @p owner (a plugin's go when it unloads anyway).
-    virtual void ClearPhrases(PluginId owner) = 0;
+    virtual void ClearPhrases() = 0;
 
-    virtual bool PhraseExists(PluginId owner, const char* phrase) = 0;
-    virtual bool IsTranslatedFor(PluginId owner, const char* phrase, int language) = 0;
+    virtual bool PhraseExists(const char* phrase) = 0;
+    virtual bool IsTranslatedFor(const char* phrase, int language) = 0;
 
     /* -------- text -------- */
 
@@ -160,14 +162,14 @@ public:
      * @return Bytes written; the fallbacks (server language, English, the
      *         phrase name) mean there always is a text.
      */
-    virtual size_t Translate(PluginId owner, const char* phrase, CPlayerSlot target, char* buffer, size_t maxlen) = 0;
+    virtual size_t Translate(const char* phrase, CPlayerSlot target, char* buffer, size_t maxlen) = 0;
 
     /**
      * @brief The text for a target with its {1}..{n} replaced by @p args.
      *        The values are text already; the phrase's format is not applied.
      * @return Bytes written.
      */
-    virtual size_t FormatPhrase(PluginId owner, const char* phrase, CPlayerSlot target,
+    virtual size_t FormatPhrase(const char* phrase, CPlayerSlot target,
                                 const char* const* args, int numArgs, char* buffer, size_t maxlen) = 0;
 
     /**
@@ -180,7 +182,7 @@ public:
      *                 English, the phrase name.
      * @return Bytes written.
      */
-    virtual size_t TranslateLanguage(PluginId owner, const char* phrase, int language, char* buffer, size_t maxlen) = 0;
+    virtual size_t TranslateLanguage(const char* phrase, int language, char* buffer, size_t maxlen) = 0;
 };
 
 #endif //_INCLUDE_ISOURCE2MOD_TRANSLATIONS_H

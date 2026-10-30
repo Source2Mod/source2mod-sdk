@@ -71,6 +71,8 @@
 #define _INCLUDE_ISOURCE2MOD_MENUS_H
 
 #pragma once
+
+#include <source2mod/ISource2ModTypes.h>
 // Only the types: ISource2ModPlugin.h includes this header, and so do plugin
 // headers whose menus build on IBaseMenu, so it must not include the plugin
 // header back.
@@ -82,6 +84,8 @@
 // The same alias ISource2ModTypes.h declares, repeated so this header reads the
 // same whichever header of the SDK pulled it in first.
 using PluginId = int;
+
+class ISource2ModPlugin;
 
 #include <string>
 #include <vector>
@@ -675,7 +679,7 @@ Core Source2Mod Menus
 /**
  * @brief Interface for menu system management.
  */
-#define SOURCE2MOD_MENUS_INTERFACE "ISource2ModMenus007"
+#define SOURCE2MOD_MENUS_INTERFACE "ISource2ModMenus008"
 
 class ISource2ModMenus
 {
@@ -693,7 +697,7 @@ public:
      *       menu object and its option handlers live inside that plugin's
      *       library, and the next key press would go looking for them there.
      */
-    virtual void OpenCenterHtmlMenu(PluginId owner, CCSPlayerController* player, CenterHtmlMenu* menu) = 0;
+    virtual void OpenCenterHtmlMenu(CCSPlayerController* player, CenterHtmlMenu* menu) = 0;
 
     /**
      * @brief Gets active menu instance for player.
@@ -731,7 +735,11 @@ public:
      * @param player   Target player
      * @param instance Built with new by the caller; the core owns it from here
      */
-    virtual void OpenMenu(PluginId owner, CCSPlayerController* player, IMenuInstance* instance) = 0;
+    virtual void OpenMenu(CCSPlayerController* player, IMenuInstance* instance) = 0;
+
+    /// OpenMenu() on behalf of another plugin: the menu goes when @p owner
+    /// unloads (a menu library opening what its callers built).
+    virtual void OpenMenuFor(ISource2ModPlugin* owner, CCSPlayerController* player, IMenuInstance* instance) = 0;
 
     /* =========================
     ISource2ModMenus006
@@ -751,7 +759,7 @@ public:
     virtual IMenu* GetOpenMenu(CCSPlayerController* player) = 0;
 };
 
-#define OPEN_CENTER_HTML_MENU(player, menu)  g_pSource2ModMenus->OpenCenterHtmlMenu(g_PluginID, player, menu)
+#define OPEN_CENTER_HTML_MENU(player, menu)  g_pSource2ModMenus->OpenCenterHtmlMenu(player, menu)
 #define GET_ACTIVE_MENU(player)              g_pSource2ModMenus->GetActiveMenu(player)
 #define CLOSE_ACTIVE_MENU(player)            g_pSource2ModMenus->CloseActiveMenu(player)
 #define MENU_ON_KEY_PRESS(player, key)       g_pSource2ModMenus->OnKeyPress(player, key)

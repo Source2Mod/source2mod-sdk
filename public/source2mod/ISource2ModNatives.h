@@ -49,7 +49,7 @@
  * needed to call it.
  *
  * @code
- * g_pSource2ModNatives->AddNatives(g_PluginID, g_MyNatives);
+ * g_pSource2ModNatives->AddNatives(g_MyNatives);
  * @endcode
  *
  * Everything registered here goes when the plugin unloads: its natives
@@ -86,6 +86,8 @@
 #define _INCLUDE_ISOURCE2MOD_NATIVES_H
 
 #pragma once
+
+#include <source2mod/ISource2ModTypes.h>
 #include "ISource2ModTypes.h"
 
 #include <sp_vm_api.h>
@@ -95,7 +97,7 @@
 #include <string>
 #include <type_traits>
 
-#define SOURCE2MOD_NATIVES_INTERFACE "ISource2ModNatives002"
+#define SOURCE2MOD_NATIVES_INTERFACE "ISource2ModNatives003"
 
 /// A handle type registered through CreateHandleType(); 0 is none.
 using Source2ModHandleType = uint32_t;
@@ -409,12 +411,12 @@ public:
      * live plugin already registered is refused (and logged), the rest of the
      * list still goes in.
      *
-     * @param owner     The plugin's id (g_PluginID)
+     * @param owner     The plugin; the overload without it passes this plugin
      * @param natives   Name and function pairs, ending in { nullptr, nullptr };
      *                  copied, the array need not outlive the call
      * @return          false when any of them was refused
      */
-    virtual bool AddNatives(PluginId owner, const sp_nativeinfo_t* natives) = 0;
+    virtual bool AddNatives(const sp_nativeinfo_t* natives) = 0;
 
     /**
      * @brief Registers a library, what LibraryExists() and OnLibraryAdded()
@@ -425,7 +427,7 @@ public:
      *
      * @return false on an empty name
      */
-    virtual bool RegisterLibrary(PluginId owner, const char* name) = 0;
+    virtual bool RegisterLibrary(const char* name) = 0;
 
     /// @brief Whether a plugin (script or native) registered this library.
     virtual bool LibraryExists(const char* name) = 0;
@@ -453,7 +455,7 @@ public:
      *                  (CloseHandle / delete, the owning script unloading);
      *                  may be nullptr
      */
-    virtual Source2ModHandleType CreateHandleType(PluginId owner, const char* name, Source2ModHandleDestructor destroy) = 0;
+    virtual Source2ModHandleType CreateHandleType(const char* name, Source2ModHandleDestructor destroy) = 0;
 
     /**
      * @brief A new handle to `object`, owned by the script that `ctx` is --

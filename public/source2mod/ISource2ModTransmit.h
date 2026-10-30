@@ -72,6 +72,8 @@
 #define _INCLUDE_ISOURCE2MOD_TRANSMIT_H
 
 #pragma once
+
+#include <source2mod/ISource2ModTypes.h>
 #include "ISource2ModPlugin.h"
 #include "ISource2ModTypes.h"
 
@@ -199,7 +201,7 @@ using CheckTransmitHook = Source2ModCallback<void(ISource2ModTransmitInfo* const
 Core Source2Mod Transmit
 ========================= */
 
-#define SOURCE2MOD_TRANSMIT_INTERFACE "ISource2ModTransmit002"
+#define SOURCE2MOD_TRANSMIT_INTERFACE "ISource2ModTransmit003"
 
 class ISource2ModTransmit
 {
@@ -229,7 +231,7 @@ public:
      * @return false when the entity is a pawn, already hooked, or about to be
      *         deleted.
      */
-    virtual bool HookEntity(PluginId owner, CEntityInstance* entity, bool defaultVisible = true) = 0;
+    virtual bool HookEntity(CEntityInstance* entity, bool defaultVisible = true) = 0;
 
     /**
      * @brief Forgets an entity: sent as the engine decides from now on.
@@ -337,7 +339,7 @@ Helpers
 /**
  * @brief Shorthand accessors via g_pSource2ModTransmit.
  */
-#define TRANSMIT_HOOK_ENTITY(entity, ...)   g_pSource2ModTransmit->HookEntity(g_PluginID, entity, ##__VA_ARGS__)
+#define TRANSMIT_HOOK_ENTITY(entity, ...)   g_pSource2ModTransmit->HookEntity(entity, ##__VA_ARGS__)
 #define TRANSMIT_UNHOOK_ENTITY(entity)      g_pSource2ModTransmit->UnhookEntity(entity)
 #define TRANSMIT_SET_VISIBLE(entity, ...)   g_pSource2ModTransmit->SetVisible(entity, __VA_ARGS__)
 #define TRANSMIT_SET_BLOCK_ALL(entity, on)  g_pSource2ModTransmit->SetBlockAll(entity, on)

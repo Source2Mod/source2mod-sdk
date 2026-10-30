@@ -70,6 +70,8 @@
 #define _INCLUDE_ISOURCE2MOD_SCRIPTS_H
 
 #pragma once
+
+#include <source2mod/ISource2ModTypes.h>
 #include "ISource2ModPlugin.h"
 
 #include <entityhandle.h>
@@ -96,7 +98,7 @@ using ScriptMessageHandler = Source2ModCallback<void(const char* pszChannel, con
 Core Source2Mod Scripts
 ========================= */
 
-#define SOURCE2MOD_SCRIPTS_INTERFACE "ISource2ModScripts002"
+#define SOURCE2MOD_SCRIPTS_INTERFACE "ISource2ModScripts003"
 
 /**
  * @brief Runs cs_script scripts for plugins and carries messages both ways.
@@ -128,7 +130,7 @@ public:
      * @param bPersistent Spawn it again after a round restart or a map change
      * @return The `point_script` entity, or an invalid handle on failure
      */
-    virtual CEntityHandle LoadAsset(PluginId owner, const char* pszName, const char* pszAsset, bool bPersistent) = 0;
+    virtual CEntityHandle LoadAsset(const char* pszName, const char* pszAsset, bool bPersistent) = 0;
 
     /**
      * @brief Runs raw JavaScript source in a new `point_script`.
@@ -144,7 +146,7 @@ public:
      * @note A script that does not compile is reported by the game in the
      *       server console; the entity exists regardless.
      */
-    virtual CEntityHandle RunSource(PluginId owner, const char* pszName, const char* pszVirtualPath, const char* pszSource, bool bPersistent) = 0;
+    virtual CEntityHandle RunSource(const char* pszName, const char* pszVirtualPath, const char* pszSource, bool bPersistent) = 0;
 
     /**
      * @brief Runs a JavaScript file from the server's disk.
@@ -157,7 +159,7 @@ public:
      * @return The `point_script` entity, or an invalid handle when the file
      *         cannot be read or run
      */
-    virtual CEntityHandle RunFile(PluginId owner, const char* pszName, const char* pszFilePath, bool bPersistent) = 0;
+    virtual CEntityHandle RunFile(const char* pszName, const char* pszFilePath, bool bPersistent) = 0;
 
     /**
      * @brief Throws the script's entity away and runs the script again.
@@ -224,9 +226,9 @@ public:
 /**
  * @brief Shorthand accessors via g_pSource2ModScripts.
  */
-#define SCRIPTS_LOAD_ASSET(name, asset, persistent)       g_pSource2ModScripts->LoadAsset(g_PluginID, name, asset, persistent)
-#define SCRIPTS_RUN_SOURCE(name, path, source, persistent) g_pSource2ModScripts->RunSource(g_PluginID, name, path, source, persistent)
-#define SCRIPTS_RUN_FILE(name, file, persistent)          g_pSource2ModScripts->RunFile(g_PluginID, name, file, persistent)
+#define SCRIPTS_LOAD_ASSET(name, asset, persistent)       g_pSource2ModScripts->LoadAsset(name, asset, persistent)
+#define SCRIPTS_RUN_SOURCE(name, path, source, persistent) g_pSource2ModScripts->RunSource(name, path, source, persistent)
+#define SCRIPTS_RUN_FILE(name, file, persistent)          g_pSource2ModScripts->RunFile(name, file, persistent)
 #define SCRIPTS_FIRE_INPUT(name, input)                   g_pSource2ModScripts->FireInput(name, input)
 
 #define HOOK_SCRIPT_MESSAGE(channel, ...)   g_pSource2ModScripts->HookScriptMessage(channel, __VA_ARGS__)

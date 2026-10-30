@@ -339,34 +339,6 @@ public:
     Module factory
     ========================= */
 
-    /**
-
-    * @brief Creates and initialises a module wrapper by name.
-    *
-    * The returned object must be released with FreeModule().
-    *
-    * @param name Module name without extension (e.g. "server").
-    * @return Heap-allocated ISource2ModModule, or nullptr on failure.
-      */
-    virtual ISource2ModModule* LoadModule(const char* name) = 0;
-
-    /**
-
-    * @brief Creates and initialises a module wrapper from an address inside it.
-    *
-    * The returned object must be released with FreeModule().
-    *
-    * @param ptr Any address that belongs to the target module.
-    * @return Heap-allocated ISource2ModModule, or nullptr on failure.
-      */
-    virtual ISource2ModModule* LoadModuleFromMemory(uintptr_t ptr) = 0;
-
-    /**
-
-    * @brief Releases a module previously obtained from LoadModule() / LoadModuleFromMemory().
-      */
-    virtual void FreeModule(ISource2ModModule* module) = 0;
-
     /* =========================
     Engine interfaces
     ========================= */

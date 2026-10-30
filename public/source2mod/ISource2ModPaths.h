@@ -48,6 +48,8 @@
 #define _INCLUDE_ISOURCE2MOD_PATHS_H
 
 #pragma once
+
+#include <source2mod/ISource2ModTypes.h>
 #include "ISource2ModPlugin.h"
 
 /* =========================
@@ -72,7 +74,7 @@ Core Source2Mod Paths
 * The returned strings are owned by Source2Mod and stay valid for as long as
 * it is loaded; copy them if you need to keep one past that.
   */
-#define SOURCE2MOD_PATHS_INTERFACE "ISource2ModPaths001"
+#define SOURCE2MOD_PATHS_INTERFACE "ISource2ModPaths002"
 
 class ISource2ModPaths
 {
@@ -125,7 +127,7 @@ public:
     * @param owner Plugin ID to look up
     * @return The path, or nullptr when there is no such plugin
       */
-    virtual const char* PluginConfigDirectory(PluginId owner) = 0;
+    virtual const char* PluginConfigDirectory() = 0;
 };
 
 #define SOURCE2MOD_GAME_DIR()          g_pSource2ModPaths->GameDirectory()
@@ -138,6 +140,6 @@ public:
 /**
  * @brief This plugin's config directory; the plugin ID is filled in for you.
  */
-#define PLUGIN_CONFIG_DIR()         g_pSource2ModPaths->PluginConfigDirectory(g_PluginID)
+#define PLUGIN_CONFIG_DIR()         g_pSource2ModPaths->PluginConfigDirectory()
 
 #endif //_INCLUDE_ISOURCE2MOD_PATHS_H

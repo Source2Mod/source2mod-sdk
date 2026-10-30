@@ -54,6 +54,8 @@
 #define _INCLUDE_ISOURCE2MOD_SQL_H
 
 #pragma once
+
+#include <source2mod/ISource2ModTypes.h>
 #include "ISource2ModPlugin.h"
 
 #include <functional>
@@ -520,7 +522,7 @@ public:
 SQL client
 ========================= */
 
-#define SOURCE2MOD_SQL_INTERFACE "ISource2ModSQL001"
+#define SOURCE2MOD_SQL_INTERFACE "ISource2ModSQL002"
 
 class ISource2ModSQL
 {
@@ -538,7 +540,7 @@ public:
      *       Destroy(): the worker thread runs code, and the query callbacks
      *       are std::functions holding code, inside that plugin's library.
      */
-    virtual ISource2ModSQLConnection* CreateConnection(PluginId owner, Source2ModSQLConnectionInfo info) = 0;
+    virtual ISource2ModSQLConnection* CreateConnection(Source2ModSQLConnectionInfo info) = 0;
 
     /**
      * @brief Creates a handle that runs each of its queries on a connection of
@@ -554,7 +556,7 @@ public:
      *       pending callback is a std::function holding code inside that
      *       plugin's library.
      */
-    virtual ISource2ModSQLServerless* CreateServerless(PluginId owner, Source2ModSQLConnectionInfo info) = 0;
+    virtual ISource2ModSQLServerless* CreateServerless(Source2ModSQLConnectionInfo info) = 0;
     /**
      * @brief The connection details named @p name in configs/databases.json
      *        ({"name": {"driver": "mysql"|"sqlite", "host", "user", "pass",
@@ -567,6 +569,6 @@ public:
     virtual bool GetNamedConnection(const char* name, Source2ModSQLConnectionInfo& info) = 0;
 };
 
-#define SQL_CREATE_CONNECTION(info)    g_pSource2ModSQL->CreateConnection(g_PluginID, info)
+#define SQL_CREATE_CONNECTION(info)    g_pSource2ModSQL->CreateConnection(info)
 
 #endif //_INCLUDE_ISOURCE2MOD_SQL_H

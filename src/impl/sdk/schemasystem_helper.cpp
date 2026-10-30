@@ -307,18 +307,15 @@ void schema::SetStateChanged(CEntityInstance* entity, const char* className, con
 }
 
 // Whether p points into the .text section of the module pModuleAddress lives in.
-// The range is read once; the module is temporary, as it holds a copy of the
-// whole section read from disk.
+// The range is read once.
 static bool IsInModuleText(const void* p, const void* pModuleAddress)
 {
     static const ISource2ModModule::SectionInfo s_text = [pModuleAddress] {
-        ISource2ModModule* pModule = ISource2ModModule::New(const_cast<void*>(pModuleAddress));
+        ISource2ModModule* pModule = g_pSource2ModModules->GetFromAddress(pModuleAddress);
         if (!pModule)
             return ISource2ModModule::SectionInfo{0, 0};
 
-        const ISource2ModModule::SectionInfo text = pModule->GetSectionByName(".text");
-        g_pSource2ModAPI->FreeModule(pModule);
-        return text;
+        return pModule->GetSectionByName(".text");
     }();
 
     const auto address = reinterpret_cast<uintptr_t>(p);

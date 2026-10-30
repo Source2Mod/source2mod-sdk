@@ -117,7 +117,7 @@ class ISource2ModSchemaMethods;
 // The natives interface's name, here so SOURCE2MOD_FILLVARS() fills
 // g_pSource2ModNatives without pulling SourcePawn's headers into every plugin;
 // ISource2ModNatives.h (needed to call it) defines the same.
-#define SOURCE2MOD_NATIVES_INTERFACE "ISource2ModNatives002"
+#define SOURCE2MOD_NATIVES_INTERFACE "ISource2ModNatives003"
 // Same for the schema helpers the core serves (ISource2ModSchemaMethods.h).
 #define SOURCE2MOD_SCHEMAMETHODS_INTERFACE "ISource2ModSchemaMethods001"
 
@@ -143,6 +143,7 @@ class ISource2ModSchemaMethods;
 #include "ISource2ModHTTP.h"
 #include "ISource2ModJSON.h"
 #include "ISource2ModMaps.h"
+#include "ISource2ModModules.h"
 #include "ISource2ModMenus.h"
 #include "ISource2ModSQL.h"
 #include "ISource2ModNetworkMessages.h"
@@ -293,7 +294,7 @@ inline bool Source2ModKHookVersionMatches(const char* coreHeader, const char* co
 // ISource2ModConfigs002 and ISource2ModCrash: the owner comes from the listener
 // or the caller. The slots' signatures changed, so a plugin built against 6 is
 // refused.
-#define SOURCE2MOD_PLAPI_VERSION 7
+#define SOURCE2MOD_PLAPI_VERSION 8
 
 /// Plugin API interface name
 #define SOURCE2MOD_PLAPI_NAME "ISource2ModPlugin"
@@ -341,7 +342,7 @@ public:
     *
     * @note This is the main initialization function.
     */
-    virtual bool Load(PluginId id, ISource2ModAPI* api, char* error, size_t maxlen, bool late) = 0;
+    virtual bool Load(ISource2ModAPI* api, char* error, size_t maxlen, bool late) = 0;
 
     /**
      * @brief Called when plugin is unloaded.
@@ -544,7 +545,6 @@ Globals
 #define SOURCE2MOD_DEFINE_GLOBALVARS() \
     ISource2ModAPI*             g_pSource2ModAPI              = nullptr; \
     ISource2ModPlugin*          g_pPluginAPI                  = nullptr; \
-    PluginId                    g_PluginID                   = 0; \
     const char*                 g_Source2ModCoreKHookCommit  = nullptr; \
     const char*                 g_Source2ModCoreKHookHeader  = nullptr; \
     ISource2ModAddresses*       g_pSource2ModAddresses       = nullptr; \
@@ -564,6 +564,7 @@ Globals
     ISource2ModHTTP*            g_pSource2ModHTTP            = nullptr; \
     ISource2ModJSON*            g_pSource2ModJSON            = nullptr; \
     ISource2ModMaps*            g_pSource2ModMaps            = nullptr; \
+    ISource2ModModules*         g_pSource2ModModules         = nullptr; \
     ISource2ModMenus*           g_pSource2ModMenus           = nullptr; \
     ISource2ModSQL*             g_pSource2ModSQL             = nullptr; \
     ISource2ModNetworkMessages* g_pSource2ModNetworkMessages = nullptr; \
@@ -604,7 +605,6 @@ Globals
 #define SOURCE2MOD_GLOBALVARS() \
     extern ISource2ModAPI*             g_pSource2ModAPI; \
     extern ISource2ModPlugin*          g_pPluginAPI; \
-    extern PluginId                    g_PluginID; \
     extern const char*                 g_Source2ModCoreKHookCommit; \
     extern const char*                 g_Source2ModCoreKHookHeader; \
     extern ISource2ModAddresses*       g_pSource2ModAddresses; \
@@ -624,6 +624,7 @@ Globals
     extern ISource2ModHTTP*            g_pSource2ModHTTP; \
     extern ISource2ModJSON*            g_pSource2ModJSON; \
     extern ISource2ModMaps*            g_pSource2ModMaps; \
+    extern ISource2ModModules*         g_pSource2ModModules; \
     extern ISource2ModMenus*           g_pSource2ModMenus; \
     extern ISource2ModSQL*             g_pSource2ModSQL; \
     extern ISource2ModNetworkMessages* g_pSource2ModNetworkMessages; \
@@ -675,6 +676,7 @@ Globals
     g_pSource2ModPermissions     = (ISource2ModPermissions*)    (api)->Source2ModFactory(SOURCE2MOD_PERMISSIONS_INTERFACE,     nullptr, nullptr); \
     g_pSource2ModJSON            = (ISource2ModJSON*)           (api)->Source2ModFactory(SOURCE2MOD_JSON_INTERFACE,            nullptr, nullptr); \
     g_pSource2ModMaps            = (ISource2ModMaps*)           (api)->Source2ModFactory(SOURCE2MOD_MAPS_INTERFACE,            nullptr, nullptr); \
+    g_pSource2ModModules            = (ISource2ModModules*)           (api)->Source2ModFactory(SOURCE2MOD_MODULES_INTERFACE,            nullptr, nullptr); \
     g_pSource2ModScheduler       = (ISource2ModScheduler*)      (api)->Source2ModFactory(SOURCE2MOD_SCHEDULER_INTERFACE,       nullptr, nullptr); \
     g_pSource2ModScripts         = (ISource2ModScripts*)        (api)->Source2ModFactory(SOURCE2MOD_SCRIPTS_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModSounds          = (ISource2ModSounds*)         (api)->Source2ModFactory(SOURCE2MOD_SOUNDS_INTERFACE,          nullptr, nullptr); \
@@ -747,8 +749,8 @@ Globals
   */
 #define SOURCE2MOD_CONVAR_REGISTER() \
     ConVar_Register(SOURCE2MOD_CONVAR_FLAGS, \
-        [](ConVarRefAbstract* ref) { if (g_pSource2ModConVars) g_pSource2ModConVars->TrackConVar(g_PluginID, ref); }, \
-        [](ConCommandRef* ref) { if (g_pSource2ModConVars) g_pSource2ModConVars->TrackConCommand(g_PluginID, ref); });
+        [](ConVarRefAbstract* ref) { if (g_pSource2ModConVars) g_pSource2ModConVars->TrackConVar(ref); }, \
+        [](ConCommandRef* ref) { if (g_pSource2ModConVars) g_pSource2ModConVars->TrackConCommand(ref); });
 
 // The KHook check is not here: a plugin that never hooks (nothing but the
 // source2mod's own interfaces) does not care which KHook the core runs.
@@ -758,7 +760,6 @@ Globals
     g_pSource2ModAPI = api; \
     SOURCE2MOD_FILLGAMEVARS(api) \
     g_pPluginAPI  = static_cast<ISource2ModPlugin*>(this); \
-    g_PluginID   = id; \
     KHook::__exported__khook = static_cast<KHook::IKHook*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_INTERFACE, nullptr, nullptr)); \
     g_Source2ModCoreKHookCommit = static_cast<const char*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_VERSION_INTERFACE, nullptr, nullptr)); \
     g_Source2ModCoreKHookHeader = static_cast<const char*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_HEADER_INTERFACE, nullptr, nullptr)); \

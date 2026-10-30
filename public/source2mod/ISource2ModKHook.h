@@ -283,12 +283,7 @@ protected:
     // forward-declared where this header lands (the end of ISource2ModPlugin.h),
     // so they are defined in the SDK's src/utils/hooks.cpp.
     static void Warn(const char* pszFormat, const char* pszName);
-    // windows.h defines FreeModule as a macro; ISource2ModApi.h drops it, but
-    // this header can land first (ISource2ModMenus.h -> ISource2ModTypes.h).
-#ifdef FreeModule
-#undef FreeModule
-#endif
-    static void FreeModule(ISource2ModModule* pModule);
+    static ISource2ModModule* GetModule(const char* pszName);
     static int GetOffset(const char* pszName);
     static ISource2ModMemory ResolveSignature(const char* pszName);
 };
@@ -302,7 +297,7 @@ struct CSource2ModVTableName
 {
     CSource2ModVTableName() = default;
 
-    /// The module by name -- loaded through ISource2ModModule::New at Init.
+    /// The module by name, from g_pSource2ModModules at Init.
     CSource2ModVTableName(const char* module, const char* name) :
         pszModule(module), pszClass(name)
     {
@@ -524,16 +519,14 @@ public:
       */
     bool InitGlobal(const char* pszModule, const char* pszClass, const char* pszBase = nullptr)
     {
-        ISource2ModModule* pModule = ISource2ModModule::New(pszModule);
+        ISource2ModModule* pModule = GetModule(pszModule);
         if (!pModule)
         {
             Warn("KHook: module '%s' is not loaded; hook not installed\n", pszModule);
             return false;
         }
 
-        const bool bInstalled = InitGlobal(pModule, pszClass, pszBase);
-        FreeModule(pModule);
-        return bInstalled;
+        return InitGlobal(pModule, pszClass, pszBase);
     }
 
     void Destruct() override

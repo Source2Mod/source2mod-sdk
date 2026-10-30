@@ -59,7 +59,7 @@
 * OnDeclareConfigs() and copies the values it needs in OnConfigChanged():
 *
 * @code
-* bool MyPlugin::Load(PluginId id, ISource2ModAPI* api, char* error, size_t maxlen, bool late)
+* bool MyPlugin::Load(ISource2ModAPI* api, char* error, size_t maxlen, bool late)
 * {
 *     SOURCE2MOD_SAVEVARS();
 *     if (!g_pSource2ModConfigs || !g_pSource2ModConfigs->AddListener(this, error, maxlen))
@@ -88,6 +88,8 @@
 #define _INCLUDE_ISOURCE2MOD_CONFIGS_H
 
 #pragma once
+
+#include <source2mod/ISource2ModTypes.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -259,7 +261,7 @@ public:
     virtual bool Reload(char* error, size_t maxlen) = 0;
 };
 
-#define SOURCE2MOD_CONFIGS_INTERFACE "ISource2ModConfigs002"
+#define SOURCE2MOD_CONFIGS_INTERFACE "ISource2ModConfigs003"
 
 class ISource2ModConfigs
 {
@@ -301,11 +303,11 @@ public:
 
     /// A config by owner and name, this plugin's or another one's (plugin ids
     /// as OnPluginLoad reports them); null when there is none.
-    virtual ISource2ModConfig* Get(PluginId owner, const char* pszName) = 0;
+    virtual ISource2ModConfig* Get(const char* pszName) = 0;
 };
 
 /// This plugin's config by name.
-#define PLUGIN_CONFIG(name) g_pSource2ModConfigs->Get(g_PluginID, name)
+#define PLUGIN_CONFIG(name) g_pSource2ModConfigs->Get(name)
 
 /**
 * @brief Config defaults built key by key instead of written as JSON text.

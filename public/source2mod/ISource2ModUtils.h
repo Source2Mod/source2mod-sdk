@@ -50,6 +50,8 @@
 #define _INCLUDE_ISOURCE2MOD_UTILS_H
 
 #pragma once
+
+#include <source2mod/ISource2ModTypes.h>
 #include "ISource2ModPlugin.h"
 
 #include <cstdint>
@@ -91,7 +93,7 @@ protected:
 Core Source2Mod Utils
 ========================= */
 
-#define SOURCE2MOD_UTILS_INTERFACE "ISource2ModUtils001"
+#define SOURCE2MOD_UTILS_INTERFACE "ISource2ModUtils002"
 
 class ISource2ModUtils
 {
@@ -134,7 +136,7 @@ public:
      *        (under the game folder unless absolute); 0 for @p owner leaves the
      *        plugin out. Missing folders are made.
      */
-    virtual bool LogToFile(PluginId owner, const char* path, const char* message) = 0;
+    virtual bool LogToFile(const char* path, const char* message) = 0;
 };
 
 #endif //_INCLUDE_ISOURCE2MOD_UTILS_H

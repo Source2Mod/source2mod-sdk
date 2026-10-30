@@ -113,7 +113,7 @@ Core Source2Mod ConVars
 using ConVarChangeHandler = Source2ModCallback<void(ConVarRefAbstract* ref, CSplitScreenSlot slot,
                                                   const char* pszNewValue, const char* pszOldValue)>;
 
-#define SOURCE2MOD_CONVARS_INTERFACE "ISource2ModConVars004"
+#define SOURCE2MOD_CONVARS_INTERFACE "ISource2ModConVars005"
 
 /// Access index meaning "no such ConVar" -- the engine's own invalid index.
 /// 0 is a real ConVar, so test against this, never against zero.
@@ -314,7 +314,7 @@ public:
     * so it is gone from the console and the next registration of the name
     * (the plugin loading again) sets it up anew.
       */
-    virtual void TrackConVar(PluginId owner, ConVarRefAbstract* ref) = 0;
+    virtual void TrackConVar(ConVarRefAbstract* ref) = 0;
 
     /**
 
@@ -322,7 +322,7 @@ public:
     *        unloads its callbacks go and it is hidden (FCVAR_DEVELOPMENTONLY):
     *        the engine cannot remove a command, only make it unreachable.
       */
-    virtual void TrackConCommand(PluginId owner, ConCommandRef* ref) = 0;
+    virtual void TrackConCommand(ConCommandRef* ref) = 0;
 
     /**
      * @brief ISource2ModClients::QueryClientConVar: asks a client for any of

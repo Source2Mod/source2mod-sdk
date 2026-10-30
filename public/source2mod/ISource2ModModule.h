@@ -38,8 +38,8 @@
  * @file ISource2ModModule.h
  * @brief Source2Mod-facing module interface (mirrors DynLibUtils::CModule).
  *
- * Plugins obtain an ISource2ModModule via ISource2ModAPI::LoadModule() and release
- * it with ISource2ModAPI::FreeModule().  The implementation inside Source2Mod
+ * Plugins get an ISource2ModModule from g_pSource2ModModules; the core owns it
+ * (never delete one).  The implementation inside Source2Mod
  * core delegates every call 1:1 to DynLibUtils::CModule so plugins are
  * fully decoupled from the DynLibUtils headers.
  */
@@ -81,27 +81,6 @@ public:
     };
 
     virtual ~ISource2ModModule() = default;
-
-    /* =========================
-    Initialization
-    ========================= */
-
-    /**
-     * @brief Initialises the module from its name (without extension).
-     *
-     * @param name      Module name, e.g. "server" or "engine2".
-     * @param extension When true the platform extension is appended automatically.
-     * @return True on success.
-     */
-    virtual bool InitFromName(const char* name, bool extension = false) = 0;
-
-    /**
-     * @brief Initialises the module from an address inside it.
-     *
-     * @param ptr Any address that belongs to the target module.
-     * @return True on success.
-     */
-    virtual bool InitFromMemory(uintptr_t ptr) = 0;
 
     /* =========================
     Pattern scanning
@@ -212,36 +191,6 @@ public:
      */
     [[nodiscard]] virtual ISource2ModMemory GetVirtualTableByBase(const char* name, const char* baseName, bool decorated = false) const = 0;
 
-    /* =========================
-    Virtual constructor (New)
-    ========================= */
-
-    /**
-     * @brief Creates a module wrapper by name (without extension).
-     *
-     * Equivalent to `g_pSource2ModAPI->LoadModule(name)`. Release with `delete`
-     * or `g_pSource2ModAPI->FreeModule()`.
-     *
-     * @param name Module name, e.g. "server" or "tier0".
-     */
-    static ISource2ModModule* New(const char* name);
-
-    /**
-     * @brief Creates a module wrapper from an address that belongs to the module.
-     *
-     * @param ptr Any address inside the target module.
-     */
-    static ISource2ModModule* New(uintptr_t ptr);
-
-    /**
-     * @brief Creates a module wrapper from a void pointer inside the module.
-     */
-    static ISource2ModModule* New(void* ptr);
-
-    /**
-     * @brief Creates a module wrapper from an ISource2ModMemory address inside the module.
-     */
-    static ISource2ModModule* New(ISource2ModMemory mem);
 };
 
 /**
@@ -262,9 +211,5 @@ public:
 #define WIN_LINUX(win, lin) lin
 #endif
 #endif
-
-#define LOAD_MODULE(name)       g_pSource2ModAPI->LoadModule(name)
-#define LOAD_MODULE_MEM(ptr)    g_pSource2ModAPI->LoadModuleFromMemory(ptr)
-#define FREE_MODULE(mod)        g_pSource2ModAPI->FreeModule(mod)
 
 #endif // _INCLUDE_ISOURCE2MOD_MODULE_H

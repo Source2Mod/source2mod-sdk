@@ -53,10 +53,9 @@ void ISource2ModHook::Warn(const char* pszFormat, const char* pszName)
         g_pSource2ModAPI->Log(pszFormat, pszName ? pszName : "(null)");
 }
 
-void ISource2ModHook::FreeModule(ISource2ModModule* pModule)
+ISource2ModModule* ISource2ModHook::GetModule(const char* pszName)
 {
-    if (g_pSource2ModAPI && pModule)
-        g_pSource2ModAPI->FreeModule(pModule);
+    return g_pSource2ModModules ? g_pSource2ModModules->Get(pszName) : nullptr;
 }
 
 int ISource2ModHook::GetOffset(const char* pszName)

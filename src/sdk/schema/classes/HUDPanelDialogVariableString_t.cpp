@@ -37,6 +37,9 @@
 #include "source2mod/sdk/schema/classes/HUDPanelDialogVariableString_t.h"
 
 #include "source2mod/ISource2ModModule.h"
+#include <source2mod/ISource2ModModules.h>
+
+extern ISource2ModModules* g_pSource2ModModules;
 
 HUDPanelDialogVariableString_t::HUDPanelDialogVariableString_t(uint16 nPanelIdIndex, uint16 nDialogVariableIndex, CUtlString sValue, bool bIsSet)
 {
@@ -44,13 +47,11 @@ HUDPanelDialogVariableString_t::HUDPanelDialogVariableString_t(uint16 nPanelIdIn
     // there. Point it at the engine's table.
     static void* const pVTable = []() -> void*
     {
-        ISource2ModModule* libserver = ISource2ModModule::New("server");
+        ISource2ModModule* libserver = g_pSource2ModModules->Get(Source2ModModuleId::Server);
         if (!libserver)
             return nullptr;
 
-        void* pTable = libserver->GetVirtualTableByName("HUDPanelDialogVariableString_t").GetPtr();
-        delete libserver;
-        return pTable;
+        return libserver->GetVirtualTableByName("HUDPanelDialogVariableString_t").GetPtr();
     }();
 
     if (pVTable) *reinterpret_cast<void**>(this) = pVTable;

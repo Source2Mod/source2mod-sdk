@@ -59,7 +59,7 @@
 * OnDeclareConfigs() and copies the values it needs in OnConfigChanged():
 *
 * @code
-* bool MyPlugin::Load(PluginId id, ISource2ModAPI* api, char* error, size_t maxlen, bool late)
+* bool MyPlugin::Load(ISource2ModAPI* api, char* error, size_t maxlen, bool late)
 * {
 *     SOURCE2MOD_SAVEVARS();
 *     if (!g_pSource2ModConfigs || !g_pSource2ModConfigs->AddListener(this, error, maxlen))

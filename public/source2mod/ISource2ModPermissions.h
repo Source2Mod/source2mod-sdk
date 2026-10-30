@@ -75,6 +75,8 @@
 #define _INCLUDE_ISOURCE2MOD_PERMISSIONS_H
 
 #pragma once
+
+#include <source2mod/ISource2ModTypes.h>
 #include "ISource2ModPlugin.h"
 
 /// An access-denied handler (SetAccessDeniedHandler).
@@ -96,7 +98,7 @@ class Source2ModCommandArgs;
  */
 using AccessDeniedHandler = Source2ModCallback<void(const Source2ModCommandContext& ctx, const Source2ModCommandArgs& args, const char* permission)>;
 
-#define SOURCE2MOD_PERMISSIONS_INTERFACE "ISource2ModPermissions001"
+#define SOURCE2MOD_PERMISSIONS_INTERFACE "ISource2ModPermissions002"
 
 class ISource2ModPermissions
 {
@@ -161,24 +163,24 @@ public:
      * @brief Grants a permission (wildcards allowed) to a SteamID64, in the
      * owner's layer. Gone when the owner unloads, or by RevokePermission().
      */
-    virtual void GrantPermission(PluginId owner, uint64 steamId, const char* permission) = 0;
+    virtual void GrantPermission(uint64 steamId, const char* permission) = 0;
 
     /// Takes back what GrantPermission() gave in the owner's layer; other
     /// layers are untouched.
-    virtual void RevokePermission(PluginId owner, uint64 steamId, const char* permission) = 0;
+    virtual void RevokePermission(uint64 steamId, const char* permission) = 0;
 
     /// Puts a SteamID64 in a group, in the owner's layer.
-    virtual void AddToGroup(PluginId owner, uint64 steamId, const char* group) = 0;
+    virtual void AddToGroup(uint64 steamId, const char* group) = 0;
 
     /// Takes a SteamID64 out of a group in the owner's layer.
-    virtual void RemoveFromGroup(PluginId owner, uint64 steamId, const char* group) = 0;
+    virtual void RemoveFromGroup(uint64 steamId, const char* group) = 0;
 
     /// The player's own immunity in the owner's layer; the highest of all
     /// layers and groups counts.
-    virtual void SetImmunity(PluginId owner, uint64 steamId, int immunity) = 0;
+    virtual void SetImmunity(uint64 steamId, int immunity) = 0;
 
     /// Drops everything the owner's layer holds for this SteamID64.
-    virtual void ClearPlayer(PluginId owner, uint64 steamId) = 0;
+    virtual void ClearPlayer(uint64 steamId) = 0;
 
     /* =========================
     Groups -- in the caller's layer
@@ -190,22 +192,22 @@ public:
      * plugin, two plugins) has all of their permissions and parents and the
      * highest immunity.
      */
-    virtual void CreateGroup(PluginId owner, const char* group, int immunity) = 0;
+    virtual void CreateGroup(const char* group, int immunity) = 0;
 
     /// Drops the owner's definition of the group; other layers' stay.
-    virtual void DeleteGroup(PluginId owner, const char* group) = 0;
+    virtual void DeleteGroup(const char* group) = 0;
 
     /// Adds a permission to the owner's definition of the group (made if missing).
-    virtual void AddGroupPermission(PluginId owner, const char* group, const char* permission) = 0;
+    virtual void AddGroupPermission(const char* group, const char* permission) = 0;
 
     /// Takes a permission back out of the owner's definition of the group.
-    virtual void RemoveGroupPermission(PluginId owner, const char* group, const char* permission) = 0;
+    virtual void RemoveGroupPermission(const char* group, const char* permission) = 0;
 
     /// Makes the group inherit everything `parent` has (made if missing).
-    virtual void AddGroupParent(PluginId owner, const char* group, const char* parent) = 0;
+    virtual void AddGroupParent(const char* group, const char* parent) = 0;
 
     /// Undoes AddGroupParent() in the owner's layer.
-    virtual void RemoveGroupParent(PluginId owner, const char* group, const char* parent) = 0;
+    virtual void RemoveGroupParent(const char* group, const char* parent) = 0;
 
     /* =========================
     Refused commands
@@ -232,9 +234,9 @@ public:
 #define PERMISSIONS_HAS(steamId, permission)              g_pSource2ModPermissions->HasPermission(steamId, permission)
 #define PERMISSIONS_PLAYER_HAS(slot, permission)          g_pSource2ModPermissions->PlayerHasPermission(slot, permission)
 #define PERMISSIONS_CHECK_ACCESS(slot, name, permission)  g_pSource2ModPermissions->CheckAccess(slot, name, permission)
-#define PERMISSIONS_GRANT(steamId, permission)            g_pSource2ModPermissions->GrantPermission(g_PluginID, steamId, permission)
-#define PERMISSIONS_REVOKE(steamId, permission)           g_pSource2ModPermissions->RevokePermission(g_PluginID, steamId, permission)
-#define PERMISSIONS_ADD_TO_GROUP(steamId, group)          g_pSource2ModPermissions->AddToGroup(g_PluginID, steamId, group)
-#define PERMISSIONS_REMOVE_FROM_GROUP(steamId, group)     g_pSource2ModPermissions->RemoveFromGroup(g_PluginID, steamId, group)
+#define PERMISSIONS_GRANT(steamId, permission)            g_pSource2ModPermissions->GrantPermission(steamId, permission)
+#define PERMISSIONS_REVOKE(steamId, permission)           g_pSource2ModPermissions->RevokePermission(steamId, permission)
+#define PERMISSIONS_ADD_TO_GROUP(steamId, group)          g_pSource2ModPermissions->AddToGroup(steamId, group)
+#define PERMISSIONS_REMOVE_FROM_GROUP(steamId, group)     g_pSource2ModPermissions->RemoveFromGroup(steamId, group)
 
 #endif //_INCLUDE_ISOURCE2MOD_PERMISSIONS_H

@@ -116,7 +116,7 @@
  * @endcode
  */
 
-#define SOURCE2MOD_HOOKS_INTERFACE "ISource2ModHooks001"
+#define SOURCE2MOD_HOOKS_INTERFACE "ISource2ModHooks002"
 
 /* =========================
 Targets and filters
@@ -134,6 +134,7 @@ struct HookTarget
     Kind kind = Kind::All;
     void* instance = nullptr;
     const char* className = nullptr;    // Kind::Class: the RTTI name ("CCSPlayerPawn")
+    ISource2ModModule* module = nullptr;    // Kind::Class: where its vtable is; null looks in the common modules
 
     static HookTarget All() { return {}; }
 
@@ -145,11 +146,12 @@ struct HookTarget
         return t;
     }
 
-    static HookTarget Class(const char* name)
+    static HookTarget Class(const char* name, ISource2ModModule* module = nullptr)
     {
         HookTarget t;
         t.kind = Kind::Class;
         t.className = name;
+        t.module = module;
         return t;
     }
 };

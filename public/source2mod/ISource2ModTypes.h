@@ -61,6 +61,7 @@
 /// A plugin's id; the core hands it to Load().
 using PluginId = int;
 
+
 /// What a Register* / Hook* call returns and the matching Unregister* /
 /// Unhook* takes: the one handler it registered. 0 is never handed out.
 using Source2ModHookId = int;
@@ -68,42 +69,6 @@ using Source2ModHookId = int;
 /* =========================
 Callbacks
 ========================= */
-
-namespace source2mod_detail
-{
-    /// One per callable type, instantiated where the callable is: its address
-    /// is a code address inside the plugin that made the callable, which is
-    /// how the core tells whose a handler is. Hidden, so the dynamic linker
-    /// never hands another module's copy out for it.
-    template <typename T>
-#if !defined(_MSC_VER)
-    __attribute__((visibility("hidden"), noinline))
-#endif
-    void CallbackOrigin()
-    {
-    }
-
-    /// A code address of a method: its entry, or for a virtual method the
-    /// object's vtable (both live in the module that defined the class).
-    template <typename M>
-    const void* MethodOrigin(const void* object, M method)
-    {
-#if defined(_MSC_VER)
-        // MSVC: the code, or the vcall thunk in the module that formed the pointer.
-        (void)object;
-        const void* code = nullptr;
-        std::memcpy(&code, &method, sizeof(code));
-        return code;
-#else
-        // Itanium: an odd pointer is 1 + a vtable offset.
-        std::uintptr_t ptr = 0;
-        std::memcpy(&ptr, &method, sizeof(ptr));
-        if (ptr & 1)
-            return object ? *static_cast<const void* const*>(object) : nullptr;
-        return reinterpret_cast<const void*>(ptr);
-#endif
-    }
-}
 
 template <typename SIG>
 class Source2ModCallback;
@@ -118,10 +83,6 @@ class Source2ModCallback;
  * g_pSource2ModCommands->RegisterConCommand("jbtestend", { this, &Plugin::OnTest });
  * g_pSource2ModCommands->RegisterConCommand("jbtestend", [](auto&, auto&, bool) {});  // lambda
  * @endcode
- *
- * Whose a handler is, the core reads off the handler itself: Origin() is a
- * code address inside the plugin that made it, which the core maps to that
- * plugin's library -- so no call takes a plugin id.
  *
  * A function or an object-and-method is also remembered by what it is, so
  * the same one handed to Unregister* / Unhook* finds it again; a lambda has
@@ -138,7 +99,7 @@ public:
     template <typename FR, typename... FA,
               typename = std::enable_if_t<std::is_invocable_r_v<R, FR (*)(FA...), A...>>>
     Source2ModCallback(FR (*fn)(FA...))
-        : m_fn(fn), m_origin(reinterpret_cast<const void*>(fn))
+        : m_fn(fn)
     {
         if (fn)
             Key(nullptr, &fn, sizeof(fn));
@@ -147,16 +108,14 @@ public:
     /// An object and one of its methods.
     template <typename C, typename MR, typename... MA>
     Source2ModCallback(C* object, MR (C::*method)(MA...))
-        : m_fn([object, method](A... args) -> R { return (object->*method)(std::forward<A>(args)...); }),
-          m_origin(source2mod_detail::MethodOrigin(object, method))
+        : m_fn([object, method](A... args) -> R { return (object->*method)(std::forward<A>(args)...); })
     {
         Key(object, &method, sizeof(method));
     }
 
     template <typename C, typename MR, typename... MA>
     Source2ModCallback(const C* object, MR (C::*method)(MA...) const)
-        : m_fn([object, method](A... args) -> R { return (object->*method)(std::forward<A>(args)...); }),
-          m_origin(source2mod_detail::MethodOrigin(object, method))
+        : m_fn([object, method](A... args) -> R { return (object->*method)(std::forward<A>(args)...); })
     {
         Key(object, &method, sizeof(method));
     }
@@ -168,35 +127,13 @@ public:
                                           !std::is_function_v<std::remove_reference_t<F>> &&
                                           std::is_invocable_r_v<R, F&, A...>>>
     Source2ModCallback(F&& callable)
-        : m_fn(std::forward<F>(callable)),
-          m_origin(reinterpret_cast<const void*>(&source2mod_detail::CallbackOrigin<std::decay_t<F>>))
+        : m_fn(std::forward<F>(callable))
     {
     }
 
     R operator()(A... args) const { return m_fn(std::forward<A>(args)...); }
 
     explicit operator bool() const { return static_cast<bool>(m_fn); }
-
-    /// A code address inside the plugin that made this handler; the core
-    /// finds the owner by it.
-    const void* Origin() const { return m_origin; }
-
-    /**
-     * @brief For a handler made on behalf of another plugin -- a wrapper one
-     * plugin puts around a handler another one handed it: the registration
-     * then belongs to whoever made `of`, and goes when that plugin unloads.
-     *
-     * @code
-     * ChatHandler wrapped = [handler](auto& ctx, auto& args, bool post) { if (Allowed(ctx)) handler(ctx, args, post); };
-     * g_pSource2ModCommands->RegisterConCommand(name, std::move(wrapped.OwnedAs(handler)));
-     * @endcode
-     */
-    template <typename SIG>
-    Source2ModCallback& OwnedAs(const Source2ModCallback<SIG>& of)
-    {
-        m_origin = of.Origin();
-        return *this;
-    }
 
     /// A function or object-and-method the Unregister* / Unhook* calls can
     /// find again; false for a lambda.
@@ -218,7 +155,6 @@ private:
     }
 
     std::function<R(A...)> m_fn;
-    const void* m_origin = nullptr;
     const void* m_object = nullptr;
     unsigned char m_key[16] = {};
     bool m_keyed = false;

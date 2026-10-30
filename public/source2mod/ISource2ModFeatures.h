@@ -103,7 +103,7 @@ public:
      * @brief The status of a native, capability, interface or library.
      *
      * @param type What `name` names.
-     * @param name The native, capability, interface ("ISource2ModMenus005")
+     * @param name The native, capability, interface ("ISource2ModMenus006")
      *             or library name.
      */
     virtual Source2ModFeatureStatus GetFeatureStatus(Source2ModFeatureType type, const char* name) = 0;

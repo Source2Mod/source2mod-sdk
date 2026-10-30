@@ -54,6 +54,8 @@
 #define _INCLUDE_ISOURCE2MOD_GAMESYSTEMS_H
 
 #pragma once
+
+#include <source2mod/ISource2ModTypes.h>
 #include "ISource2ModTypes.h"
 
 #include <igamesystem.h>
@@ -161,7 +163,7 @@ Core Source2Mod Game Systems
 * @brief Game systems owned by Source2Mod, with the events a plugin hooks.
 *
 * @code
-* Source2ModGameSystemId gs = g_pSource2ModGameSystems->Create(g_PluginID, "MyPlugin");
+* Source2ModGameSystemId gs = g_pSource2ModGameSystems->Create("MyPlugin");
 * g_pSource2ModGameSystems->Hook<EventBuildGameSessionManifest_t>(gs, [](const EventBuildGameSessionManifest_t* msg)
 * {
 *     msg->m_pResourceManifest->AddResource("models/example/thing.vmdl");
@@ -179,7 +181,7 @@ Core Source2Mod Game Systems
 * @note Handlers run on the thread the engine posts the event on; the
 *       Server*AsyncPostTickWork ones may be a worker thread.
   */
-#define SOURCE2MOD_GAMESYSTEMS_INTERFACE "ISource2ModGameSystems002"
+#define SOURCE2MOD_GAMESYSTEMS_INTERFACE "ISource2ModGameSystems003"
 
 class ISource2ModGameSystems
 {
@@ -207,7 +209,7 @@ public:
     * @param name What GetName() answers, for logs.
     * @return Its id, 0 on failure.
       */
-    virtual Source2ModGameSystemId Create(PluginId owner, const char* name) = 0;
+    virtual Source2ModGameSystemId Create(const char* name) = 0;
 
     /**
 
@@ -243,7 +245,6 @@ public:
     Source2ModHookId Hook(Source2ModGameSystemId system, Source2ModCallback<void(const EVENT*)> handler)
     {
         GameSystemHandler wrapped = [handler](const void* msg) { handler(static_cast<const EVENT*>(msg)); };
-        wrapped.OwnedAs(handler);
         return Hook(system, GameSystemEventOf<EVENT>::value, std::move(wrapped));
     }
 };
