@@ -152,10 +152,11 @@ public:
 
     * @brief Logs a formatted message with plugin context.
     *
-    * @param plugin Plugin instance
+    * The prefix is the name of the plugin whose code called this.
+    *
     * @param msg Format string
       */
-    virtual void Log(ISource2ModPlugin* plugin, const char* msg, ...) = 0;
+    virtual void Log(const char* msg, ...) = 0;
 
     /**
 
@@ -177,10 +178,9 @@ public:
 
     * @brief Registers a source2mod listener.
     *
-    * @param plugin Owner plugin
-    * @param pListener Listener instance
+    * @param pListener Listener instance; its plugin owns it
       */
-    virtual void AddListener(ISource2ModPlugin* plugin, ISource2ModListener* pListener) = 0;
+    virtual void AddListener(ISource2ModListener* pListener) = 0;
 
     /* =========================
     Interface system

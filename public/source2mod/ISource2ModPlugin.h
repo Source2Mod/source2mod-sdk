@@ -289,7 +289,11 @@ inline bool Source2ModKHookVersionMatches(const char* coreHeader, const char* co
 // HookConCommand / UnhookConCommand (REGISTER_CON_LISTENER is
 // HOOK_CON_COMMAND). A plugin built against 5 asks for ISource2ModCommands003,
 // which is gone, so it is refused instead of running with no commands interface.
-#define SOURCE2MOD_PLAPI_VERSION 6
+// 7: no ISource2ModPlugin* in ISource2ModAPI::Log / AddListener,
+// ISource2ModConfigs002 and ISource2ModCrash: the owner comes from the listener
+// or the caller. The slots' signatures changed, so a plugin built against 6 is
+// refused.
+#define SOURCE2MOD_PLAPI_VERSION 7
 
 /// Plugin API interface name
 #define SOURCE2MOD_PLAPI_NAME "ISource2ModPlugin"

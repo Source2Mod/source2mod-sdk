@@ -62,7 +62,7 @@
 * bool MyPlugin::Load(PluginId id, ISource2ModAPI* api, char* error, size_t maxlen, bool late)
 * {
 *     SOURCE2MOD_SAVEVARS();
-*     if (!g_pSource2ModConfigs || !g_pSource2ModConfigs->AddListener(this, this, error, maxlen))
+*     if (!g_pSource2ModConfigs || !g_pSource2ModConfigs->AddListener(this, error, maxlen))
 *         return false;
 *     ...
 * }
@@ -259,7 +259,7 @@ public:
     virtual bool Reload(char* error, size_t maxlen) = 0;
 };
 
-#define SOURCE2MOD_CONFIGS_INTERFACE "ISource2ModConfigs001"
+#define SOURCE2MOD_CONFIGS_INTERFACE "ISource2ModConfigs002"
 
 class ISource2ModConfigs
 {
@@ -274,16 +274,15 @@ public:
     * OnConfigValidate() and calls OnConfigChanged(ConfigChange::Loaded) -- all
     * before it returns, so Load() can use the values right after.
     *
-    * @param plugin   The plugin (this), as for ISource2ModAPI::AddListener().
-    * @param listener Usually the plugin object itself.
+    * @param listener Usually the plugin object itself; its plugin owns the configs.
     * @return False with the reason when a declaration is broken (name,
     *         defaults, a duplicate), a REQUIRED file does not parse or
     *         OnConfigValidate() refused the first read.
     */
-    virtual bool AddListener(ISource2ModPlugin* plugin, ISource2ModConfigListener* listener, char* error, size_t maxlen) = 0;
+    virtual bool AddListener(ISource2ModConfigListener* listener, char* error, size_t maxlen) = 0;
 
     /// Optional; the unload drops it anyway. The configs stay readable.
-    virtual void RemoveListener(ISource2ModPlugin* plugin) = 0;
+    virtual void RemoveListener(ISource2ModConfigListener* listener) = 0;
 
     /**
     * @brief A config outside the declaration step, e.g. one per map.
@@ -294,7 +293,7 @@ public:
     *
     * @return The config, or null with the reason (as AddListener()).
     */
-    virtual ISource2ModConfig* Register(ISource2ModPlugin* plugin, const char* pszName, const char* pszDefaults, uint32_t nFlags,
+    virtual ISource2ModConfig* Register(const char* pszName, const char* pszDefaults, uint32_t nFlags,
                                         ISource2ModConfigListener* listener, char* error, size_t maxlen) = 0;
 
     /// Forgets a config (the files stay). The handle is gone afterwards.

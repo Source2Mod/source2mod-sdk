@@ -62,7 +62,7 @@
 * bool MyPlugin::Load(PluginId id, ISource2ModAPI* api, char* error, size_t maxlen, bool late)
 * {
 *     SOURCE2MOD_SAVEVARS();
-*     if (!g_pSource2ModConfigs || !g_pSource2ModConfigs->AddListener(this, this, error, maxlen))
+*     if (!g_pSource2ModConfigs || !g_pSource2ModConfigs->AddListener(this, error, maxlen))
 *         return false;
 *     ...
 * }
@@ -141,10 +141,9 @@ public:
 
     * @brief Registers a listener. Removed by RemoveListener() or when the plugin unloads.
     *
-    * @param plugin   The plugin (this), as for ISource2ModAPI::AddListener().
     * @return False when every slot is taken.
       */
-    virtual bool AddListener(ISource2ModPlugin* plugin, ISource2ModCrashListener* listener) = 0;
+    virtual bool AddListener(ISource2ModCrashListener* listener) = 0;
 
     virtual void RemoveListener(ISource2ModCrashListener* listener) = 0;
 };

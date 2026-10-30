@@ -50,7 +50,7 @@ SOURCE2MOD_GLOBALVARS();
 void ISource2ModHook::Warn(const char* pszFormat, const char* pszName)
 {
     if (g_pSource2ModAPI)
-        g_pSource2ModAPI->Log(g_pPluginAPI, pszFormat, pszName ? pszName : "(null)");
+        g_pSource2ModAPI->Log(pszFormat, pszName ? pszName : "(null)");
 }
 
 void ISource2ModHook::FreeModule(ISource2ModModule* pModule)
