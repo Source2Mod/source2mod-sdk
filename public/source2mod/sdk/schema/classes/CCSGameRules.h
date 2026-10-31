@@ -131,6 +131,7 @@ public:
     SCHEMA_FIELD_POINTER(int32_t, m_iMatchStats_PlayersAlive_CT);
     SCHEMA_FIELD_POINTER(int32_t, m_iMatchStats_PlayersAlive_T);
     SCHEMA_FIELD_POINTER(float, m_TeamRespawnWaveTimes);
+    SCHEMA_FIELD(int32_t, m_nActiveMutators);
     SCHEMA_FIELD_POINTER(float, m_flNextRespawnWave);
     SCHEMA_FIELD(Vector, m_vMinimapMins);
     SCHEMA_FIELD(Vector, m_vMinimapMaxs);
