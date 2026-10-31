@@ -1,4 +1,4 @@
-﻿/**
+/**
 * vim: set ts=4 sw=4 tw=99 noet:
  * =============================================================================
  * Source2Mod
@@ -121,6 +121,27 @@ class ISource2ModSounds;
 class ISource2ModTrace;
 class ISource2ModTransmit;
 class ISource2ModHooks;
+class ISource2ModClients;
+class ISource2ModConfigs;
+class ISource2ModCookies;
+class ISource2ModCrash;
+class ISource2ModFeatures;
+class ISource2ModFiles;
+class ISource2ModFunctions;
+class ISource2ModGeoIP;
+class ISource2ModJSON;
+class ISource2ModMaps;
+class ISource2ModModules;
+class ISource2ModNatives;
+class ISource2ModPaths;
+class ISource2ModPermissions;
+class ISource2ModSchemaMethods;
+class ISource2ModScripts;
+class ISource2ModTargeting;
+class ISource2ModTranslations;
+class ISource2ModUtils;
+class ISource2ModVoice;
+class ISource2ModWebSockets;
 
 typedef void* (*CreateInterfaceFn)(const char* pName, int* pReturnCode);
 
@@ -233,111 +254,45 @@ public:
     Source2Mod subsystems
     ========================= */
 
-    /**
-
-    * @brief Access address/pattern system.
-      */
+    // The interfaces SOURCE2MOD_SAVEVARS() puts in the g_pSource2Mod* globals, this plugin's own.
     virtual ISource2ModAddresses* Addresses() = 0;
-
-    /**
-
-    * @brief Access command system.
-      */
+    virtual ISource2ModClients* Clients() = 0;
     virtual ISource2ModCommands* Commands() = 0;
-
-    /**
-
-    * @brief Access ConVar system.
-      */
+    virtual ISource2ModConfigs* Configs() = 0;
     virtual ISource2ModConVars* ConVars() = 0;
-
-    /**
-
-    * @brief Access custom HUD layout system.
-      */
+    virtual ISource2ModCookies* Cookies() = 0;
+    virtual ISource2ModCrash* Crash() = 0;
     virtual ISource2ModCustomHud* CustomHud() = 0;
-
-    /**
-
-    * @brief Access entities and Entity I/O system.
-      */
     virtual ISource2ModEntities* Entities() = 0;
-
-    /**
-
-    * @brief Access event system.
-      */
     virtual ISource2ModEvents* Events() = 0;
-
-    /**
-
-    * @brief Access game configuration system.
-      */
+    virtual ISource2ModFeatures* Features() = 0;
+    virtual ISource2ModFiles* Files() = 0;
+    virtual ISource2ModFunctions* Functions() = 0;
     virtual ISource2ModGameConfig* GameConfig() = 0;
-
-    /**
-
-    * @brief Access game system registry.
-      */
     virtual ISource2ModGameSystems* GameSystems() = 0;
-
-    /**
-
-    * @brief Access HTTP system.
-      */
+    virtual ISource2ModGeoIP* GeoIP() = 0;
+    virtual ISource2ModHooks* Hooks() = 0;
     virtual ISource2ModHTTP* HTTP() = 0;
-
-    /**
-
-    * @brief Access menu system.
-      */
+    virtual ISource2ModJSON* JSON() = 0;
+    virtual ISource2ModMaps* Maps() = 0;
     virtual ISource2ModMenus* Menus() = 0;
-
-    /**
-
-    * @brief Access the SQL system (MySQL and SQLite).
-      */
-    virtual ISource2ModSQL* SQL() = 0;
-
-    /**
-
-    * @brief Access network messages system.
-      */
+    virtual ISource2ModModules* Modules() = 0;
+    virtual ISource2ModNatives* Natives() = 0;
     virtual ISource2ModNetworkMessages* NetworkMessages() = 0;
-
-    /**
-
-    * @brief Where Source2Mod keeps things on disk.
-      */
     virtual ISource2ModPaths* Paths() = 0;
-
-    /**
-
-    * @brief Access scheduler system.
-      */
+    virtual ISource2ModPermissions* Permissions() = 0;
     virtual ISource2ModScheduler* Scheduler() = 0;
-
-    /**
-
-    * @brief Access sound system.
-      */
+    virtual ISource2ModSchemaMethods* SchemaMethods() = 0;
+    virtual ISource2ModScripts* Scripts() = 0;
     virtual ISource2ModSounds* Sounds() = 0;
-
-    /**
-
-    * @brief Access tracing system.
-      */
+    virtual ISource2ModSQL* SQL() = 0;
+    virtual ISource2ModTargeting* Targeting() = 0;
     virtual ISource2ModTrace* Trace() = 0;
-
-    /**
-
-    * @brief Access transmit system (per-viewer entity visibility).
-      */
+    virtual ISource2ModTranslations* Translations() = 0;
     virtual ISource2ModTransmit* Transmit() = 0;
-
-    /* =========================
-    Module factory
-    ========================= */
+    virtual ISource2ModUtils* Utils() = 0;
+    virtual ISource2ModVoice* Voice() = 0;
+    virtual ISource2ModWebSockets* WebSockets() = 0;
 
     /* =========================
     Engine interfaces
@@ -390,17 +345,8 @@ public:
     virtual size_t FormatArgs(char* buffer, size_t maxlength, const char* format, va_list ap) = 0;
 
     /* =========================
-    Added in plugin API 2 -- at the end, so a plugin built against API 1
-    still finds every slot above where it left it.
+    Server
     ========================= */
-
-    /**
-
-    * @brief The hooks (ISource2ModHooks.h): game functions, entity virtuals,
-    *        engine callbacks, any function. Entity events and outputs are
-    *        listeners of ISource2ModEntities.
-      */
-    virtual ISource2ModHooks* Hooks() = 0;
 
     /**
      * @brief Whether core.json's "FollowCS2ServerGuidelines" is on: then the

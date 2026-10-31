@@ -1,4 +1,4 @@
-﻿/**
+/**
 * vim: set ts=4 sw=4 tw=99 noet:
  * =============================================================================
  * Source2Mod
@@ -295,7 +295,12 @@ inline bool Source2ModKHookVersionMatches(const char* coreHeader, const char* co
 // ISource2ModConfigs002 and ISource2ModCrash: the owner comes from the listener
 // or the caller. The slots' signatures changed, so a plugin built against 6 is
 // refused.
-#define SOURCE2MOD_PLAPI_VERSION 8
+// 8: per-plugin interface instances, no plugin ids in the calls.
+// 9: ISource2ModAPI in order, with every subsystem on it. A plugin built against
+// 8 still loads: the core hands it that layout through the core's pluginapi008.h.
+#define SOURCE2MOD_PLAPI_VERSION 9
+/// The oldest plugin API the core still loads.
+#define SOURCE2MOD_PLAPI_MIN 8
 
 /// Plugin API interface name
 #define SOURCE2MOD_PLAPI_NAME "ISource2ModPlugin"
