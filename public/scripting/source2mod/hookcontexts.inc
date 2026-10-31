@@ -17,7 +17,8 @@
  *
  * Objects that are not entities (the services, the jump component, the
  * econ item, the user command) are SchemaObjects; CUserCmd has no schema
- * class, its SchemaObject is opaque (for Source2ModFunction calls).
+ * class: RunCommandContext and SetupMoveContext read it with GetCommand() and the
+ * getters beside it, its SchemaObject is for Source2ModFunction calls.
  */
 
 #if defined _source2mod_hookcontexts_included
@@ -28,6 +29,7 @@
 #include <source2mod/types>
 #include <source2mod/schema>
 #include <source2mod/trace>
+#include <source2mod/netmessages>
 
 /** What CCSPlayer_ItemServices::CanAcquire answers. */
 enum AcquireResult
@@ -462,7 +464,7 @@ methodmap SimulateUserCommandsContext
 	public native void CallOriginal();
 }
 
-/** CPlayer_MovementServices::RunCommand(cmd); the command is opaque (CUserCmd). */
+/** CPlayer_MovementServices::RunCommand(cmd) */
 methodmap RunCommandContext
 {
 	property CCSPlayer_MovementServices services
@@ -477,6 +479,17 @@ methodmap RunCommandContext
 	{
 		public native get();
 	}
+	/** The command as a protobuf (CSGOUserCmdPB, read with Source2ModNetworkMessages); valid inside the handler, not closable, not sendable. A nested message the command does not have answers null. */
+	public native NetMessage GetCommand();
+	/** The button masks (two cells, low 32 bits first): held, changed this command, and from the scroll wheel. */
+	public native void GetButtons(int held[2], int changed[2], int scroll[2]);
+	public native void GetViewAngles(float angles[3]);
+	public native void GetMove(float &forwardMove, float &leftMove, float &upMove);
+	public native int GetImpulse();
+	public native int GetWeaponSelect();
+	public native int GetClientTick();
+	public native int GetCommandNumber();
+	public native int GetSubtickMoveCount();
 	public native void CallOriginal();
 }
 
@@ -687,7 +700,7 @@ methodmap FullWalkMoveContext
 	public native void CallOriginal();
 }
 
-/** CCSPlayer_MovementServices::SetupMove(cmd, move); the command is opaque (CUserCmd). */
+/** CCSPlayer_MovementServices::SetupMove(cmd, move) */
 methodmap SetupMoveContext
 {
 	property CCSPlayer_MovementServices services
@@ -706,6 +719,17 @@ methodmap SetupMoveContext
 	{
 		public native get();
 	}
+	/** The command as a protobuf (CSGOUserCmdPB, read with Source2ModNetworkMessages); valid inside the handler, not closable, not sendable. A nested message the command does not have answers null. */
+	public native NetMessage GetCommand();
+	/** The button masks (two cells, low 32 bits first): held, changed this command, and from the scroll wheel. */
+	public native void GetButtons(int held[2], int changed[2], int scroll[2]);
+	public native void GetViewAngles(float angles[3]);
+	public native void GetMove(float &forwardMove, float &leftMove, float &upMove);
+	public native int GetImpulse();
+	public native int GetWeaponSelect();
+	public native int GetClientTick();
+	public native int GetCommandNumber();
+	public native int GetSubtickMoveCount();
 	public native void CallOriginal();
 }
 

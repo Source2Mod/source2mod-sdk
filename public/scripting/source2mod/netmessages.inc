@@ -34,6 +34,13 @@ typedef Source2ModClientMessageHook = function Source2ModAction (CPlayerSlot slo
 methodmap Source2ModNetworkMessages
 {
 	public static native NetMessage AllocateNetMessageByID(int messageId);
+
+	/**
+	 * Sends a message on one client's own channel, past the game event system
+	 * and its hooks. reliable false: in the next unreliable datagram.
+	 * @return false for no client or no net channel
+	 */
+	public static native bool SendMessageDirect(NetMessage msg, CPlayerSlot slot, bool reliable = true);
 	public static native NetMessage AllocateNetMessageByPartialName(const char[] name);
 	public static native void DeallocateNetMessage(NetMessage msg);
 

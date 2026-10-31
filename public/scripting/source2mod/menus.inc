@@ -157,8 +157,77 @@ methodmap CenterHtmlMenu < Handle
 	public native int GetColor(CenterHtmlMenuColor which, char[] buffer, int maxlen);
 }
 
+/**
+ * A menu whose drawing and keys are the script's: one open instance per player
+ * through the same manager as every other menu, so opening one closes what the
+ * player had open. Deleting the handle closes it for everyone on the next frame.
+ */
+typedef CustomMenuDisplay = function void (Source2ModMenuInstance menu, CCSPlayerController player, any data);
+typedef CustomMenuKey     = function void (Source2ModMenuInstance menu, CCSPlayerController player, int key, any data);
+typedef CustomMenuClose   = function void (Source2ModMenuInstance menu, CCSPlayerController player, CenterHtmlMenuEnd reason, any data);
+
+methodmap Source2ModMenuInstance < Handle
+{
+	/**
+	 * @param onDisplay Draws it, usually with ShowHtml: on opening, on Redraw and every RefreshInterval.
+	 * @param onKey     A key, 1-9.
+	 * @param onClose   It went away for a player; not called when the script itself is unloading.
+	 */
+	public native Source2ModMenuInstance(CustomMenuDisplay onDisplay, CustomMenuKey onKey, CustomMenuClose onClose = INVALID_FUNCTION, any data = 0);
+
+	public native void Open(CCSPlayerController player);
+	public native void Redraw(CCSPlayerController player);
+
+	/** Calls OnReset's function, then draws when redraw is true. */
+	public native void Reset(CCSPlayerController player, bool redraw = true);
+
+	/** Closes it for one player, or everyone with NULL_ENTITY. */
+	public native void Close(CCSPlayerController player = view_as<CCSPlayerController>(NULL_ENTITY));
+
+	public native bool IsOpenFor(CCSPlayerController player);
+
+	/** The center panel, sent only when it changed; unchanged it is sent again before the client's copy fades. */
+	public native void ShowHtml(CCSPlayerController player, const char[] html);
+
+	public native void OnReset(CustomMenuDisplay callback);
+
+	/** The keys the menu takes, bit 1 = key 1 ... bit 9 = key 9; the others stay with the game. Default 0x3FE. */
+	property int KeyMask
+	{
+		public native get();
+		public native set(int mask);
+	}
+
+	/** false: the number keys do nothing, for a menu worked some other way. */
+	property bool AcceptsKeys
+	{
+		public native get();
+		public native set(bool accepts);
+	}
+
+	/** Seconds between onDisplay calls while open; 0 (default) only when asked, which is what a full server needs. */
+	property float RefreshInterval
+	{
+		public native get();
+		public native set(float seconds);
+	}
+
+	/** Seconds until it closes by itself (MenuEnd_Timeout); 0 = never. */
+	property int Timeout
+	{
+		public native get();
+		public native set(int seconds);
+	}
+}
+
 methodmap Source2ModMenus
 {
+	/** The plugin whose menu the player has open (Source2Mod_OnPluginLoad's id); 0 for none or the core's. */
+	public static native int GetActiveMenuOwner(CCSPlayerController player);
+
+	/** The title of the player's open menu, any plugin's; empty for one without. @return Bytes written */
+	public static native int GetActiveMenuTitle(CCSPlayerController player, char[] buffer, int maxlen);
+
 	public static native void OpenCenterHtmlMenu(CCSPlayerController player, CenterHtmlMenu menu);
 
 	/** Whether the player has any menu open (of any plugin). */

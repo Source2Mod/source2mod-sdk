@@ -245,6 +245,14 @@ methodmap CServerSideClient
 	public native void ForceFullUpdate();
 
 	/**
+	 * Bans the client on the engine's own list, what "banid" adds to; plugins
+	 * keep any list of their own that must survive a restart. A sv_lan server
+	 * has no such list.
+	 * @param duration Minutes, 0 for good
+	 */
+	public native void Ban(float duration, bool kick = true);
+
+	/**
 	 * Asks the client for any of its ConVars (SVC_GetCvarValue). Unlike
 	 * Source2ModClients.GetClientConVar, which reads the copy of a userinfo
 	 * cvar the client sent on its own, this goes over the wire and back:
@@ -360,6 +368,18 @@ methodmap Source2ModClients
 
 	/** The slot of a connected client by user id; CPlayerSlot(-1) when there is none. */
 	public static native CPlayerSlot FromUserId(int userid);
+
+	/** CServerSideClient.Ban by SteamID (any form), whether connected or not. @return false when steamId is none */
+	public static native bool BanSteamId(const char[] steamId, float duration, bool kick = true);
+
+	/**
+	 * A fake client from the engine: in game with a controller. For a playing
+	 * bot use ServerCommand("bot_add"). CPlayerSlot(-1) when no slot is free.
+	 */
+	public static native CPlayerSlot CreateFakeClient(const char[] name);
+
+	/** A userinfo ConVar of a fake client. */
+	public static native void SetFakeClientConVar(CPlayerSlot slot, const char[] name, const char[] value);
 
 	/** The slot of a connected client by SteamID (any form); CPlayerSlot(-1) when there is none. */
 	public static native CPlayerSlot FromSteamId(const char[] steamId);

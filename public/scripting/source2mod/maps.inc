@@ -50,6 +50,10 @@ enum FindMapResult
 
 methodmap Source2ModMaps
 {
+	/** The addons mounted, comma separated. @return Bytes written */
+	public static native int GetMountedAddons(char[] buffer, int maxlen);
+	public static native bool IsAddonMounted(const char[] addon);
+
 	/** The map running now. @return Bytes written. */
 	public static native int GetCurrentMap(char[] buffer, int maxlen);
 

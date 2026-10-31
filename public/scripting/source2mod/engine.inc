@@ -136,6 +136,9 @@ methodmap Source2ModApi
 	public static native int FormatArgs(char[] buffer, int maxlen, const char[] format, int varpos);
 }
 
+/** A line the server printed: its logging channel, severity and the text with its newline. */
+typedef ConsoleOutputCallback = function void (const char[] channel, int severity, const char[] message);
+
 /** The engine server (IVEngineServer2). */
 methodmap Source2ModEngine
 {
@@ -185,4 +188,21 @@ methodmap Source2ModEngine
 
 	/** The server's time scale, 1 is normal (host_timescale without its cheat flag). */
 	public static native void SetTimescale(float scale);
+
+	/**
+	 * Listens to everything the server prints. Lines from other threads arrive
+	 * with the next line printed on the game thread. What the callback prints
+	 * itself does not come back to it.
+	 * @return The id RemoveConsoleListener takes
+	 */
+	public static native int AddConsoleListener(ConsoleOutputCallback callback);
+	public static native void RemoveConsoleListener(int id);
+
+	/**
+	 * Runs a console command now, as the server's console, and captures what it
+	 * prints. Unlike ServerCommand a ConVar name is not a command here; a command
+	 * that does not exist raises an error.
+	 * @return Bytes written
+	 */
+	public static native int ServerCommandEx(char[] output, int maxlen, const char[] format, any ...);
 }

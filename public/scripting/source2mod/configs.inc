@@ -56,6 +56,13 @@ typeset Source2ModConfigCallback
 };
 
 /**
+ * Checks a freshly read file before it goes live: return false to refuse it,
+ * with the reason in error. A reload then keeps the previous document, the first
+ * read fails Register. root is valid inside the call.
+ */
+typedef Source2ModConfigValidator = function bool (Source2ModConfig config, ISource2ModJSONValue root, char[] error, int maxlen);
+
+/**
  * One config file of this plugin. Freed with the plugin; delete it to forget
  * the config earlier (the files stay).
  */
@@ -74,7 +81,8 @@ methodmap Source2ModConfig < Handle
 	 */
 	public static native Source2ModConfig Register(const char[] name, const char[] defaults,
 	                                               Source2ModConfigCallback callback = INVALID_FUNCTION,
-	                                               int flags = SOURCE2MOD_CONFIG_DEFAULT);
+	                                               int flags = SOURCE2MOD_CONFIG_DEFAULT,
+	                                               Source2ModConfigValidator validator = INVALID_FUNCTION);
 
 	/** The admin's file merged over the defaults. */
 	public native ISource2ModJSONValue Root();
@@ -156,5 +164,5 @@ methodmap Source2ModConfigDefaults < Handle
 	 * delete this handle afterwards.
 	 */
 	public native Source2ModConfig Register(const char[] name, Source2ModConfigCallback callback = INVALID_FUNCTION,
-	                                        int flags = SOURCE2MOD_CONFIG_DEFAULT);
+	                                        int flags = SOURCE2MOD_CONFIG_DEFAULT, Source2ModConfigValidator validator = INVALID_FUNCTION);
 };
