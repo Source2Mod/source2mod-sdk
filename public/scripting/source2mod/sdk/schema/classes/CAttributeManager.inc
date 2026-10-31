@@ -8,6 +8,7 @@
 
 methodmap CAttributeManager < SchemaObject
 {
+	public int m_ProvidersCount() { return Source2ModSchema.GetUtlVectorCount(this, "CAttributeManager", "m_Providers"); }
 	property int m_iReapplyProvisionParity {
 		public get() { return Source2ModSchema.GetInt(this, "CAttributeManager", "m_iReapplyProvisionParity"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CAttributeManager", "m_iReapplyProvisionParity", value); }
@@ -24,4 +25,5 @@ methodmap CAttributeManager < SchemaObject
 		public get() { return Source2ModSchema.GetInt(this, "CAttributeManager", "m_ProviderType"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CAttributeManager", "m_ProviderType", value); }
 	}
+	public int m_CachedResultsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CAttributeManager", "m_CachedResults"); }
 }

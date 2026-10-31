@@ -54,6 +54,7 @@ methodmap CCSPlayer_WeaponServices < CPlayer_WeaponServices
 		public get() { return Source2ModSchema.GetBool(this, "CCSPlayer_WeaponServices", "m_bIsPickingUpGroundWeapon"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSPlayer_WeaponServices", "m_bIsPickingUpGroundWeapon", value); }
 	}
+	public int m_networkAnimTimingCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSPlayer_WeaponServices", "m_networkAnimTiming"); }
 	property bool m_bBlockInspectUntilNextGraphUpdate {
 		public get() { return Source2ModSchema.GetBool(this, "CCSPlayer_WeaponServices", "m_bBlockInspectUntilNextGraphUpdate"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSPlayer_WeaponServices", "m_bBlockInspectUntilNextGraphUpdate", value); }

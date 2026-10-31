@@ -10,10 +10,17 @@
 
 methodmap CSoundOpvarSetDomeEntity < CSoundOpvarSetPointEntity
 {
+	public int m_arDirectionsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSoundOpvarSetDomeEntity", "m_arDirections"); }
+	public int m_arOpennessCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSoundOpvarSetDomeEntity", "m_arOpenness"); }
+	public int m_arNeighborsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSoundOpvarSetDomeEntity", "m_arNeighbors"); }
 	property int m_nCurrentIndex {
 		public get() { return Source2ModSchema.GetInt(this, "CSoundOpvarSetDomeEntity", "m_nCurrentIndex"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CSoundOpvarSetDomeEntity", "m_nCurrentIndex", value); }
 	}
+	public int m_arClusterParentCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSoundOpvarSetDomeEntity", "m_arClusterParent"); }
+	public int m_arClusterSizeCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSoundOpvarSetDomeEntity", "m_arClusterSize"); }
+	public int m_arClusterWeightCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSoundOpvarSetDomeEntity", "m_arClusterWeight"); }
+	public int m_arClusterDirSumCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSoundOpvarSetDomeEntity", "m_arClusterDirSum"); }
 	property int m_nClusterIndex {
 		public get() { return Source2ModSchema.GetInt(this, "CSoundOpvarSetDomeEntity", "m_nClusterIndex"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CSoundOpvarSetDomeEntity", "m_nClusterIndex", value); }

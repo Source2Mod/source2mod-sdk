@@ -58,6 +58,7 @@ methodmap CPathMoverEntitySpawner < CLogicalEntity
 		public get() { return Source2ModSchema.GetBool(this, "CPathMoverEntitySpawner", "m_bDestroyMoverOnArrivedAtEnd"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CPathMoverEntitySpawner", "m_bDestroyMoverOnArrivedAtEnd", value); }
 	}
+	public int m_vecQueuedRemovalsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathMoverEntitySpawner", "m_vecQueuedRemovals"); }
 	public int m_iszPathMoverName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CPathMoverEntitySpawner", "m_iszPathMoverName", buffer, maxlen); }
 	property bool m_bPrepopulateOnSpawn {
 		public get() { return Source2ModSchema.GetBool(this, "CPathMoverEntitySpawner", "m_bPrepopulateOnSpawn"); }

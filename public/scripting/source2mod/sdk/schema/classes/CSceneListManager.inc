@@ -10,6 +10,7 @@
 
 methodmap CSceneListManager < CLogicalEntity
 {
+	public int m_hListManagersCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSceneListManager", "m_hListManagers"); }
 	public int m_iszScenes(int index, char[] buffer, int maxlen) { return Source2ModSchema.GetArrayString(this, "CSceneListManager", "m_iszScenes", index, buffer, maxlen); }
 	public int m_iszScenes_Count() { return Source2ModSchema.GetArraySize("CSceneListManager", "m_iszScenes"); }
 	public CBaseEntity m_hScenes(int index) { return view_as<CBaseEntity>(Source2ModSchema.GetArrayHandle(this, "CSceneListManager", "m_hScenes", index)); }

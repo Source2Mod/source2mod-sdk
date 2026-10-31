@@ -8,6 +8,7 @@
 
 methodmap PhysicsRagdollPose_t < SchemaObject
 {
+	public int m_RelativeTransformsCount() { return Source2ModSchema.GetUtlVectorCount(this, "PhysicsRagdollPose_t", "m_RelativeTransforms"); }
 	property CBaseEntity m_hOwner {
 		public get() { return view_as<CBaseEntity>(Source2ModSchema.GetHandle(this, "PhysicsRagdollPose_t", "m_hOwner")); }
 		public set(CBaseEntity value) { Source2ModSchema.SetHandle(this, "PhysicsRagdollPose_t", "m_hOwner", value); }

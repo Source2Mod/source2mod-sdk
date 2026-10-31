@@ -12,6 +12,7 @@ methodmap CFuncLadder < CBaseModelEntity
 {
 	public void m_vecLadderDir(float vec[3]) { Source2ModSchema.GetVector(this, "CFuncLadder", "m_vecLadderDir", vec); }
 	public void Set_m_vecLadderDir(const float vec[3]) { Source2ModSchema.SetVector(this, "CFuncLadder", "m_vecLadderDir", vec); }
+	public int m_DismountsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CFuncLadder", "m_Dismounts"); }
 	public void m_vecLocalTop(float vec[3]) { Source2ModSchema.GetVector(this, "CFuncLadder", "m_vecLocalTop", vec); }
 	public void Set_m_vecLocalTop(const float vec[3]) { Source2ModSchema.SetVector(this, "CFuncLadder", "m_vecLocalTop", vec); }
 	public void m_vecPlayerMountPositionTop(float vec[3]) { Source2ModSchema.GetVector(this, "CFuncLadder", "m_vecPlayerMountPositionTop", vec); }

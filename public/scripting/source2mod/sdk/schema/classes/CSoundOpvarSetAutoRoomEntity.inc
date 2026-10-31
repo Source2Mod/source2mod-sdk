@@ -10,6 +10,8 @@
 
 methodmap CSoundOpvarSetAutoRoomEntity < CSoundOpvarSetPointEntity
 {
+	public int m_traceResultsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSoundOpvarSetAutoRoomEntity", "m_traceResults"); }
+	public int m_doorwayPairsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSoundOpvarSetAutoRoomEntity", "m_doorwayPairs"); }
 	property float m_flSize {
 		public get() { return Source2ModSchema.GetFloat(this, "CSoundOpvarSetAutoRoomEntity", "m_flSize"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CSoundOpvarSetAutoRoomEntity", "m_flSize", value); }

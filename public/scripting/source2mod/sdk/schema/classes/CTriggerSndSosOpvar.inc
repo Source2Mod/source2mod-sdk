@@ -10,6 +10,7 @@
 
 methodmap CTriggerSndSosOpvar < CBaseTrigger
 {
+	public int m_hTouchingPlayersCount() { return Source2ModSchema.GetUtlVectorCount(this, "CTriggerSndSosOpvar", "m_hTouchingPlayers"); }
 	public void m_flPosition(float vec[3]) { Source2ModSchema.GetVector(this, "CTriggerSndSosOpvar", "m_flPosition", vec); }
 	public void Set_m_flPosition(const float vec[3]) { Source2ModSchema.SetVector(this, "CTriggerSndSosOpvar", "m_flPosition", vec); }
 	property float m_flCenterSize {

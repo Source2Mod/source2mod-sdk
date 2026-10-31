@@ -26,6 +26,7 @@ methodmap CSmokeGrenadeProjectile < CBaseCSGrenadeProjectile
 	public void Set_m_vSmokeColor(const float vec[3]) { Source2ModSchema.SetVector(this, "CSmokeGrenadeProjectile", "m_vSmokeColor", vec); }
 	public void m_vSmokeDetonationPos(float vec[3]) { Source2ModSchema.GetVector(this, "CSmokeGrenadeProjectile", "m_vSmokeDetonationPos", vec); }
 	public void Set_m_vSmokeDetonationPos(const float vec[3]) { Source2ModSchema.SetVector(this, "CSmokeGrenadeProjectile", "m_vSmokeDetonationPos", vec); }
+	public int m_VoxelFrameDataCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSmokeGrenadeProjectile", "m_VoxelFrameData"); }
 	property int m_nVoxelFrameDataSize {
 		public get() { return Source2ModSchema.GetInt(this, "CSmokeGrenadeProjectile", "m_nVoxelFrameDataSize"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CSmokeGrenadeProjectile", "m_nVoxelFrameDataSize", value); }

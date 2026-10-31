@@ -19,6 +19,7 @@ methodmap CPathParticleRope < CBaseEntity
 		public set(float value) { Source2ModSchema.SetFloat(this, "CPathParticleRope", "m_flMaxSimulationTime", value); }
 	}
 	public int m_iszEffectName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CPathParticleRope", "m_iszEffectName", buffer, maxlen); }
+	public int m_PathNodes_NameCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathParticleRope", "m_PathNodes_Name"); }
 	property float m_flParticleSpacing {
 		public get() { return Source2ModSchema.GetFloat(this, "CPathParticleRope", "m_flParticleSpacing"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CPathParticleRope", "m_flParticleSpacing", value); }
@@ -37,4 +38,10 @@ methodmap CPathParticleRope < CBaseEntity
 		public get() { return Source2ModSchema.GetInt(this, "CPathParticleRope", "m_nEffectState"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CPathParticleRope", "m_nEffectState", value); }
 	}
+	public int m_PathNodes_PositionCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathParticleRope", "m_PathNodes_Position"); }
+	public int m_PathNodes_TangentInCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathParticleRope", "m_PathNodes_TangentIn"); }
+	public int m_PathNodes_TangentOutCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathParticleRope", "m_PathNodes_TangentOut"); }
+	public int m_PathNodes_ColorCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathParticleRope", "m_PathNodes_Color"); }
+	public int m_PathNodes_PinEnabledCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathParticleRope", "m_PathNodes_PinEnabled"); }
+	public int m_PathNodes_RadiusScaleCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathParticleRope", "m_PathNodes_RadiusScale"); }
 }

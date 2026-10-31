@@ -30,6 +30,7 @@ methodmap CFishPool < CBaseEntity
 		public get() { return Source2ModSchema.GetBool(this, "CFishPool", "m_isDormant"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CFishPool", "m_isDormant", value); }
 	}
+	public int m_fishesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CFishPool", "m_fishes"); }
 	property CountdownTimer m_visTimer {
 		public get() { return view_as<CountdownTimer>(Source2ModSchema.GetObject(this, "CFishPool", "m_visTimer")); }
 	}

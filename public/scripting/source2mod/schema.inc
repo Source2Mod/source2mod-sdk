@@ -59,6 +59,43 @@ methodmap CEntityInstance
  * generated properties are made of, for the fields they do not cover.
  * `instance` is an entity or a SchemaObject.
  */
+/**
+ * Memory of a script's own, for what an engine call takes by pointer: a plain
+ * struct, an out-parameter, a pointer array. Zeroed when made, freed on delete or
+ * when the script goes, and whatever was reached through it (Source2ModMemory.Offset)
+ * stops working then. Usable as the instance of every *At and as a Pointer argument;
+ * *At offsets are checked against the size.
+ *
+ * Nothing can tell whether the engine kept the pointer past a call: keep the block
+ * alive while it may, or Release it when the engine is the one that frees it.
+ */
+methodmap Source2ModMemoryBlock < Handle
+{
+	public native Source2ModMemoryBlock(int size, int align = 0);
+
+	property int Size
+	{
+		public native get();
+	}
+
+	/** The block as an address. */
+	property SchemaObject Address
+	{
+		public get() { return view_as<SchemaObject>(this); }
+	}
+
+	public native void Fill(int offset, int value, int bytes);
+	public native void CopyFrom(int offset, SchemaObject src, int srcOffset, int bytes);
+	public native void CopyTo(int offset, SchemaObject dst, int dstOffset, int bytes);
+
+	/**
+	 * Hands the memory to the engine: it is no longer freed here and this handle
+	 * is gone. Refused for an aligned block.
+	 * @return Its address
+	 */
+	public native SchemaObject Release();
+}
+
 methodmap Source2ModSchema
 {
 	/** Integer fields up to 32 bits; a 64-bit one throws (GetInt64 / SetInt64). */
@@ -148,6 +185,15 @@ methodmap Source2ModSchema
 	public static native SchemaObject GetEmbeddedAt(any instance, int offset);
 	/** A char* stored at the offset (CUtlSymbolLarge, CUtlString, const char*). */
 	public static native int GetStringPointerAt(any instance, int offset, char[] buffer, int maxlen);
+
+	/** Stores a pointer at the offset; null stores 0. */
+	public static native void SetObjectAt(any instance, int offset, SchemaObject pointer);
+
+	/** Chars stored at the offset itself, not a pointer to them. @return Bytes written */
+	public static native int GetStringAt(any instance, int offset, char[] buffer, int maxlen);
+
+	/** Writes chars at the offset, always terminated inside maxBytes. */
+	public static native void SetStringAt(any instance, int offset, const char[] value, int maxBytes);
 
 	/** A CUtlVector field (networked ones too): how many elements. */
 	public static native int GetUtlVectorCount(any instance, const char[] className, const char[] field);

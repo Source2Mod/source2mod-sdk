@@ -8,6 +8,7 @@
 
 methodmap CAnimGraphControllerManager < SchemaObject
 {
+	public int m_controllersCount() { return Source2ModSchema.GetUtlVectorCount(this, "CAnimGraphControllerManager", "m_controllers"); }
 	property bool m_bGraphBindingsCreated {
 		public get() { return Source2ModSchema.GetBool(this, "CAnimGraphControllerManager", "m_bGraphBindingsCreated"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CAnimGraphControllerManager", "m_bGraphBindingsCreated", value); }

@@ -42,4 +42,5 @@ methodmap CCSPlayerController_InventoryServices < CPlayerControllerComponent
 	public int m_unEquippedPlayerSprayIDs_Count() { return Source2ModSchema.GetArraySize("CCSPlayerController_InventoryServices", "m_unEquippedPlayerSprayIDs"); }
 	public void m_unCurrentLoadoutHash(int value[2]) { Source2ModSchema.GetInt64(this, "CCSPlayerController_InventoryServices", "m_unCurrentLoadoutHash", value); }
 	public void Set_m_unCurrentLoadoutHash(const int value[2]) { Source2ModSchema.SetInt64(this, "CCSPlayerController_InventoryServices", "m_unCurrentLoadoutHash", value); }
+	public int m_vecServerAuthoritativeWeaponSlotsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSPlayerController_InventoryServices", "m_vecServerAuthoritativeWeaponSlots"); }
 }

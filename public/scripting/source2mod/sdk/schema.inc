@@ -774,3 +774,13 @@
 #include <source2mod/sdk/schema/enums/ValueRemapperHapticsType_t>
 #include <source2mod/sdk/schema/enums/ValueRemapperMomentumType_t>
 #include <source2mod/sdk/schema/enums/ValueRemapperRatchetType_t>
+#include <source2mod/sdk/schema/enums/CSWeaponNameID>
+#include <source2mod/sdk/schema/enums/AmmoFlags_t>
+#include <source2mod/sdk/schema/enums/SpawnGroupFlags_t>
+#include <source2mod/sdk/schema/enums/InputBitMask_t>
+#include <source2mod/sdk/schema/enums/TOGGLE_STATE>
+#include <source2mod/sdk/schema/enums/ForcedCrouchState_t>
+#include <source2mod/sdk/schema/enums/SurroundingBoundsType_t>
+#include <source2mod/sdk/schema/enums/EntityPlatformTypes_t>
+#include <source2mod/sdk/schema/enums/RumbleEffect_t>
+#include <source2mod/sdk/schema/enums/JointMotion_t>

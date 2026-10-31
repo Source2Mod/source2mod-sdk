@@ -15,9 +15,13 @@ methodmap CCSCustomHudLayout < CBaseEntity
 		public get() { return Source2ModSchema.GetBool(this, "CCSCustomHudLayout", "m_bObservable"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSCustomHudLayout", "m_bObservable", value); }
 	}
+	public int m_vecPlayerLayoutStatesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSCustomHudLayout", "m_vecPlayerLayoutStates"); }
 	property CCSCustomHudLayoutState m_globalLayoutState {
 		public get() { return view_as<CCSCustomHudLayoutState>(Source2ModSchema.GetObject(this, "CCSCustomHudLayout", "m_globalLayoutState")); }
 	}
+	public int m_vecPanelIdsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSCustomHudLayout", "m_vecPanelIds"); }
+	public int m_vecClassNamesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSCustomHudLayout", "m_vecClassNames"); }
+	public int m_vecDialogVariableNamesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSCustomHudLayout", "m_vecDialogVariableNames"); }
 	// NULL_ENTITY as the controller: every player (the layout's shared state).
 	public static native CCSCustomHudLayout Create(const char[] layout, const char[] targetName = "");
 	public native CCSCustomHudLayoutState GetLayoutState(CCSPlayerController controller = NULL_ENTITY);

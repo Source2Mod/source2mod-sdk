@@ -18,6 +18,10 @@ methodmap Source2ModFiles
 	public static native int ResolvePath(const char[] path, char[] buffer, int maxlen);
 
 	public static native bool FileExists(const char[] path);
+
+	/** Whether the engine's file system has it, inside VPKs too: a compiled resource ("materials/x.vmat_c"). */
+	public static native bool ExistsInGame(const char[] path, const char[] pathId = "GAME");
+
 	public static native bool DirExists(const char[] path);
 
 	/** -1 when there is no such file. */

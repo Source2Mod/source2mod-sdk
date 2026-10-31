@@ -14,4 +14,5 @@ methodmap CCSPlayerController_DamageServices < CPlayerControllerComponent
 		public get() { return Source2ModSchema.GetInt(this, "CCSPlayerController_DamageServices", "m_nSendUpdate"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSPlayerController_DamageServices", "m_nSendUpdate", value); }
 	}
+	public int m_DamageListCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSPlayerController_DamageServices", "m_DamageList"); }
 }

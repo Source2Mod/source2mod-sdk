@@ -32,6 +32,7 @@ methodmap CTriggerLerpObject < CBaseTrigger
 		public get() { return Source2ModSchema.GetBool(this, "CTriggerLerpObject", "m_bSingleLerpObject"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CTriggerLerpObject", "m_bSingleLerpObject", value); }
 	}
+	public int m_vecLerpingObjectsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CTriggerLerpObject", "m_vecLerpingObjects"); }
 	public int m_iszLerpEffect(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CTriggerLerpObject", "m_iszLerpEffect", buffer, maxlen); }
 	public int m_iszLerpSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CTriggerLerpObject", "m_iszLerpSound", buffer, maxlen); }
 	property bool m_bAttachTouchingObject {

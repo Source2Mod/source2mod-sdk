@@ -29,9 +29,12 @@ methodmap CInfoOffscreenPanoramaTexture < CPointEntity
 	public int m_szPanelType(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CInfoOffscreenPanoramaTexture", "m_szPanelType", buffer, maxlen); }
 	public int m_szLayoutFileName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CInfoOffscreenPanoramaTexture", "m_szLayoutFileName", buffer, maxlen); }
 	public int m_RenderAttrName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CInfoOffscreenPanoramaTexture", "m_RenderAttrName", buffer, maxlen); }
+	public int m_TargetEntitiesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CInfoOffscreenPanoramaTexture", "m_TargetEntities"); }
 	property int m_nTargetChangeCount {
 		public get() { return Source2ModSchema.GetInt(this, "CInfoOffscreenPanoramaTexture", "m_nTargetChangeCount"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CInfoOffscreenPanoramaTexture", "m_nTargetChangeCount", value); }
 	}
+	public int m_vecCSSClassesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CInfoOffscreenPanoramaTexture", "m_vecCSSClasses"); }
 	public int m_szTargetsName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CInfoOffscreenPanoramaTexture", "m_szTargetsName", buffer, maxlen); }
+	public int m_AdditionalTargetEntitiesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CInfoOffscreenPanoramaTexture", "m_AdditionalTargetEntities"); }
 }

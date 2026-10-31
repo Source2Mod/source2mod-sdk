@@ -326,6 +326,7 @@ methodmap CCSGameRules < CTeamplayRules
 		public get() { return Source2ModSchema.GetInt(this, "CCSGameRules", "m_iNumSpawnableCT"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSGameRules", "m_iNumSpawnableCT", value); }
 	}
+	public int m_arrSelectedHostageSpawnIndicesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSGameRules", "m_arrSelectedHostageSpawnIndices"); }
 	property int m_nSpawnPointsRandomSeed {
 		public get() { return Source2ModSchema.GetInt(this, "CCSGameRules", "m_nSpawnPointsRandomSeed"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSGameRules", "m_nSpawnPointsRandomSeed", value); }
@@ -350,6 +351,7 @@ methodmap CCSGameRules < CTeamplayRules
 		public get() { return Source2ModSchema.GetBool(this, "CCSGameRules", "m_bSwapTeamsOnRestart"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSGameRules", "m_bSwapTeamsOnRestart", value); }
 	}
+	public int m_nEndMatchTiedVotesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSGameRules", "m_nEndMatchTiedVotes"); }
 	property bool m_bNeedToAskPlayersForContinueVote {
 		public get() { return Source2ModSchema.GetBool(this, "CCSGameRules", "m_bNeedToAskPlayersForContinueVote"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSGameRules", "m_bNeedToAskPlayersForContinueVote", value); }
@@ -532,6 +534,8 @@ methodmap CCSGameRules < CTeamplayRules
 	}
 	public void m_vecMainCTSpawnPos(float vec[3]) { Source2ModSchema.GetVector(this, "CCSGameRules", "m_vecMainCTSpawnPos", vec); }
 	public void Set_m_vecMainCTSpawnPos(const float vec[3]) { Source2ModSchema.SetVector(this, "CCSGameRules", "m_vecMainCTSpawnPos", vec); }
+	public int m_CTSpawnPointsMasterListCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSGameRules", "m_CTSpawnPointsMasterList"); }
+	public int m_TerroristSpawnPointsMasterListCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSGameRules", "m_TerroristSpawnPointsMasterList"); }
 	property bool m_bRespawningAllRespawnablePlayers {
 		public get() { return Source2ModSchema.GetBool(this, "CCSGameRules", "m_bRespawningAllRespawnablePlayers"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSGameRules", "m_bRespawningAllRespawnablePlayers", value); }
@@ -552,6 +556,8 @@ methodmap CCSGameRules < CTeamplayRules
 		public get() { return Source2ModSchema.GetFloat(this, "CCSGameRules", "m_flTerroristSpawnPointUsedTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CCSGameRules", "m_flTerroristSpawnPointUsedTime", value); }
 	}
+	public int m_CTSpawnPointsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSGameRules", "m_CTSpawnPoints"); }
+	public int m_TerroristSpawnPointsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSGameRules", "m_TerroristSpawnPoints"); }
 	property bool m_bIsUnreservedGameServer {
 		public get() { return Source2ModSchema.GetBool(this, "CCSGameRules", "m_bIsUnreservedGameServer"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSGameRules", "m_bIsUnreservedGameServer", value); }

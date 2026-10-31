@@ -8,4 +8,5 @@
 
 methodmap WeaponPurchaseTracker_t < SchemaObject
 {
+	public int m_weaponPurchasesCount() { return Source2ModSchema.GetUtlVectorCount(this, "WeaponPurchaseTracker_t", "m_weaponPurchases"); }
 }

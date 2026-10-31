@@ -10,6 +10,8 @@
 
 methodmap CTeam < CBaseEntity
 {
+	public int m_aPlayerControllersCount() { return Source2ModSchema.GetUtlVectorCount(this, "CTeam", "m_aPlayerControllers"); }
+	public int m_aPlayersCount() { return Source2ModSchema.GetUtlVectorCount(this, "CTeam", "m_aPlayers"); }
 	property int m_iScore {
 		public get() { return Source2ModSchema.GetInt(this, "CTeam", "m_iScore"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CTeam", "m_iScore", value); }

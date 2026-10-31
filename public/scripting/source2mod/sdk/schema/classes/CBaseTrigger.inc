@@ -10,6 +10,7 @@
 
 methodmap CBaseTrigger < CBaseToggle
 {
+	public int m_hTouchingEntitiesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseTrigger", "m_hTouchingEntities"); }
 	public int m_iFilterName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseTrigger", "m_iFilterName", buffer, maxlen); }
 	property CBaseFilter m_hFilter {
 		public get() { return view_as<CBaseFilter>(Source2ModSchema.GetHandle(this, "CBaseTrigger", "m_hFilter")); }

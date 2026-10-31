@@ -15,4 +15,5 @@ methodmap CTriggerSoundscape < CBaseTrigger
 		public set(CEnvSoundscapeTriggerable value) { Source2ModSchema.SetHandle(this, "CTriggerSoundscape", "m_hSoundscape", value); }
 	}
 	public int m_SoundscapeName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CTriggerSoundscape", "m_SoundscapeName", buffer, maxlen); }
+	public int m_spectatorsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CTriggerSoundscape", "m_spectators"); }
 }

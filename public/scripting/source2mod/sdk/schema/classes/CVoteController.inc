@@ -53,4 +53,6 @@ methodmap CVoteController < CBaseEntity
 		public get() { return Source2ModSchema.GetInt(this, "CVoteController", "m_nHighestCountIndex"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CVoteController", "m_nHighestCountIndex", value); }
 	}
+	public int m_potentialIssuesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CVoteController", "m_potentialIssues"); }
+	public int m_VoteOptionsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CVoteController", "m_VoteOptions"); }
 }

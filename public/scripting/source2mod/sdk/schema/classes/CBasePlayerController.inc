@@ -32,6 +32,7 @@ methodmap CBasePlayerController < CBaseEntity
 		public get() { return view_as<CBasePlayerController>(Source2ModSchema.GetHandle(this, "CBasePlayerController", "m_hSplitOwner")); }
 		public set(CBasePlayerController value) { Source2ModSchema.SetHandle(this, "CBasePlayerController", "m_hSplitOwner", value); }
 	}
+	public int m_hSplitScreenPlayersCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBasePlayerController", "m_hSplitScreenPlayers"); }
 	property bool m_bIsHLTV {
 		public get() { return Source2ModSchema.GetBool(this, "CBasePlayerController", "m_bIsHLTV"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CBasePlayerController", "m_bIsHLTV", value); }

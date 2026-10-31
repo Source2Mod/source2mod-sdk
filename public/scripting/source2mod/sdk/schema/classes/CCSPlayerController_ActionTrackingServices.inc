@@ -10,6 +10,7 @@
 
 methodmap CCSPlayerController_ActionTrackingServices < CPlayerControllerComponent
 {
+	public int m_perRoundStatsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSPlayerController_ActionTrackingServices", "m_perRoundStats"); }
 	property CSMatchStats_t m_matchStats {
 		public get() { return view_as<CSMatchStats_t>(Source2ModSchema.GetObject(this, "CCSPlayerController_ActionTrackingServices", "m_matchStats")); }
 	}

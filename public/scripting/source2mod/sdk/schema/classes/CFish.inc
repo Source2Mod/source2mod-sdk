@@ -90,4 +90,5 @@ methodmap CFish < CBaseAnimGraph
 	property CountdownTimer m_proximityTimer {
 		public get() { return view_as<CountdownTimer>(Source2ModSchema.GetObject(this, "CFish", "m_proximityTimer")); }
 	}
+	public int m_visibleCount() { return Source2ModSchema.GetUtlVectorCount(this, "CFish", "m_visible"); }
 }

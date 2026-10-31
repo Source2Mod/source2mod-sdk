@@ -52,4 +52,5 @@ methodmap CTriggerHurt < CBaseTrigger
 		public get() { return Source2ModSchema.GetFloat(this, "CTriggerHurt", "m_hurtThinkPeriod"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CTriggerHurt", "m_hurtThinkPeriod", value); }
 	}
+	public int m_hurtEntitiesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CTriggerHurt", "m_hurtEntities"); }
 }

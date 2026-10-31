@@ -10,4 +10,5 @@
 
 methodmap CCSPlayer_BuyServices < CPlayerPawnComponent
 {
+	public int m_vecSellbackPurchaseEntriesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSPlayer_BuyServices", "m_vecSellbackPurchaseEntries"); }
 }

@@ -14,4 +14,5 @@ methodmap CLogicBranch < CLogicalEntity
 		public get() { return Source2ModSchema.GetBool(this, "CLogicBranch", "m_bInValue"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CLogicBranch", "m_bInValue", value); }
 	}
+	public int m_ListenersCount() { return Source2ModSchema.GetUtlVectorCount(this, "CLogicBranch", "m_Listeners"); }
 }

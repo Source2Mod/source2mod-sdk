@@ -144,10 +144,13 @@ methodmap CSceneEntity < CPointEntity
 		public get() { return Source2ModSchema.GetBool(this, "CSceneEntity", "m_bSceneFinished"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CSceneEntity", "m_bSceneFinished", value); }
 	}
+	public int m_hActorListCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSceneEntity", "m_hActorList"); }
+	public int m_hRemoveActorListCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSceneEntity", "m_hRemoveActorList"); }
 	property int m_nSceneStringIndex {
 		public get() { return Source2ModSchema.GetInt(this, "CSceneEntity", "m_nSceneStringIndex"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CSceneEntity", "m_nSceneStringIndex", value); }
 	}
+	public int m_ActorMapCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSceneEntity", "m_ActorMap"); }
 	property CSceneEntity m_hInterruptScene {
 		public get() { return view_as<CSceneEntity>(Source2ModSchema.GetHandle(this, "CSceneEntity", "m_hInterruptScene")); }
 		public set(CSceneEntity value) { Source2ModSchema.SetHandle(this, "CSceneEntity", "m_hInterruptScene", value); }
@@ -178,6 +181,8 @@ methodmap CSceneEntity < CPointEntity
 		public get() { return Source2ModSchema.GetBool(this, "CSceneEntity", "m_bRestoring"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CSceneEntity", "m_bRestoring", value); }
 	}
+	public int m_hNotifySceneCompletionCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSceneEntity", "m_hNotifySceneCompletion"); }
+	public int m_hListManagersCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSceneEntity", "m_hListManagers"); }
 	public int m_iszSoundName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CSceneEntity", "m_iszSoundName", buffer, maxlen); }
 	public int m_iszSequenceName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CSceneEntity", "m_iszSequenceName", buffer, maxlen); }
 	property CBaseModelEntity m_hActor {

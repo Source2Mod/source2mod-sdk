@@ -32,4 +32,5 @@ methodmap CMultiLightProxy < CLogicalEntity
 		public get() { return Source2ModSchema.GetFloat(this, "CMultiLightProxy", "m_flCurrentBrightnessMultiplier"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CMultiLightProxy", "m_flCurrentBrightnessMultiplier", value); }
 	}
+	public int m_vecLightsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CMultiLightProxy", "m_vecLights"); }
 }

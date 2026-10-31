@@ -34,4 +34,8 @@ methodmap CBuoyancyHelper < SchemaObject
 		public get() { return Source2ModSchema.GetBool(this, "CBuoyancyHelper", "m_bNeutrallyBuoyant"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CBuoyancyHelper", "m_bNeutrallyBuoyant", value); }
 	}
+	public int m_vecFractionOfWheelSubmergedForWheelFrictionCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBuoyancyHelper", "m_vecFractionOfWheelSubmergedForWheelFriction"); }
+	public int m_vecWheelFrictionScalesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBuoyancyHelper", "m_vecWheelFrictionScales"); }
+	public int m_vecFractionOfWheelSubmergedForWheelDragCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBuoyancyHelper", "m_vecFractionOfWheelSubmergedForWheelDrag"); }
+	public int m_vecWheelDragCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBuoyancyHelper", "m_vecWheelDrag"); }
 }

@@ -10,6 +10,7 @@
 
 methodmap CPlayer_WeaponServices < CPlayerPawnComponent
 {
+	public int m_hMyWeaponsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPlayer_WeaponServices", "m_hMyWeapons"); }
 	property CBasePlayerWeapon m_hActiveWeapon {
 		public get() { return view_as<CBasePlayerWeapon>(Source2ModSchema.GetHandle(this, "CPlayer_WeaponServices", "m_hActiveWeapon")); }
 		public set(CBasePlayerWeapon value) { Source2ModSchema.SetHandle(this, "CPlayer_WeaponServices", "m_hActiveWeapon", value); }

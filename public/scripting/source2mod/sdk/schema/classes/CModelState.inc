@@ -38,6 +38,7 @@ methodmap CModelState < SchemaObject
 	}
 	public void m_MeshGroupMask(int value[2]) { Source2ModSchema.GetInt64(this, "CModelState", "m_MeshGroupMask", value); }
 	public void Set_m_MeshGroupMask(const int value[2]) { Source2ModSchema.SetInt64(this, "CModelState", "m_MeshGroupMask", value); }
+	public int m_nBodyGroupChoicesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CModelState", "m_nBodyGroupChoices"); }
 	property int m_nIdealMotionType {
 		public get() { return Source2ModSchema.GetInt(this, "CModelState", "m_nIdealMotionType"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CModelState", "m_nIdealMotionType", value); }

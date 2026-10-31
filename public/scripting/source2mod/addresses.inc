@@ -1,7 +1,7 @@
 /**
  * Source2Mod SourcePawn API: the core's resolved game functions
- * (ISource2ModAddresses, the ADDR_* getters), for Source2ModFunction and
- * Source2ModHook.FromAddress. The list follows the C++ interface; the core
+ * (ISource2ModAddresses, the ADDR_* getters), for Source2ModFunction.FromAddress
+ * and Source2ModHooks.HookFunction on it. The list follows the C++ interface; the core
  * resolves them from its own gamedata, so a script never needs a signature
  * for these.
  *
@@ -84,4 +84,7 @@ methodmap Source2ModAddresses
 {
 	/** Whether the core resolved this function on the running game. */
 	public static native bool IsResolved(Source2ModAddress address);
+
+	/** Where it is; null when it is not resolved. */
+	public static native SchemaObject Get(Source2ModAddress address);
 }

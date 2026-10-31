@@ -8,6 +8,7 @@
 
 methodmap CAttributeList < SchemaObject
 {
+	public int m_AttributesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CAttributeList", "m_Attributes"); }
 	property CAttributeManager m_pManager {
 		public get() { return view_as<CAttributeManager>(Source2ModSchema.GetObject(this, "CAttributeList", "m_pManager")); }
 	}

@@ -37,6 +37,7 @@ methodmap CBasePlayerPawn < CBaseCombatCharacter
 	property CPlayer_MovementServices m_pMovementServices {
 		public get() { return view_as<CPlayer_MovementServices>(Source2ModSchema.GetObject(this, "CBasePlayerPawn", "m_pMovementServices")); }
 	}
+	public int m_ServerViewAngleChangesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBasePlayerPawn", "m_ServerViewAngleChanges"); }
 	public void v_angle(float vec[3]) { Source2ModSchema.GetVector(this, "CBasePlayerPawn", "v_angle", vec); }
 	public void Set_v_angle(const float vec[3]) { Source2ModSchema.SetVector(this, "CBasePlayerPawn", "v_angle", vec); }
 	public void v_anglePrevious(float vec[3]) { Source2ModSchema.GetVector(this, "CBasePlayerPawn", "v_anglePrevious", vec); }
@@ -84,6 +85,7 @@ methodmap CBasePlayerPawn < CBaseCombatCharacter
 		public get() { return Source2ModSchema.GetInt(this, "CBasePlayerPawn", "m_iHltvReplayEntity"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBasePlayerPawn", "m_iHltvReplayEntity", value); }
 	}
+	public int m_sndOpvarLatchDataCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBasePlayerPawn", "m_sndOpvarLatchData"); }
 	public native void CommitSuicide(bool explode, bool force, Source2ModHookChain chain = HookChain_Default);
 	public native void SnapViewAngles(const float angles[3], Source2ModHookChain chain = HookChain_Default);
 	public native CCSPlayerController GetController();

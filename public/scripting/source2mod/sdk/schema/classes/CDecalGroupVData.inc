@@ -8,6 +8,7 @@
 
 methodmap CDecalGroupVData < SchemaObject
 {
+	public int m_vecOptionsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CDecalGroupVData", "m_vecOptions"); }
 	property float m_flTotalProbability {
 		public get() { return Source2ModSchema.GetFloat(this, "CDecalGroupVData", "m_flTotalProbability"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CDecalGroupVData", "m_flTotalProbability", value); }

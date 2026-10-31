@@ -14,6 +14,7 @@ methodmap CBaseEntity < CEntityInstance
 	property CNetworkTransmitComponent m_NetworkTransmitComponent {
 		public get() { return view_as<CNetworkTransmitComponent>(Source2ModSchema.GetObject(this, "CBaseEntity", "m_NetworkTransmitComponent")); }
 	}
+	public int m_aThinkFunctionsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseEntity", "m_aThinkFunctions"); }
 	property int m_iCurrentThinkContext {
 		public get() { return Source2ModSchema.GetInt(this, "CBaseEntity", "m_iCurrentThinkContext"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBaseEntity", "m_iCurrentThinkContext", value); }
@@ -30,6 +31,7 @@ methodmap CBaseEntity < CEntityInstance
 		public get() { return Source2ModSchema.GetFloat(this, "CBaseEntity", "m_lastNetworkChange"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBaseEntity", "m_lastNetworkChange", value); }
 	}
+	public int m_ResponseContextsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseEntity", "m_ResponseContexts"); }
 	public int m_iszResponseContext(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseEntity", "m_iszResponseContext", buffer, maxlen); }
 	property int m_iHealth {
 		public get() { return Source2ModSchema.GetInt(this, "CBaseEntity", "m_iHealth"); }

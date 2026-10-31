@@ -32,6 +32,7 @@ methodmap CPlayer_CameraServices < CPlayerPawnComponent
 		public get() { return view_as<CTonemapController2>(Source2ModSchema.GetHandle(this, "CPlayer_CameraServices", "m_hTonemapController")); }
 		public set(CTonemapController2 value) { Source2ModSchema.SetHandle(this, "CPlayer_CameraServices", "m_hTonemapController", value); }
 	}
+	public int m_PostProcessingVolumesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPlayer_CameraServices", "m_PostProcessingVolumes"); }
 	property float m_flOldPlayerZ {
 		public get() { return Source2ModSchema.GetFloat(this, "CPlayer_CameraServices", "m_flOldPlayerZ"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CPlayer_CameraServices", "m_flOldPlayerZ", value); }
@@ -40,4 +41,5 @@ methodmap CPlayer_CameraServices < CPlayerPawnComponent
 		public get() { return Source2ModSchema.GetFloat(this, "CPlayer_CameraServices", "m_flOldPlayerViewOffsetZ"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CPlayer_CameraServices", "m_flOldPlayerViewOffsetZ", value); }
 	}
+	public int m_hTriggerSoundscapeListCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPlayer_CameraServices", "m_hTriggerSoundscapeList"); }
 }

@@ -25,6 +25,9 @@ methodmap CRagdollProp < CBaseAnimGraph
 		public get() { return Source2ModSchema.GetFloat(this, "CRagdollProp", "m_buoyancyScale"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CRagdollProp", "m_buoyancyScale", value); }
 	}
+	public int m_ragEnabledCount() { return Source2ModSchema.GetUtlVectorCount(this, "CRagdollProp", "m_ragEnabled"); }
+	public int m_ragPosCount() { return Source2ModSchema.GetUtlVectorCount(this, "CRagdollProp", "m_ragPos"); }
+	public int m_ragAnglesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CRagdollProp", "m_ragAngles"); }
 	property int m_lastUpdateTickCount {
 		public get() { return Source2ModSchema.GetInt(this, "CRagdollProp", "m_lastUpdateTickCount"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CRagdollProp", "m_lastUpdateTickCount", value); }
@@ -105,8 +108,11 @@ methodmap CRagdollProp < CBaseAnimGraph
 		public get() { return Source2ModSchema.GetFloat(this, "CRagdollProp", "m_flDefaultFadeScale"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CRagdollProp", "m_flDefaultFadeScale", value); }
 	}
+	public int m_ragdollMinsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CRagdollProp", "m_ragdollMins"); }
+	public int m_ragdollMaxsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CRagdollProp", "m_ragdollMaxs"); }
 	property bool m_bShouldDeleteActivationRecord {
 		public get() { return Source2ModSchema.GetBool(this, "CRagdollProp", "m_bShouldDeleteActivationRecord"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CRagdollProp", "m_bShouldDeleteActivationRecord", value); }
 	}
+	public int m_vecNavObstaclesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CRagdollProp", "m_vecNavObstacles"); }
 }

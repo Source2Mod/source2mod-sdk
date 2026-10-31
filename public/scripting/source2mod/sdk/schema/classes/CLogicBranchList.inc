@@ -12,6 +12,7 @@ methodmap CLogicBranchList < CLogicalEntity
 {
 	public int m_nLogicBranchNames(int index, char[] buffer, int maxlen) { return Source2ModSchema.GetArrayString(this, "CLogicBranchList", "m_nLogicBranchNames", index, buffer, maxlen); }
 	public int m_nLogicBranchNames_Count() { return Source2ModSchema.GetArraySize("CLogicBranchList", "m_nLogicBranchNames"); }
+	public int m_LogicBranchListCount() { return Source2ModSchema.GetUtlVectorCount(this, "CLogicBranchList", "m_LogicBranchList"); }
 	property int m_eLastState {
 		public get() { return Source2ModSchema.GetInt(this, "CLogicBranchList", "m_eLastState"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CLogicBranchList", "m_eLastState", value); }

@@ -190,6 +190,13 @@ methodmap Source2ModEngine
 	public static native void SetTimescale(float scale);
 
 	/**
+	 * A token from the server's own localization files ("#SFUI_..."). A server
+	 * loads few of them: translations for players belong in phrase files.
+	 * @return false when the server does not have the token
+	 */
+	public static native bool Localize(const char[] token, char[] buffer, int maxlen);
+
+	/**
 	 * Listens to everything the server prints. Lines from other threads arrive
 	 * with the next line printed on the game thread. What the callback prints
 	 * itself does not come back to it.

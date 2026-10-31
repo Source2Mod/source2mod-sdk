@@ -11,6 +11,7 @@
 methodmap CDynamicNavConnectionsVolume < CTriggerMultiple
 {
 	public int m_iszConnectionTarget(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CDynamicNavConnectionsVolume", "m_iszConnectionTarget", buffer, maxlen); }
+	public int m_vecConnectionsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CDynamicNavConnectionsVolume", "m_vecConnections"); }
 	public int m_sTransitionType(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CDynamicNavConnectionsVolume", "m_sTransitionType", buffer, maxlen); }
 	property bool m_bConnectionsEnabled {
 		public get() { return Source2ModSchema.GetBool(this, "CDynamicNavConnectionsVolume", "m_bConnectionsEnabled"); }

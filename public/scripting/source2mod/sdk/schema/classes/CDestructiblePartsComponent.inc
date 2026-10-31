@@ -8,6 +8,7 @@
 
 methodmap CDestructiblePartsComponent < SchemaObject
 {
+	public int m_vecDamageTakenByHitGroupCount() { return Source2ModSchema.GetUtlVectorCount(this, "CDestructiblePartsComponent", "m_vecDamageTakenByHitGroup"); }
 	property CBaseModelEntity m_hOwner {
 		public get() { return view_as<CBaseModelEntity>(Source2ModSchema.GetHandle(this, "CDestructiblePartsComponent", "m_hOwner")); }
 		public set(CBaseModelEntity value) { Source2ModSchema.SetHandle(this, "CDestructiblePartsComponent", "m_hOwner", value); }

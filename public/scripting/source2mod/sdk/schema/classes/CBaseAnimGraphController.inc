@@ -17,6 +17,8 @@ methodmap CBaseAnimGraphController < CSkeletonAnimationController
 	property ExternalAnimGraphHandle_t m_nNextExternalGraphHandle {
 		public get() { return view_as<ExternalAnimGraphHandle_t>(Source2ModSchema.GetObject(this, "CBaseAnimGraphController", "m_nNextExternalGraphHandle")); }
 	}
+	public int m_vecSecondarySkeletonSlotIDsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseAnimGraphController", "m_vecSecondarySkeletonSlotIDs"); }
+	public int m_vecSecondarySkeletonsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseAnimGraphController", "m_vecSecondarySkeletons"); }
 	property int m_nSecondarySkeletonMasterCount {
 		public get() { return Source2ModSchema.GetInt(this, "CBaseAnimGraphController", "m_nSecondarySkeletonMasterCount"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBaseAnimGraphController", "m_nSecondarySkeletonMasterCount", value); }
@@ -73,6 +75,8 @@ methodmap CBaseAnimGraphController < CSkeletonAnimationController
 		public get() { return Source2ModSchema.GetInt(this, "CBaseAnimGraphController", "m_nPrevAnimUpdateTick"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBaseAnimGraphController", "m_nPrevAnimUpdateTick", value); }
 	}
+	public int m_SerializePoseRecipeAG2SlotsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseAnimGraphController", "m_SerializePoseRecipeAG2Slots"); }
+	public int m_SerializePoseRecipeAG2DynamicCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseAnimGraphController", "m_SerializePoseRecipeAG2Dynamic"); }
 	property int m_nSerializePoseRecipeAG2ActiveSlot {
 		public get() { return Source2ModSchema.GetInt(this, "CBaseAnimGraphController", "m_nSerializePoseRecipeAG2ActiveSlot"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBaseAnimGraphController", "m_nSerializePoseRecipeAG2ActiveSlot", value); }
@@ -92,6 +96,8 @@ methodmap CBaseAnimGraphController < CSkeletonAnimationController
 	property ResourceId_t m_primaryGraphId {
 		public get() { return view_as<ResourceId_t>(Source2ModSchema.GetObject(this, "CBaseAnimGraphController", "m_primaryGraphId")); }
 	}
+	public int m_vecExternalGraphIdsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseAnimGraphController", "m_vecExternalGraphIds"); }
+	public int m_vecExternalClipIdsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseAnimGraphController", "m_vecExternalClipIds"); }
 	public int m_sAnimGraph2Identifier(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseAnimGraphController", "m_sAnimGraph2Identifier", buffer, maxlen); }
 	property CAnimGraph2InstancePtr m_pGraphInstanceAG2 {
 		public get() { return view_as<CAnimGraph2InstancePtr>(Source2ModSchema.GetObject(this, "CBaseAnimGraphController", "m_pGraphInstanceAG2")); }

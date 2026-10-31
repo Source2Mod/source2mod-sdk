@@ -22,6 +22,7 @@ methodmap CPhysMagnet < CBaseAnimGraph
 		public get() { return Source2ModSchema.GetFloat(this, "CPhysMagnet", "m_torqueLimit"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CPhysMagnet", "m_torqueLimit", value); }
 	}
+	public int m_MagnettedEntitiesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPhysMagnet", "m_MagnettedEntities"); }
 	property bool m_bActive {
 		public get() { return Source2ModSchema.GetBool(this, "CPhysMagnet", "m_bActive"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CPhysMagnet", "m_bActive", value); }

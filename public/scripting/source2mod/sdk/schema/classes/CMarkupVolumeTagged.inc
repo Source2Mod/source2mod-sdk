@@ -10,6 +10,8 @@
 
 methodmap CMarkupVolumeTagged < CMarkupVolume
 {
+	public int m_GroupNamesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CMarkupVolumeTagged", "m_GroupNames"); }
+	public int m_TagsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CMarkupVolumeTagged", "m_Tags"); }
 	property bool m_bIsGroup {
 		public get() { return Source2ModSchema.GetBool(this, "CMarkupVolumeTagged", "m_bIsGroup"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CMarkupVolumeTagged", "m_bIsGroup", value); }

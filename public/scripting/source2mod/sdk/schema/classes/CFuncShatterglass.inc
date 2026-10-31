@@ -10,6 +10,7 @@
 
 methodmap CFuncShatterglass < CBaseModelEntity
 {
+	public int m_vecShatterGlassShardsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CFuncShatterglass", "m_vecShatterGlassShards"); }
 	property float m_flLastShatterSoundEmitTime {
 		public get() { return Source2ModSchema.GetFloat(this, "CFuncShatterglass", "m_flLastShatterSoundEmitTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CFuncShatterglass", "m_flLastShatterSoundEmitTime", value); }
@@ -62,6 +63,9 @@ methodmap CFuncShatterglass < CBaseModelEntity
 	public int m_szDamagePositioningEntityName02(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncShatterglass", "m_szDamagePositioningEntityName02", buffer, maxlen); }
 	public int m_szDamagePositioningEntityName03(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncShatterglass", "m_szDamagePositioningEntityName03", buffer, maxlen); }
 	public int m_szDamagePositioningEntityName04(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncShatterglass", "m_szDamagePositioningEntityName04", buffer, maxlen); }
+	public int m_vInitialDamagePositionsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CFuncShatterglass", "m_vInitialDamagePositions"); }
+	public int m_vExtraDamagePositionsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CFuncShatterglass", "m_vExtraDamagePositions"); }
+	public int m_vInitialPanelVerticesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CFuncShatterglass", "m_vInitialPanelVertices"); }
 	property int m_iSurfaceType {
 		public get() { return Source2ModSchema.GetInt(this, "CFuncShatterglass", "m_iSurfaceType"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CFuncShatterglass", "m_iSurfaceType", value); }

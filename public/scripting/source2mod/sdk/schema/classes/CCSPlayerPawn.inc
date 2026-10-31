@@ -50,6 +50,7 @@ methodmap CCSPlayerPawn < CCSPlayerPawnBase
 		public get() { return Source2ModSchema.GetBool(this, "CCSPlayerPawn", "m_bInBuyZone"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSPlayerPawn", "m_bInBuyZone", value); }
 	}
+	public int m_TouchingBuyZonesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSPlayerPawn", "m_TouchingBuyZones"); }
 	property bool m_bWasInBuyZone {
 		public get() { return Source2ModSchema.GetBool(this, "CCSPlayerPawn", "m_bWasInBuyZone"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSPlayerPawn", "m_bWasInBuyZone", value); }

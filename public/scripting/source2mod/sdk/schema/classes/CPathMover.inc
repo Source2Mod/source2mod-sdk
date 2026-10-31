@@ -10,6 +10,8 @@
 
 methodmap CPathMover < CPathWithDynamicNodes
 {
+	public int m_vecMoversCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathMover", "m_vecMovers"); }
+	public int m_vecSpawnersCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathMover", "m_vecSpawners"); }
 	public int m_iszMoverSpawnerName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CPathMover", "m_iszMoverSpawnerName", buffer, maxlen); }
 	property CFuncMoverRouter m_hMoverRouter {
 		public get() { return view_as<CFuncMoverRouter>(Source2ModSchema.GetHandle(this, "CPathMover", "m_hMoverRouter")); }

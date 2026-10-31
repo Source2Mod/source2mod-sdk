@@ -10,4 +10,6 @@
 
 methodmap CInfoChoreoAnchor < CPointEntity
 {
+	public int m_vecTargetEntriesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CInfoChoreoAnchor", "m_vecTargetEntries"); }
+	public int m_vecTargetWarpsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CInfoChoreoAnchor", "m_vecTargetWarps"); }
 }

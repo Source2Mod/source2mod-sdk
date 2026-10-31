@@ -66,6 +66,7 @@ methodmap CPointClientUIWorldPanel < CBaseClientUIEntity
 		public get() { return Source2ModSchema.GetBool(this, "CPointClientUIWorldPanel", "m_bAllowInteractionFromAllSceneWorlds"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CPointClientUIWorldPanel", "m_bAllowInteractionFromAllSceneWorlds", value); }
 	}
+	public int m_vecCSSClassesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPointClientUIWorldPanel", "m_vecCSSClasses"); }
 	property bool m_bOpaque {
 		public get() { return Source2ModSchema.GetBool(this, "CPointClientUIWorldPanel", "m_bOpaque"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CPointClientUIWorldPanel", "m_bOpaque", value); }

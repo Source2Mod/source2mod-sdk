@@ -14,6 +14,7 @@ methodmap CBasePropDoor < CDynamicProp
 		public get() { return Source2ModSchema.GetFloat(this, "CBasePropDoor", "m_flAutoReturnDelay"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBasePropDoor", "m_flAutoReturnDelay", value); }
 	}
+	public int m_hDoorListCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBasePropDoor", "m_hDoorList"); }
 	property int m_nHardwareType {
 		public get() { return Source2ModSchema.GetInt(this, "CBasePropDoor", "m_nHardwareType"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBasePropDoor", "m_nHardwareType", value); }

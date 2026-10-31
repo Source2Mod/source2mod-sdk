@@ -22,4 +22,5 @@ methodmap CPropDoorRotatingBreakable < CPropDoorRotating
 		public get() { return Source2ModSchema.GetInt(this, "CPropDoorRotatingBreakable", "m_currentDamageState"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CPropDoorRotatingBreakable", "m_currentDamageState", value); }
 	}
+	public int m_damageStatesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPropDoorRotatingBreakable", "m_damageStates"); }
 }

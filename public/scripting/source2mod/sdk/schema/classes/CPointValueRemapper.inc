@@ -56,6 +56,7 @@ methodmap CPointValueRemapper < CBaseEntity
 	public int m_iszOutputEntity2Name(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CPointValueRemapper", "m_iszOutputEntity2Name", buffer, maxlen); }
 	public int m_iszOutputEntity3Name(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CPointValueRemapper", "m_iszOutputEntity3Name", buffer, maxlen); }
 	public int m_iszOutputEntity4Name(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CPointValueRemapper", "m_iszOutputEntity4Name", buffer, maxlen); }
+	public int m_hOutputEntitiesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPointValueRemapper", "m_hOutputEntities"); }
 	property int m_nHapticsType {
 		public get() { return Source2ModSchema.GetInt(this, "CPointValueRemapper", "m_nHapticsType"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CPointValueRemapper", "m_nHapticsType", value); }

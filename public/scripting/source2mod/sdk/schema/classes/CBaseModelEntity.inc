@@ -100,6 +100,7 @@ methodmap CBaseModelEntity < CBaseEntity
 	}
 	public void m_clrRender(int color[4]) { Source2ModSchema.GetColor(this, "CBaseModelEntity", "m_clrRender", color); }
 	public void Set_m_clrRender(const int color[4]) { Source2ModSchema.SetColor(this, "CBaseModelEntity", "m_clrRender", color); }
+	public int m_vecRenderAttributesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseModelEntity", "m_vecRenderAttributes"); }
 	property bool m_bRenderToCubemaps {
 		public get() { return Source2ModSchema.GetBool(this, "CBaseModelEntity", "m_bRenderToCubemaps"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CBaseModelEntity", "m_bRenderToCubemaps", value); }
@@ -146,6 +147,7 @@ methodmap CBaseModelEntity < CBaseEntity
 		public get() { return Source2ModSchema.GetInt(this, "CBaseModelEntity", "m_bodyGroupTotalRequestCount"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBaseModelEntity", "m_bodyGroupTotalRequestCount", value); }
 	}
+	public int m_bodyGroupRequestsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseModelEntity", "m_bodyGroupRequests"); }
 	property CNetworkViewOffsetVector m_vecViewOffset {
 		public get() { return view_as<CNetworkViewOffsetVector>(Source2ModSchema.GetObject(this, "CBaseModelEntity", "m_vecViewOffset")); }
 	}

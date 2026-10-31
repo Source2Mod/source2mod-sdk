@@ -8,4 +8,5 @@
 
 methodmap CNavHullPresetVData < SchemaObject
 {
+	public int m_vecNavHullsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CNavHullPresetVData", "m_vecNavHulls"); }
 }

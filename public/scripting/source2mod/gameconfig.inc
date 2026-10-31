@@ -163,6 +163,25 @@ methodmap Source2ModMemory
  * A game function to call. Close it (delete) when done; it goes with the
  * plugin otherwise.
  */
+methodmap Source2ModPatch < Handle
+{
+	/**
+	 * Bytes to write over code, "90 90 E9" (what GetPatch gives). Nothing is
+	 * written until Enable; the original comes back with Disable, on delete and
+	 * when the script goes.
+	 */
+	public native Source2ModPatch(SchemaObject address, const char[] bytes);
+
+	/** @return false when another enabled patch, of any script, covers these bytes */
+	public native bool Enable();
+	public native void Disable();
+
+	property bool Enabled
+	{
+		public native get();
+	}
+}
+
 methodmap Source2ModFunction < Handle
 {
 	/**
@@ -218,6 +237,15 @@ methodmap Source2ModFunction < Handle
 
 	/** A function at a core address (ISource2ModAddresses); null when it is not resolved. */
 	public static native Source2ModFunction FromAddress(Source2ModAddress address, Source2ModType returnType);
+
+	/** A function at any address; a wrong one crashes the server when called. Parameters with AddParam. */
+	public static native Source2ModFunction FromPointer(SchemaObject address, Source2ModType returnType);
+
+	/** Where the function is; null for a virtual, which is read off the object's vtable. */
+	property SchemaObject Address
+	{
+		public native get();
+	}
 
 	/** The next parameter; `this` of a member function is the first. */
 	public native void AddParam(Source2ModType type);

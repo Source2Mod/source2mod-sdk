@@ -14,6 +14,7 @@ methodmap CBaseCombatCharacter < CBaseAnimGraph
 		public get() { return Source2ModSchema.GetBool(this, "CBaseCombatCharacter", "m_bForceServerRagdoll"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CBaseCombatCharacter", "m_bForceServerRagdoll", value); }
 	}
+	public int m_hMyWearablesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseCombatCharacter", "m_hMyWearables"); }
 	property float m_impactEnergyScale {
 		public get() { return Source2ModSchema.GetFloat(this, "CBaseCombatCharacter", "m_impactEnergyScale"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBaseCombatCharacter", "m_impactEnergyScale", value); }
@@ -26,6 +27,7 @@ methodmap CBaseCombatCharacter < CBaseAnimGraph
 		public get() { return Source2ModSchema.GetBool(this, "CBaseCombatCharacter", "m_bDeathEventsDispatched"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CBaseCombatCharacter", "m_bDeathEventsDispatched", value); }
 	}
+	public int m_vecRelationshipsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseCombatCharacter", "m_vecRelationships"); }
 	public int m_strRelationships(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseCombatCharacter", "m_strRelationships", buffer, maxlen); }
 	property int m_eHull {
 		public get() { return Source2ModSchema.GetInt(this, "CBaseCombatCharacter", "m_eHull"); }

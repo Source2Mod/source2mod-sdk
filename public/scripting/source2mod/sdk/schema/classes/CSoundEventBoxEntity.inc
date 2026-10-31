@@ -12,4 +12,5 @@ methodmap CSoundEventBoxEntity < CSoundEventMultiPointEntity
 {
 	public int m_iszBoxEntities(int index, char[] buffer, int maxlen) { return Source2ModSchema.GetArrayString(this, "CSoundEventBoxEntity", "m_iszBoxEntities", index, buffer, maxlen); }
 	public int m_iszBoxEntities_Count() { return Source2ModSchema.GetArraySize("CSoundEventBoxEntity", "m_iszBoxEntities"); }
+	public int m_vecBoxHelpersNetworkedCount() { return Source2ModSchema.GetUtlVectorCount(this, "CSoundEventBoxEntity", "m_vecBoxHelpersNetworked"); }
 }

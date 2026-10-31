@@ -16,4 +16,6 @@ methodmap CCSCustomHudLayoutState < SchemaObject
 		public get() { return Source2ModSchema.GetBool(this, "CCSCustomHudLayoutState", "m_bInputCaptureEnabled"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSCustomHudLayoutState", "m_bInputCaptureEnabled", value); }
 	}
+	public int m_vecHasClassesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSCustomHudLayoutState", "m_vecHasClasses"); }
+	public int m_vecDialogVariableStringsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSCustomHudLayoutState", "m_vecDialogVariableStrings"); }
 }

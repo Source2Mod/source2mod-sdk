@@ -25,4 +25,5 @@ methodmap CPointPrefab < CServerOnlyPointEntity
 		public get() { return view_as<CPointPrefab>(Source2ModSchema.GetHandle(this, "CPointPrefab", "m_associatedRelayEntity")); }
 		public set(CPointPrefab value) { Source2ModSchema.SetHandle(this, "CPointPrefab", "m_associatedRelayEntity", value); }
 	}
+	public int m_ProceduralRelaySourcesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPointPrefab", "m_ProceduralRelaySources"); }
 }

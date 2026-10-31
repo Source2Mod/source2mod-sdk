@@ -10,4 +10,5 @@
 
 methodmap CCSGameModeRules_ArmsRace < CCSGameModeRules
 {
+	public int m_WeaponSequenceCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSGameModeRules_ArmsRace", "m_WeaponSequence"); }
 }

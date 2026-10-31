@@ -43,4 +43,5 @@ methodmap CFuncConveyor < CBaseModelEntity
 		public get() { return Source2ModSchema.GetFloat(this, "CFuncConveyor", "m_flFrictionScale"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CFuncConveyor", "m_flFrictionScale", value); }
 	}
+	public int m_hConveyorModelsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CFuncConveyor", "m_hConveyorModels"); }
 }

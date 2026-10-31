@@ -10,6 +10,7 @@
 
 methodmap CPathWithDynamicNodes < CPathSimple
 {
+	public int m_vecPathNodesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathWithDynamicNodes", "m_vecPathNodes"); }
 	property int m_eDesiredDirection {
 		public get() { return Source2ModSchema.GetInt(this, "CPathWithDynamicNodes", "m_eDesiredDirection"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CPathWithDynamicNodes", "m_eDesiredDirection", value); }

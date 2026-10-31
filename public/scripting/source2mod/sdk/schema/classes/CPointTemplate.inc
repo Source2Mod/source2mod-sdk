@@ -29,4 +29,6 @@ methodmap CPointTemplate < CLogicalEntity
 		public get() { return Source2ModSchema.GetInt(this, "CPointTemplate", "m_ownerSpawnGroupType"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CPointTemplate", "m_ownerSpawnGroupType", value); }
 	}
+	public int m_createdSpawnGroupHandlesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPointTemplate", "m_createdSpawnGroupHandles"); }
+	public int m_SpawnedEntityHandlesCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPointTemplate", "m_SpawnedEntityHandles"); }
 }

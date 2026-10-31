@@ -30,6 +30,7 @@ methodmap CCSPlayerBase_CameraServices < CPlayer_CameraServices
 		public get() { return view_as<CBaseEntity>(Source2ModSchema.GetHandle(this, "CCSPlayerBase_CameraServices", "m_hZoomOwner")); }
 		public set(CBaseEntity value) { Source2ModSchema.SetHandle(this, "CCSPlayerBase_CameraServices", "m_hZoomOwner", value); }
 	}
+	public int m_hTriggerFogListCount() { return Source2ModSchema.GetUtlVectorCount(this, "CCSPlayerBase_CameraServices", "m_hTriggerFogList"); }
 	property CBaseEntity m_hLastFogTrigger {
 		public get() { return view_as<CBaseEntity>(Source2ModSchema.GetHandle(this, "CCSPlayerBase_CameraServices", "m_hLastFogTrigger")); }
 		public set(CBaseEntity value) { Source2ModSchema.SetHandle(this, "CCSPlayerBase_CameraServices", "m_hLastFogTrigger", value); }
