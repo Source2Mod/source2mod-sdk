@@ -389,12 +389,23 @@ public:
     }
 
 private:
+    // Not std::pair: it cannot hold a Node while Node is still being defined.
+    struct NodeMember;
+
     struct Node
     {
         std::string comment;
         bool object = true;
         std::string value;    // JSON text of a leaf
-        std::vector<std::pair<std::string, Node>> members;
+        std::vector<NodeMember> members;
+    };
+
+    struct NodeMember
+    {
+        NodeMember(const std::string& key, Node node) : first(key), second(std::move(node)) {}
+
+        std::string first;
+        Node second;
     };
 
     static std::string Quote(const std::string& in)
