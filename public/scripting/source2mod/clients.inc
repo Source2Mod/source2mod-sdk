@@ -45,6 +45,13 @@ enum SignonState
 	SignonState_ChangeLevel
 }
 
+/** Which way a net channel statistic counts. */
+enum NetFlow
+{
+	NetFlow_Outgoing = 0,    /**< server to client */
+	NetFlow_Incoming         /**< client to server */
+}
+
 /** What a client answered a QueryConVar (ESource2ModConVarQueryResult). */
 enum ConVarQueryResult
 {
@@ -137,6 +144,105 @@ methodmap CServerSideClient
 
 	/** The remote address with its port. @return Bytes written */
 	public native int GetAddress(char[] buffer, int maxlen);
+
+	/*
+	 * The net channel (INetChannelInfo, INetChannel). All answer 0 or false for
+	 * a client without one: a bot, HLTV, no client.
+	 */
+
+	/** Average packets lost, 0 to 1. */
+	public native float GetAvgLoss(NetFlow flow);
+	/** Average packets choked, 0 to 1. */
+	public native float GetAvgChoke(NetFlow flow);
+	/** Peak jitter in seconds. */
+	public native float GetPeakJitter(NetFlow flow);
+	/** Bytes per second. */
+	public native float GetAvgData(NetFlow flow);
+	/** Packets per second. */
+	public native float GetAvgPackets(NetFlow flow);
+	/** Bytes since the channel opened, as two cells: bytes[0] the low 32 bits. */
+	public native void GetTotalData(NetFlow flow, int bytes[2]);
+	public native int GetTotalPackets(NetFlow flow);
+	/** The last sequence number used on the flow. */
+	public native int GetSequenceNr(NetFlow flow);
+	/** The engine's own latency estimate in seconds (Source2ModClients.GetLatency is the average round trip). */
+	public native float GetEngineLatency();
+	/** What the client reported of its frame rate: seconds per frame and how much it varies. */
+	public native void GetRemoteFramerate(float &frameTime, float &stdDev, float &startTimeStdDev);
+
+	/** The channel's data rate in bytes per second. */
+	property int DataRate
+	{
+		public native get();
+	}
+
+	property bool IsTimingOut
+	{
+		public native get();
+	}
+
+	property float TimeSinceLastReceived
+	{
+		public native get();
+	}
+
+	property float TimeoutSeconds
+	{
+		public native get();
+	}
+
+	property float TimeUntilTimeout
+	{
+		public native get();
+	}
+
+	property bool IsOverflowed
+	{
+		public native get();
+	}
+
+	property bool HasPendingReliableData
+	{
+		public native get();
+	}
+
+	/** How long the client may stay silent before it times out. */
+	public native void SetTimeout(float seconds);
+
+	/* What the engine keeps on the client itself. */
+
+	/** The client's rate setting (bytes per second). */
+	property int Rate
+	{
+		public native get();
+		public native set(int value);
+	}
+
+	public native void SetUpdateRate(float rate);
+
+	/** Changes a userinfo cvar as if the client had sent it. */
+	public native void SetUserCVar(const char[] name, const char[] value);
+
+	/** The tick the client acknowledged, what its next snapshot deltas from; -1 for a full update. */
+	property int DeltaTick
+	{
+		public native get();
+	}
+
+	/** Loading progress the client reported, in percent. */
+	property int LoadingProgress
+	{
+		public native get();
+	}
+
+	/** Failed commands in a row; the engine kicks the client after 16. */
+	property int FailedCommands
+	{
+		public native get();
+	}
+
+	/** Sends the client its next snapshot whole, no delta. */
+	public native void ForceFullUpdate();
 
 	/**
 	 * Asks the client for any of its ConVars (SVC_GetCvarValue). Unlike

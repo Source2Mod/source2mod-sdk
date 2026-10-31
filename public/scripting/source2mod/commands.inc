@@ -134,4 +134,23 @@ methodmap Source2ModCommands
 
 	/** CServerSideClient.ExecuteClientCommandFromServer: runs a server ConCommand on the client's behalf; nothing goes over the wire. */
 	public static native void ExecuteClientCommandFromServer(CPlayerSlot slot, const char[] command);
+
+	/**
+	 * The names of every console command starting with prefix, in the engine's order.
+	 * @param hidden Also FCVAR_HIDDEN and FCVAR_DEVELOPMENTONLY ones
+	 * @return A new ArrayList of strings; close it
+	 */
+	public static native ArrayList ListNames(const char[] prefix = "", bool hidden = false);
+
+	/**
+	 * A console command of any plugin or the engine exists.
+	 * @param hidden Also find FCVAR_DEFENSIVE ones
+	 */
+	public static native bool Exists(const char[] name, bool hidden = false);
+
+	/**
+	 * A console command's help text and FCVAR_* flags (two cells: flags[0] the low 32 bits).
+	 * @return false when there is no such command
+	 */
+	public static native bool GetInfo(const char[] name, char[] help, int maxlen, int flags[2]);
 }

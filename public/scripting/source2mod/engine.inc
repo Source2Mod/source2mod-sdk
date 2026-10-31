@@ -144,4 +144,45 @@ methodmap Source2ModEngine
 
 	/** Seconds since the server started, not scaled or paused (Plat_FloatTime). */
 	public static native float GetEngineTime();
+
+	/**
+	 * A launch parameter (ICommandLine) and the value after it.
+	 * @return false when the server was not started with it; the buffer is then empty
+	 */
+	public static native bool GetLaunchParam(const char[] name, char[] buffer, int maxlen);
+
+	public static native bool HasLaunchParam(const char[] name);
+
+	/** The whole command line. @return Bytes written */
+	public static native int GetCommandLine(char[] buffer, int maxlen);
+
+	/**
+	 * The server's address as "ip:port": its public address, else its local one.
+	 * @return false before the network system has one
+	 */
+	public static native bool GetServerAddress(char[] buffer, int maxlen);
+
+	/** The game's build number. */
+	public static native int GetBuildVersion();
+
+	/** Nobody is on the server and it hibernates: frames and timers do not run. */
+	public static native bool IsHibernating();
+
+	/** The server was asked to quit. */
+	public static native bool IsShuttingDown();
+
+	/**
+	 * How the server is doing: CPU use as the engine samples it, and bytes per
+	 * second in and out over all players. All 0 without a server.
+	 */
+	public static native void GetServerPerf(float &cpu, float &inflow, float &outflow);
+
+	/**
+	 * The demo being recorded.
+	 * @return false when none is
+	 */
+	public static native bool GetRecordingDemo(char[] buffer, int maxlen);
+
+	/** The server's time scale, 1 is normal (host_timescale without its cheat flag). */
+	public static native void SetTimescale(float scale);
 }

@@ -352,6 +352,13 @@ methodmap Source2ModConVars
 	public static native void DeleteConVar(ConVar convar);
 
 	/**
+	 * The names of every ConVar starting with prefix, in the engine's order.
+	 * @param hidden Also FCVAR_HIDDEN and FCVAR_DEVELOPMENTONLY ones
+	 * @return A new ArrayList of strings; close it
+	 */
+	public static native ArrayList ListNames(const char[] prefix = "", bool hidden = false);
+
+	/**
 	 * Writes cfg/<folder>/<name>.cfg with the plugin's ConVars when it is
 	 * missing (autoCreate) and runs it on every map start; OnConfigsExecuted
 	 * follows. name "" is the plugin's file name.
