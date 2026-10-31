@@ -15,9 +15,8 @@
 name: Schema update
 
 on:
-  # Off while the repo is private (Actions minutes); uncomment to run every 30 minutes.
-  # schedule:
-  #   - cron: '*/30 * * * *'
+  schedule:
+    - cron: '*/30 * * * *'
   workflow_dispatch:
     inputs:
       force:
