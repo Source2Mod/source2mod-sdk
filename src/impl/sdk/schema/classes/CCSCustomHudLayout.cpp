@@ -38,6 +38,7 @@
 
 #include "source2mod/ISource2ModApi.h"
 #include "source2mod/ISource2ModCustomHud.h"
+#include "source2mod/ISource2ModFunctions.h"
 #include "source2mod/ISource2ModPlugin.h"
 #include "source2mod/sdk/schema/classes/CCSPlayerController.h"
 
@@ -52,6 +53,11 @@ namespace
     /// not the path.
     constexpr const char* LAYOUT_PATH_PREFIX = "panorama/layout/custom_game/";
     constexpr const char* LAYOUT_PATH_SUFFIX = ".vxml_c";
+
+    // Values go through the game's setters on the state: only they mark the changed
+    // element of a nested vector, which a state change from out here cannot do, and
+    // the client applies a value by that element. The string tables stay ours: the
+    // game's setters above these cap them at 1024 entries, /skins has far more classes.
 
     /// Index of a string in one of the layout's string tables, appending it if
     /// it is not there yet. The per-player states store these indices, not the
@@ -138,16 +144,26 @@ void CCSCustomHudLayout::SetHasClass(const char* pszPanelId, const char* pszClas
 
     auto& layoutState = GetLayoutState(pController);
 
-    HUDPanelHasClass_t hasClass(static_cast<uint16>(panelIndex), static_cast<uint16>(classIndex), bHasClass);
-
-    const int hasClassIndex = layoutState.m_vecHasClasses().Find(hasClass);
-
-    if (hasClassIndex == -1)
-        layoutState.m_vecHasClasses().AddToTail(hasClass);
+    static ISource2ModFunction* s_pSetter = g_pSource2ModFunctions->Find("CCSCustomHudLayoutState::SetHasClass");
+    if (s_pSetter)
+    {
+        s_pSetter->Call<void(CCSCustomHudLayoutState*, int, int, int)>(&layoutState, panelIndex, classIndex, bHasClass ? 1 : 0);
+    }
     else
-        layoutState.m_vecHasClasses().Element(hasClassIndex).m_eClassStatus = hasClass.m_eClassStatus;
+    {
+        // Its signature broke with a game update: most changes still get through this way.
+        HUDPanelHasClass_t hasClass(static_cast<uint16>(panelIndex), static_cast<uint16>(classIndex), bHasClass);
 
-    layoutState.m_vecHasClasses.NetworkStateChanged();
+        const int hasClassIndex = layoutState.m_vecHasClasses().Find(hasClass);
+
+        if (hasClassIndex == -1)
+            layoutState.m_vecHasClasses().AddToTail(hasClass);
+        else
+            layoutState.m_vecHasClasses().Element(hasClassIndex).m_eClassStatus = hasClass.m_eClassStatus;
+
+        layoutState.m_vecHasClasses.NetworkStateChanged();
+    }
+
     StateChanged(pController);
 }
 
@@ -161,16 +177,27 @@ void CCSCustomHudLayout::SetDialogVariableString(const char* pszPanelId, const c
 
     auto& layoutState = GetLayoutState(pController);
 
-    HUDPanelDialogVariableString_t dialogVariable(static_cast<uint16>(panelIndex), static_cast<uint16>(variableIndex), pszValue, true);
-
-    const int dialogVariableIndex = layoutState.m_vecDialogVariableStrings().Find(dialogVariable);
-
-    if (dialogVariableIndex == -1)
-        layoutState.m_vecDialogVariableStrings().AddToTail(dialogVariable);
+    static ISource2ModFunction* s_pSetter = g_pSource2ModFunctions->Find("CCSCustomHudLayoutState::SetDialogVariableString");
+    if (s_pSetter)
+    {
+        const CUtlString sValue(pszValue);
+        s_pSetter->Call<void(CCSCustomHudLayoutState*, int, int, const CUtlString*)>(&layoutState, panelIndex, variableIndex, &sValue);
+    }
     else
-        layoutState.m_vecDialogVariableStrings().Element(dialogVariableIndex).m_sValue = pszValue;
+    {
+        // Its signature broke with a game update: most texts still get through this way.
+        HUDPanelDialogVariableString_t dialogVariable(static_cast<uint16>(panelIndex), static_cast<uint16>(variableIndex), pszValue, true);
 
-    layoutState.m_vecDialogVariableStrings.NetworkStateChanged();
+        const int dialogVariableIndex = layoutState.m_vecDialogVariableStrings().Find(dialogVariable);
+
+        if (dialogVariableIndex == -1)
+            layoutState.m_vecDialogVariableStrings().AddToTail(dialogVariable);
+        else
+            layoutState.m_vecDialogVariableStrings().Element(dialogVariableIndex).m_sValue = pszValue;
+
+        layoutState.m_vecDialogVariableStrings.NetworkStateChanged();
+    }
+
     StateChanged(pController);
 }
 
