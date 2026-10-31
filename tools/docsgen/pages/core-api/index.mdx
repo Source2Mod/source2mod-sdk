@@ -16,7 +16,7 @@ your `Load()` fills one global per interface, so after that you call them direct
 ```cpp
 g_pSource2ModCommands->RegisterConCommand("sm_hello", handler);   // whose handler it is, the core reads off it
 g_pSource2ModScheduler->NextFrame([] { /* ... */ });
-auto pfnSetModel = ADDR_SET_MODEL();          // resolved engine function
+auto* pSetModel = g_pSource2ModFunctions->Find("CBaseModelEntity::SetModel"); // game function by gamedata name
 ```
 
 Each page lists the interface id and the global it lives in, next to a link to the header.
@@ -30,7 +30,7 @@ Each page lists the interface id and the global it lives in, next to a link to t
   <Card title="Gameplay" href="/docs/core-api/ISource2ModCommands">
     Commands, ConVars, events, entities, menus, custom HUD, net messages, sounds, transmit, tracing, scheduler.
   </Card>
-  <Card title="Engine" href="/docs/core-api/ISource2ModAddresses">
+  <Card title="Engine" href="/docs/core-api/ISource2ModFunctions">
     Resolved engine functions, KHook macros, gamedata, game systems, memory, modules and the schema system.
   </Card>
   <Card title="Services" href="/docs/core-api/ISource2ModHTTP">
@@ -41,7 +41,7 @@ Each page lists the interface id and the global it lives in, next to a link to t
 ## Reading the pages
 
 - **Types** lists the aliases a header declares — callback signatures and function
-  pointer types such as the `*_t` returned by `ISource2ModAddresses`.
+  pointer types such as the handlers of `ISource2ModHooks`.
 - **Methods** gives the exact declaration, then the parameters with their types and,
   where the header documents them, what they mean.
 - Types that have a page of their own are links; schema classes link into the

@@ -129,7 +129,7 @@ KHook wrappers (raw tier)
 * Targets:
 * * KHOOK_MEMBER / KHOOK_FUNCTION -- a gamedata entry name (resolved through
 *   ISource2ModGameConfig::ResolveSignature), an ISource2ModMemory / void* / typed
-*   function pointer (`ADDR_TAKE_DAMAGE_OLD()` -- what Source2Mod already
+*   function pointer (`GAMECONFIG_RESOLVE("CBaseEntity::TakeDamageOld")` -- what Source2Mod already
 *   resolved, evaluated at KHOOK_INIT()), or `nullptr`.
 * * KHOOK_VIRTUAL -- the function is a member function pointer (index read
 *   from the vtable), an integer index, or a gamedata offset name; the
@@ -332,7 +332,7 @@ namespace source2modhook
 {
     // What a deferred target evaluates to: an ISource2ModMemory, anything that
     // converts to one (void*, uintptr_t), or a typed function pointer such as
-    // the ADDR_* getters return.
+    // a GAMECONFIG_RESOLVE() RCast gives.
     inline ISource2ModMemory ToMemory(ISource2ModMemory address)
     {
         return address;
@@ -346,8 +346,8 @@ namespace source2modhook
 
     // KHOOK_MEMBER / KHOOK_FUNCTION wrap their target in a capture-less lambda
     // so it is evaluated at KHOOK_INIT(), not when the (usually global) owner
-    // is constructed -- that is what lets ADDR_TAKE_DAMAGE_OLD() sit in the
-    // macro although g_pSource2ModAddresses is still null at that point. A target
+    // is constructed -- that is what lets GAMECONFIG_RESOLVE() sit in the
+    // macro although g_pSource2ModGameConfig is still null at that point. A target
     // that is itself a lambda is unwrapped the same way.
     // Only class types (lambdas) are unwrapped: a plain function pointer with
     // no arguments is a hook target, not something to call.
@@ -777,7 +777,7 @@ public:
         return true;
     }
 
-    /// Same, from a typed function pointer (an ADDR_* getter, say).
+    /// Same, from a typed function pointer (a GAMECONFIG_RESOLVE() RCast, say).
     template <typename R, typename... A>
     bool Init(R (*pfnFunction)(A...))
     {
@@ -1134,19 +1134,19 @@ Macros
 * @brief Declares a hook on a member function found by address.
 *
 * The target is evaluated at KHOOK_INIT(), not here, so an expression that
-* needs Source2Mod -- ADDR_TAKE_DAMAGE_OLD(), a GAMECONFIG_RESOLVE() -- is
+* needs Source2Mod -- a GAMECONFIG_RESOLVE() -- is
 * fine even though the owner is usually a global constructed long before Load().
 *
 * @param member Member name.
 * @param target A gamedata entry name, an ISource2ModMemory / void* / typed
-*               function pointer (an ADDR_* getter), or nullptr for a manual
+*               function pointer (a GAMECONFIG_RESOLVE() RCast), or nullptr for a manual
 *               Init(address) later.
 * @param pre    `&Self::Handler` or nullptr.
 * @param post   `&Self::Handler` or nullptr.
 *
 * @code
 * KHOOK_MEMBER(m_hPostThink, "CCSPlayerPawn::PostThink", &Plugin::Hook_PostThink, nullptr);
-* KHOOK_MEMBER(m_hTakeDamageOld, ADDR_TAKE_DAMAGE_OLD(), &Plugin::Hook_TakeDamageOld, nullptr);
+* KHOOK_MEMBER(m_hTakeDamageOld, GAMECONFIG_RESOLVE("CBaseEntity::TakeDamageOld").GetPtr(), &Plugin::Hook_TakeDamageOld, nullptr);
 * @endcode
   */
 #define KHOOK_MEMBER(member, target, pre, post) \
@@ -1204,5 +1204,41 @@ inline int Source2ModRawHookCount()
 #define KHOOK_DESTRUCT() ::ISource2ModHook::DestructAll()
 
 #endif // SOURCE2MOD_CORE
+
+/**
+ * @brief Calls a function from this interface, bypassing any inline hooks on it.
+ *
+ * The SDK's schema helpers do the same through their HookChain argument
+ * (ISource2ModTypes.h); this is for calling a resolved function pointer directly.
+ *
+ * GAMECONFIG_RESOLVE() hands back the address the signature scan found, which
+ * is what you want to hook. It is not always what you want to *call*: once any
+ * plugin inline-hooks one of these functions, its first bytes are a jump into
+ * the detour, so calling it runs the whole Pre/Post chain. That is right when
+ * you are standing in for the game -- a plugin dealing damage as if a weapon
+ * fired wants the chain -- and wrong when you are asking for the function
+ * itself, e.g. an admin command, where another plugin's rules have no business
+ * vetoing what the server was told to do.
+ *
+ * Wrap the call in this when you mean the latter:
+ *
+ * @code
+ * SOURCE2MOD_CALL_FUNCTION(int64_t(CBaseEntity*, CTakeDamageInfo*, CTakeDamageResult*), "CBaseEntity::TakeDamageOld", HookChain::Bypass, pPawn, &info, &result);
+ * @endcode
+ *
+ * Signature-blind, so it works whatever prototype you hold and however the
+ * plugin that hooked it declared its hook -- the two routinely disagree, and
+ * TerminateRound is the standing example: the hook declares (CCSGameRules,
+ * RoundEndReason, float, void*, uint8_t) where the gamedata says
+ * (CCSGameRules*, uint32, uint32*, float). Unhooked functions come back
+ * unchanged (KHook::FindOriginal hands the address back as is), so this is
+ * always safe to apply.
+ *
+ * @note Resolve it at the call, do not cache it in a global. The address is
+ *       only the original from the moment the hook exists, and hooks are
+ *       installed long after these addresses are scanned.
+ */
+#define SOURCE2MOD_ORIGINAL(fn) \
+    reinterpret_cast<decltype(fn)>(KHook::FindOriginal(reinterpret_cast<void*>(fn)))
 
 #endif // SOURCE2MOD_KHOOK_WRAPPERS

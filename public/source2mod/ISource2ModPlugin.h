@@ -83,10 +83,9 @@ class ISource2ModAPI;
 // The SOURCE2MOD_EXPOSE/SOURCE2MOD_GLOBALVARS globals below are plain pointers, so
 // forward declarations are enough -- and they have to be here rather than rely
 // on the includes underneath. A TU that reaches this header *through* one of
-// those interface headers (e.g. ISource2ModAddresses.h -> here) finds that
+// those interface headers (e.g. ISource2ModClients.h -> here) finds that
 // header's guard already set, so its include below is a no-op and the class
 // would otherwise still be unknown when the macros expand.
-class ISource2ModAddresses;
 class ISource2ModClients;
 class ISource2ModFiles;
 class ISource2ModTargeting;
@@ -126,7 +125,55 @@ class ISource2ModSchemaMethods;
 // one back, and by then its guard is already set, so anything declared after
 // them would be invisible to them.
 
-#include "ISource2ModAddresses.h"
+#include "utils/plat.h"
+
+#include <engine2/isource2server.h>
+#include <engine2/ivengineserver2.h>
+#include <igameevents.h>
+
+class CBaseEntity;
+class CBasePlayerWeapon;
+class CBaseModelEntity;
+class CBasePlayerPawn;
+class CBasePlayerController;
+class CPlayer_WeaponServices;
+class CCSPlayerController;
+class CEntityInstance;
+class CEntityIOOutput;
+class CEntitySystem;
+class CEntityKeyValues;
+class CCSGameRules;
+class CTakeDamageInfo;
+class CTakeDamageResult;
+class IEntityFindFilter;
+class IGameEventListener2;
+class CAttributeList;
+class CCSPlayerPawn;
+class CCSPlayerPawnBase;
+class CDecoyProjectile;
+class CFlashbangProjectile;
+class CHEGrenadeProjectile;
+class CMolotovProjectile;
+class CSmokeGrenadeProjectile;
+class CCSPlayer_ItemServices;
+class CCSPlayer_MovementServices;
+class CCSPlayerLegacyJump;
+class CCSPlayerModernJump;
+class CEconItemView;
+class CEntityIdentity;
+class CGameTrace;
+class CMoveData;
+class CUserCmd;
+class IGameEventManager2;
+class CCSWeaponBaseVData;
+class IRecipientFilter;
+class CLoggingSystem;
+class CCommand;
+class ConCommandRef;
+class CUtlSymbolLarge;
+class CNavData;
+class ISource2Server;
+
 #include "ISource2ModCommands.h"
 #include "ISource2ModConfigs.h"
 #include "ISource2ModCrash.h"
@@ -297,10 +344,12 @@ inline bool Source2ModKHookVersionMatches(const char* coreHeader, const char* co
 // refused.
 // 8: per-plugin interface instances, no plugin ids in the calls.
 // 9: ISource2ModAPI in order, with every subsystem on it. A plugin built against
-// 8 still loads: the core hands it that layout through the core's pluginapi008.h.
-#define SOURCE2MOD_PLAPI_VERSION 9
+// 8 still loaded through the core's pluginapi008.h until 10.
+// 10: ISource2ModAddresses is gone, ISource2ModFunctions finds a game function by
+// its gamedata name. Slots moved, so a plugin built against an older API is refused.
+#define SOURCE2MOD_PLAPI_VERSION 10
 /// The oldest plugin API the core still loads.
-#define SOURCE2MOD_PLAPI_MIN 8
+#define SOURCE2MOD_PLAPI_MIN 10
 
 /// Plugin API interface name
 #define SOURCE2MOD_PLAPI_NAME "ISource2ModPlugin"
@@ -546,14 +595,13 @@ Globals
 *
 * Part of SOURCE2MOD_EXPOSE for a plugin. The core expands it on its own too and
 * fills the pointers with SOURCE2MOD_FILLVARS(), so SDK code reads the same
-* globals (ADDR_*, g_pSource2ModGameConfig, ...) whichever binary it is linked into.
+* globals (g_pSource2ModFunctions, g_pSource2ModGameConfig, ...) whichever binary it is linked into.
   */
 #define SOURCE2MOD_DEFINE_GLOBALVARS() \
     ISource2ModAPI*             g_pSource2ModAPI              = nullptr; \
     ISource2ModPlugin*          g_pPluginAPI                  = nullptr; \
     const char*                 g_Source2ModCoreKHookCommit  = nullptr; \
     const char*                 g_Source2ModCoreKHookHeader  = nullptr; \
-    ISource2ModAddresses*       g_pSource2ModAddresses       = nullptr; \
     ISource2ModCommands*        g_pSource2ModCommands        = nullptr; \
     ISource2ModConfigs*         g_pSource2ModConfigs         = nullptr; \
     ISource2ModCrash*           g_pSource2ModCrash           = nullptr; \
@@ -614,7 +662,6 @@ Globals
     extern ISource2ModPlugin*          g_pPluginAPI; \
     extern const char*                 g_Source2ModCoreKHookCommit; \
     extern const char*                 g_Source2ModCoreKHookHeader; \
-    extern ISource2ModAddresses*       g_pSource2ModAddresses; \
     extern ISource2ModCommands*        g_pSource2ModCommands; \
     extern ISource2ModConfigs*         g_pSource2ModConfigs; \
     extern ISource2ModCrash*           g_pSource2ModCrash; \
@@ -662,7 +709,6 @@ Globals
 * interfaces exist (see SOURCE2MOD_DEFINE_GLOBALVARS()).
   */
 #define SOURCE2MOD_FILLVARS(api) \
-    g_pSource2ModAddresses       = (ISource2ModAddresses*)      (api)->Source2ModFactory(SOURCE2MOD_ADDRESSES_INTERFACE,       nullptr, nullptr); \
     g_pSource2ModCommands        = (ISource2ModCommands*)       (api)->Source2ModFactory(SOURCE2MOD_COMMANDS_INTERFACE,        nullptr, nullptr); \
     g_pSource2ModConfigs         = (ISource2ModConfigs*)        (api)->Source2ModFactory(SOURCE2MOD_CONFIGS_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModCrash           = (ISource2ModCrash*)          (api)->Source2ModFactory(SOURCE2MOD_CRASH_INTERFACE,           nullptr, nullptr); \

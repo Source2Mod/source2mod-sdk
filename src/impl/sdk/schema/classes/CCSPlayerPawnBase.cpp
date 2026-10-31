@@ -36,7 +36,6 @@
 
 #include "source2mod/sdk/schema/classes/CCSPlayerPawnBase.h"
 
-#include "source2mod/ISource2ModAddresses.h"
 #include "source2mod/ISource2ModApi.h"
 #include "source2mod/ISource2ModPlugin.h"
 #include "source2mod/sdk/schema/classes/CCSPlayerController.h"

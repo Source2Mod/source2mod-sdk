@@ -41,7 +41,6 @@
 // from the attacker (pawn, world, slot, team) exactly as the game does.
 
 #include "source2mod/sdk/game/shared/takedamageinfo.h"
-#include "source2mod/ISource2ModAddresses.h"
 #include "source2mod/ISource2ModApi.h"
 #include "source2mod/ISource2ModGameConfig.h"
 #include "source2mod/ISource2ModPlugin.h"

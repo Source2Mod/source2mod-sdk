@@ -101,7 +101,6 @@ class IHostStateMgr;
 class ILocalize;
 class IFileSystem;
 
-class ISource2ModAddresses;
 class ISource2ModCommands;
 class ISource2ModConVars;
 class ISource2ModCustomHud;
@@ -255,7 +254,6 @@ public:
     ========================= */
 
     // The interfaces SOURCE2MOD_SAVEVARS() puts in the g_pSource2Mod* globals, this plugin's own.
-    virtual ISource2ModAddresses* Addresses() = 0;
     virtual ISource2ModClients* Clients() = 0;
     virtual ISource2ModCommands* Commands() = 0;
     virtual ISource2ModConfigs* Configs() = 0;

@@ -4,7 +4,7 @@
  *
  * A Source2ModFunction is a game function the script calls: found by a
  * gamedata entry, a signature or symbol of its own, or a vtable slot, with
- * its parameters described once. What C++ does with ADDR_* /
+ * its parameters described once. What C++ does with
  * GAMECONFIG_RESOLVE and a function pointer type.
  *
  * Arguments: on Windows at most 14; on Linux 6 integer-class (ints, entities,
@@ -18,7 +18,6 @@
 #define _source2mod_gameconfig_included
 
 #include <source2mod/types>
-#include <source2mod/addresses>
 
 /**
  * How a value crosses into a game function and back.
@@ -234,9 +233,6 @@ methodmap Source2ModFunction < Handle
 	 * secondary base. The object is still the first parameter.
 	 */
 	public static native Source2ModFunction FromVirtualTable(const char[] module, const char[] vtableName, int vtableIndex, Source2ModType returnType, const char[] baseName = "");
-
-	/** A function at a core address (ISource2ModAddresses); null when it is not resolved. */
-	public static native Source2ModFunction FromAddress(Source2ModAddress address, Source2ModType returnType);
 
 	/** A function at any address; a wrong one crashes the server when called. Parameters with AddParam. */
 	public static native Source2ModFunction FromPointer(SchemaObject address, Source2ModType returnType);

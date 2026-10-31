@@ -11,7 +11,7 @@
  *   - engine callbacks: GameFrame, StartupServer, ClientConnect, ...;
  *   - any function: HookFunction on a Source2ModFunction (Find on a gamedata
  *     "function" entry, FromSignature, FromSymbol, FromVirtualTable,
- *     FromVirtual, FromAddress) -- SourceMod's DHooks.
+ *     FromVirtual) -- SourceMod's DHooks.
  *
  * Targets: Hook -- every call; HookInstance -- one object (an entity, or a
  * SchemaObject: services, the game rules, ...); HookClass -- every object of

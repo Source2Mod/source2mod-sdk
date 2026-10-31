@@ -79,7 +79,7 @@ API_GROUPS = [
                   'ISource2ModClients', 'ISource2ModTargeting', 'ISource2ModMenus', 'ISource2ModCustomHud', 'ISource2ModTranslations',
                   'ISource2ModNetworkMessages', 'ISource2ModSounds', 'ISource2ModTransmit', 'ISource2ModTrace', 'ISource2ModScheduler',
                   'ISource2ModScripts', 'ISource2ModMaps', 'ISource2ModVoice', 'ISource2ModFeatures']),
-    ('Engine', ['ISource2ModHooks', 'ISource2ModHookContexts', 'ISource2ModFunctions', 'ISource2ModAddresses', 'ISource2ModKHook',
+    ('Engine', ['ISource2ModHooks', 'ISource2ModHookContexts', 'ISource2ModFunctions', 'ISource2ModKHook',
                 'ISource2ModGameConfig', 'ISource2ModGameSystems', 'ISource2ModMemory', 'ISource2ModModule', 'ISource2ModModules', 'ISource2ModSchemaMethods', 'Schema', 'consts']),
     ('Services', ['ISource2ModHTTP', 'ISource2ModWebSockets', 'ISource2ModJSON', 'ISource2ModConfigs', 'ISource2ModSQL', 'ISource2ModCookies', 'ISource2ModGeoIP',
                   'ISource2ModFiles', 'ISource2ModPaths', 'ISource2ModUtils']),
@@ -442,7 +442,7 @@ def api_page(rel, parsed, url, title):
         out.append('## Types\n')
         out.extend(render_typedefs(parsed['typedefs'], '###', url))
 
-    # a getter returning a documented alias (ISource2ModAddresses: X_t X()) borrows its doc
+    # a getter returning a documented alias (X_t X()) borrows its doc
     td_docs = {t['name']: t['doc'] for t in parsed['typedefs'] if not P.is_empty_doc(t['doc'])}
     for c in classes:
         for m in c['methods']:

@@ -9,7 +9,6 @@
 #include "source2mod/ISource2ModPlugin.h"
 #include "source2mod/utils/virtual.h"
 #include "source2mod/sdk/schema/classes/CAttributeList.h"
-#include "source2mod/ISource2ModAddresses.h"
 #include "source2mod/ISource2ModGameConfig.h"
 #include "source2mod/sdk/schema/classes/CBaseEntity.h"
 #include "source2mod/ISource2ModEntities.h"
