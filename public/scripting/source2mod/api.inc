@@ -48,5 +48,6 @@
 #include <source2mod/clients>
 #include <source2mod/features>
 #include <source2mod/maps>
+#include <source2mod/voice>
 #include <source2mod/geoip>
 #include <source2mod/cookies>

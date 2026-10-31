@@ -401,6 +401,13 @@ public:
     *        listeners of ISource2ModEntities.
       */
     virtual ISource2ModHooks* Hooks() = 0;
+
+    /**
+     * @brief Whether core.json's "FollowCS2ServerGuidelines" is on: then the
+     * core refuses what is known to get a server's GSLTs banned (setting the
+     * fields in schema::IsGuidelineField, giving knife skins).
+     */
+    virtual bool FollowsServerGuidelines() = 0;
 };
 
 #endif //_INCLUDE_ISOURCE2MOD_API_H

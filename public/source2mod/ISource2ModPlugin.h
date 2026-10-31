@@ -144,6 +144,7 @@ class ISource2ModSchemaMethods;
 #include "ISource2ModJSON.h"
 #include "ISource2ModMaps.h"
 #include "ISource2ModModules.h"
+#include "ISource2ModVoice.h"
 #include "ISource2ModMenus.h"
 #include "ISource2ModSQL.h"
 #include "ISource2ModNetworkMessages.h"
@@ -565,6 +566,7 @@ Globals
     ISource2ModJSON*            g_pSource2ModJSON            = nullptr; \
     ISource2ModMaps*            g_pSource2ModMaps            = nullptr; \
     ISource2ModModules*         g_pSource2ModModules         = nullptr; \
+    ISource2ModVoice*           g_pSource2ModVoice           = nullptr; \
     ISource2ModMenus*           g_pSource2ModMenus           = nullptr; \
     ISource2ModSQL*             g_pSource2ModSQL             = nullptr; \
     ISource2ModNetworkMessages* g_pSource2ModNetworkMessages = nullptr; \
@@ -625,6 +627,7 @@ Globals
     extern ISource2ModJSON*            g_pSource2ModJSON; \
     extern ISource2ModMaps*            g_pSource2ModMaps; \
     extern ISource2ModModules*         g_pSource2ModModules; \
+    extern ISource2ModVoice*           g_pSource2ModVoice; \
     extern ISource2ModMenus*           g_pSource2ModMenus; \
     extern ISource2ModSQL*             g_pSource2ModSQL; \
     extern ISource2ModNetworkMessages* g_pSource2ModNetworkMessages; \
@@ -677,6 +680,7 @@ Globals
     g_pSource2ModJSON            = (ISource2ModJSON*)           (api)->Source2ModFactory(SOURCE2MOD_JSON_INTERFACE,            nullptr, nullptr); \
     g_pSource2ModMaps            = (ISource2ModMaps*)           (api)->Source2ModFactory(SOURCE2MOD_MAPS_INTERFACE,            nullptr, nullptr); \
     g_pSource2ModModules            = (ISource2ModModules*)           (api)->Source2ModFactory(SOURCE2MOD_MODULES_INTERFACE,            nullptr, nullptr); \
+    g_pSource2ModVoice            = (ISource2ModVoice*)           (api)->Source2ModFactory(SOURCE2MOD_VOICE_INTERFACE,            nullptr, nullptr); \
     g_pSource2ModScheduler       = (ISource2ModScheduler*)      (api)->Source2ModFactory(SOURCE2MOD_SCHEDULER_INTERFACE,       nullptr, nullptr); \
     g_pSource2ModScripts         = (ISource2ModScripts*)        (api)->Source2ModFactory(SOURCE2MOD_SCRIPTS_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModSounds          = (ISource2ModSounds*)         (api)->Source2ModFactory(SOURCE2MOD_SOUNDS_INTERFACE,          nullptr, nullptr); \

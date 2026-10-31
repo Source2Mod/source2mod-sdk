@@ -235,6 +235,11 @@ namespace schema
     /**
      * @brief Gets schema offset for a field.
      */
+    /// The fields whose value is known to get a server's GSLTs banned when set.
+    bool IsGuidelineField(const char* memberName);
+    /// Whether setting this field is refused now; says so on the console.
+    bool GuidelinesBlockWrite(const char* className, const char* memberName);
+
     SchemaKey GetOffset(const char* className, uint32_t classKey,
                         const char* memberName, uint32_t memberKey);
 
@@ -475,6 +480,8 @@ Schema field macros
 		std::enable_if_t<std::is_pointer_v<T>, void>                                                                         \
 		Set(schema_identity_t<T> val)                                                                                       \
 		{                                                                                                                    \
+			static const bool m_guarded = schema::IsGuidelineField(#varName);                                                \
+			if (m_guarded && schema::GuidelinesBlockWrite(m_className, #varName)) return;                                    \
 			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);              \
 			if (!m_key.valid) return;                                                                          \
 			static const auto m_offset = offsetof(ThisClass, varName);                                                       \
@@ -488,6 +495,8 @@ Schema field macros
 		std::enable_if_t<!std::is_pointer_v<T> && std::is_trivially_copyable_v<T>, void>                                     \
 		Set(schema_identity_t<T> val)                                                                                       \
 	    {                                                                                                                 \
+			static const bool m_guarded = schema::IsGuidelineField(#varName);                                                \
+			if (m_guarded && schema::GuidelinesBlockWrite(m_className, #varName)) return;                                    \
     		static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);              \
     		if (!m_key.valid) return;                                                                          \
 			static const auto m_offset = offsetof(ThisClass, varName);                                                       \
@@ -501,6 +510,8 @@ Schema field macros
 		std::enable_if_t<!std::is_pointer_v<T> && !std::is_trivially_copyable_v<T>, void>                                    \
 		Set(const schema_identity_t<T>& val)                                                                                \
 		{                                                                                                                    \
+			static const bool m_guarded = schema::IsGuidelineField(#varName);                                                \
+			if (m_guarded && schema::GuidelinesBlockWrite(m_className, #varName)) return;                                    \
 			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);              \
 			if (!m_key.valid) return;                                                                          \
 			static const auto m_offset = offsetof(ThisClass, varName);                                                       \

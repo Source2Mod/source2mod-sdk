@@ -60,6 +60,14 @@ void CPlayer_ItemServices::RemoveWeapons(bool bRemoveSuit, HookChain eChain)
 
 CBasePlayerWeapon* CPlayer_ItemServices::GiveNamedItem(const char* pszItem, HookChain eChain)
 {
+    // A knife skin; weapon_knife and weapon_knife_t are what anybody may have.
+    if (pszItem && g_pSource2ModAPI->FollowsServerGuidelines()
+        && ((!strncmp(pszItem, "weapon_knife_", 13) && strcmp(pszItem, "weapon_knife_t")) || !strcmp(pszItem, "weapon_bayonet")))
+    {
+        g_pSource2ModAPI->Log("Cannot give %s with \"FollowCS2ServerGuidelines\" enabled.\n", pszItem);
+        return nullptr;
+    }
+
     // The implementation behind the virtual, called with the arguments the
     // virtual's thunk passes. Going through it rather than the vtable is what
     // lets HookChain::Run reach a hook on "CCSPlayer_ItemServices::GiveNamedItem".

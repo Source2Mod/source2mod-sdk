@@ -199,6 +199,13 @@ methodmap Source2ModFunction < Handle
 	/** A function by its exported or debug symbol in a module ("server"); null when there is none. */
 	public static native Source2ModFunction FromSymbol(const char[] module, const char[] symbol, Source2ModType returnType);
 
+	/**
+	 * A think, touch or use function by its name in an entity class's datamap, the
+	 * class's parents searched too: no signature needed. Add its parameters with
+	 * AddParam. Null when it is unknown, or before a map is up.
+	 */
+	public static native Source2ModFunction FromDatamap(const char[] className, const char[] functionName, Source2ModType returnType);
+
 	/** A virtual function: called on the object passed as the first parameter, by vtable index. */
 	public static native Source2ModFunction FromVirtual(int vtableIndex, Source2ModType returnType);
 

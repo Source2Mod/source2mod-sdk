@@ -414,6 +414,12 @@ public:
     /// interface: FromVirtual(KHook::GetVtableIndex(&ISource2Server::GameFrame), ...)
     /// with HookTarget::Instance(g_pSource2Server)).
     virtual ISource2ModFunction* FromVirtual(int index, const FunctionTypes& types) = 0;
+
+    /// A think, touch or use function by its name in an entity class's datamap,
+    /// which the game keeps, so no signature is needed; the class's parents are
+    /// searched too. FromDatamap("CBaseButton", "CBaseButtonButtonUse", types).
+    /// Null before a map is up: the entity system holds the classes.
+    virtual ISource2ModFunction* FromDatamap(const char* className, const char* functionName, const FunctionTypes& types) = 0;
 };
 
 /**
