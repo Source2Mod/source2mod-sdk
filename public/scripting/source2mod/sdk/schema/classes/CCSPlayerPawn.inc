@@ -380,9 +380,9 @@ methodmap CCSPlayerPawn < CCSPlayerPawnBase
 		public get() { return Source2ModSchema.GetBool(this, "CCSPlayerPawn", "m_bGunGameImmunity"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSPlayerPawn", "m_bGunGameImmunity", value); }
 	}
-	property float m_flModifier0 {
-		public get() { return Source2ModSchema.GetFloat(this, "CCSPlayerPawn", "m_flModifier0"); }
-		public set(float value) { Source2ModSchema.SetFloat(this, "CCSPlayerPawn", "m_flModifier0", value); }
+	property float m_flBigHeadScale {
+		public get() { return Source2ModSchema.GetFloat(this, "CCSPlayerPawn", "m_flBigHeadScale"); }
+		public set(float value) { Source2ModSchema.SetFloat(this, "CCSPlayerPawn", "m_flBigHeadScale", value); }
 	}
 	property float m_fMolotovDamageTime {
 		public get() { return Source2ModSchema.GetFloat(this, "CCSPlayerPawn", "m_fMolotovDamageTime"); }

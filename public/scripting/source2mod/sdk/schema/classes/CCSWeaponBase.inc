@@ -124,25 +124,21 @@ methodmap CCSWeaponBase < CBasePlayerWeapon
 		public get() { return Source2ModSchema.GetFloat(this, "CCSWeaponBase", "m_flTimeSilencerSwitchComplete"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CCSWeaponBase", "m_flTimeSilencerSwitchComplete", value); }
 	}
-	property bool m_bStealthy {
-		public get() { return Source2ModSchema.GetBool(this, "CCSWeaponBase", "m_bStealthy"); }
-		public set(bool value) { Source2ModSchema.SetBool(this, "CCSWeaponBase", "m_bStealthy", value); }
+	property bool m_bIsInStealthReload {
+		public get() { return Source2ModSchema.GetBool(this, "CCSWeaponBase", "m_bIsInStealthReload"); }
+		public set(bool value) { Source2ModSchema.SetBool(this, "CCSWeaponBase", "m_bIsInStealthReload", value); }
 	}
 	property bool m_bInSilentReloadSection {
 		public get() { return Source2ModSchema.GetBool(this, "CCSWeaponBase", "m_bInSilentReloadSection"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSWeaponBase", "m_bInSilentReloadSection", value); }
 	}
-	property bool m_bSilentReloadStatCounted {
-		public get() { return Source2ModSchema.GetBool(this, "CCSWeaponBase", "m_bSilentReloadStatCounted"); }
-		public set(bool value) { Source2ModSchema.SetBool(this, "CCSWeaponBase", "m_bSilentReloadStatCounted", value); }
-	}
 	property bool m_bSilentReloadStatPending {
 		public get() { return Source2ModSchema.GetBool(this, "CCSWeaponBase", "m_bSilentReloadStatPending"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSWeaponBase", "m_bSilentReloadStatPending", value); }
 	}
-	property float m_flStealthHoldStartTime {
-		public get() { return Source2ModSchema.GetFloat(this, "CCSWeaponBase", "m_flStealthHoldStartTime"); }
-		public set(float value) { Source2ModSchema.SetFloat(this, "CCSWeaponBase", "m_flStealthHoldStartTime", value); }
+	property float m_flStealthReloadHoldStartTime {
+		public get() { return Source2ModSchema.GetFloat(this, "CCSWeaponBase", "m_flStealthReloadHoldStartTime"); }
+		public set(float value) { Source2ModSchema.SetFloat(this, "CCSWeaponBase", "m_flStealthReloadHoldStartTime", value); }
 	}
 	property bool m_bReloadHeldSinceStart {
 		public get() { return Source2ModSchema.GetBool(this, "CCSWeaponBase", "m_bReloadHeldSinceStart"); }

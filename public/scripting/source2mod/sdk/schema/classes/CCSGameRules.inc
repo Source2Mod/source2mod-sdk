@@ -244,6 +244,10 @@ methodmap CCSGameRules < CTeamplayRules
 	public float m_TeamRespawnWaveTimes(int index) { return Source2ModSchema.GetArrayFloat(this, "CCSGameRules", "m_TeamRespawnWaveTimes", index); }
 	public void Set_m_TeamRespawnWaveTimes(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CCSGameRules", "m_TeamRespawnWaveTimes", index, value); }
 	public int m_TeamRespawnWaveTimes_Count() { return Source2ModSchema.GetArraySize("CCSGameRules", "m_TeamRespawnWaveTimes"); }
+	property int m_nActiveMutators {
+		public get() { return Source2ModSchema.GetInt(this, "CCSGameRules", "m_nActiveMutators"); }
+		public set(int value) { Source2ModSchema.SetInt(this, "CCSGameRules", "m_nActiveMutators", value); }
+	}
 	public float m_flNextRespawnWave(int index) { return Source2ModSchema.GetArrayFloat(this, "CCSGameRules", "m_flNextRespawnWave", index); }
 	public void Set_m_flNextRespawnWave(int index, float value) { Source2ModSchema.SetArrayFloat(this, "CCSGameRules", "m_flNextRespawnWave", index, value); }
 	public int m_flNextRespawnWave_Count() { return Source2ModSchema.GetArraySize("CCSGameRules", "m_flNextRespawnWave"); }
