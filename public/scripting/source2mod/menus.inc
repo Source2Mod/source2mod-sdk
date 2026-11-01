@@ -65,6 +65,12 @@ typedef CenterHtmlMenuText = function void (CCSPlayerController player, CenterHt
 /** The menu (opened as the root) went away for a player. */
 typedef CenterHtmlMenuEndCallback = function void (CCSPlayerController player, CenterHtmlMenu menu, CenterHtmlMenuEnd reason);
 
+/** SetCooldownHandlers: whether the player may pick an option now. */
+typedef CenterHtmlMenuCanSelect = function bool (CCSPlayerController player);
+
+/** SetCooldownHandlers: the player picked an option. */
+typedef CenterHtmlMenuOnSelect = function void (CCSPlayerController player);
+
 methodmap CenterHtmlMenu < Handle
 {
 	public native CenterHtmlMenu(const char[] title);
@@ -76,7 +82,17 @@ methodmap CenterHtmlMenu < Handle
 	public native int AddMenuOption(const char[] text, CenterHtmlMenuHandler handler, any data = 0, bool disabled = false);
 
 	/**
-	 * IBaseMenu::AddMenuOptionWithCooldown with the default cooldown handlers:
+	 * IBaseMenu::SetCooldownHandlers, for this script's options added with
+	 * AddMenuOptionWithCooldown, in every menu of it. Scripts do not share them.
+	 *
+	 * @param canSelect Asked before a pick; false ignores it. INVALID_FUNCTION keeps the one set before.
+	 * @param onSelect  Called after the option's handler. INVALID_FUNCTION keeps the one set before.
+	 */
+	public static native void SetCooldownHandlers(CenterHtmlMenuCanSelect canSelect = INVALID_FUNCTION,
+	                                              CenterHtmlMenuOnSelect onSelect = INVALID_FUNCTION);
+
+	/**
+	 * IBaseMenu::AddMenuOptionWithCooldown, with SetCooldownHandlers' handlers:
 	 * close = after a pick, close the menu and show the option text centered
 	 * for 5 seconds. evaluator: as SetOptionDisabledEvaluator, with the same data.
 	 */
