@@ -241,6 +241,10 @@ methodmap Source2ModMenus
 	/** The plugin whose menu the player has open (Source2Mod_OnPluginLoad's id); 0 for none or the core's. */
 	public static native int GetActiveMenuOwner(CCSPlayerController player);
 
+	/** Whether the player's menus take keys through fake weapons (default on). Off: only the "1".."9" commands. Until they disconnect. */
+	public static native void SetKeyWeapons(CCSPlayerController player, bool enabled);
+	public static native bool GetKeyWeapons(CCSPlayerController player);
+
 	/** The title of the player's open menu, any plugin's; empty for one without. @return Bytes written */
 	public static native int GetActiveMenuTitle(CCSPlayerController player, char[] buffer, int maxlen);
 

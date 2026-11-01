@@ -679,7 +679,7 @@ Core Source2Mod Menus
 /**
  * @brief Interface for menu system management.
  */
-#define SOURCE2MOD_MENUS_INTERFACE "ISource2ModMenus008"
+#define SOURCE2MOD_MENUS_INTERFACE "ISource2ModMenus009"
 
 class ISource2ModMenus
 {
@@ -757,6 +757,19 @@ public:
 
     /// The menu @p player is looking at (the submenu they are in), or nullptr.
     virtual IMenu* GetOpenMenu(CCSPlayerController* player) = 0;
+
+    /* =========================
+    ISource2ModMenus009
+    ========================= */
+
+    /**
+     * @brief Whether @p player's menus take keys through fake weapons (the
+     *        default). Off, the player gets no fakes and their menus take only
+     *        the "1".."9" commands, for someone whose number keys stay weapon
+     *        switches. Lasts until they disconnect.
+     */
+    virtual void SetKeyWeapons(CCSPlayerController* player, bool enabled) = 0;
+    virtual bool GetKeyWeapons(CCSPlayerController* player) = 0;
 };
 
 #define OPEN_CENTER_HTML_MENU(player, menu)  g_pSource2ModMenus->OpenCenterHtmlMenu(player, menu)
