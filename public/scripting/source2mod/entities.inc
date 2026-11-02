@@ -50,6 +50,15 @@ methodmap Source2ModEntities
 	/** Created, not spawned: set it up, then DispatchSpawn(). */
 	public static native CBaseEntity CreateEntityByName(const char[] className);
 
+	/**
+	 * Creates and spawns an entity in one step; its resources are precached first, so it also works
+	 * for a weapon nothing has precached. What it needs before its spawn goes in the keyvalues.
+	 *
+	 * @param keyValues  Its entries become the spawn keyvalues; null for none
+	 * @return           The entity, NULL_ENTITY if the game made none
+	 */
+	public static native CBaseEntity SpawnEntityByClassname(const char[] className, StringMap keyValues = null);
+
 	/** An input, as a map's I/O sends it. */
 	public static native void AcceptInput(CEntityInstance target, const char[] input, CEntityInstance activator = NULL_ENTITY,
 	                                      CEntityInstance caller = NULL_ENTITY, const char[] value = "");

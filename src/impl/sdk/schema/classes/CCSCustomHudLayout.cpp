@@ -85,11 +85,6 @@ CCSCustomHudLayout* CCSCustomHudLayout::Create(const char* pszLayout, const char
     if (!pszLayout || !*pszLayout)
         return nullptr;
 
-    CCSCustomHudLayout* pLayout = CCSCustomHudLayout::New("custom_hud_layout");
-
-    if (!pLayout)
-        return nullptr;
-
     const std::string sLayoutPath = LAYOUT_PATH_PREFIX + std::string(pszLayout) + LAYOUT_PATH_SUFFIX;
 
     auto* pKeyValues = new CEntityKeyValues();
@@ -98,8 +93,7 @@ CCSCustomHudLayout* CCSCustomHudLayout::Create(const char* pszLayout, const char
     if (pszTargetName && *pszTargetName)
         pKeyValues->SetString("targetname", pszTargetName);
 
-    pLayout->DispatchSpawn(pKeyValues);
-    return pLayout;
+    return reinterpret_cast<CCSCustomHudLayout*>(g_pSource2ModEntities->SpawnEntityByClassname("custom_hud_layout", pKeyValues));
 }
 
 // A player's state is an element of m_vecPlayerLayoutStates, embedded without a NetworkVar of its own: the

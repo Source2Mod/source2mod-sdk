@@ -94,7 +94,9 @@ protected:
 
 * @brief Interface for interacting with entities and Entity I/O system.
   */
-#define SOURCE2MOD_ENTITIES_INTERFACE "ISource2ModEntities004"
+#define SOURCE2MOD_ENTITIES_INTERFACE "ISource2ModEntities005"
+
+class CEntityKeyValues;
 
 class ISource2ModEntities
 {
@@ -217,6 +219,24 @@ public:
 
     /// @brief Drops every registration of the listener.
     virtual void RemoveEntityOutputListener(IEntityOutputListener* pListener) = 0;
+
+    /* =========================
+    ISource2ModEntities005
+    ========================= */
+
+    /**
+     * @brief Creates and spawns an entity in one step, the way the game spawns a
+     *        map's: its resources are precached first, so it also works for a
+     *        weapon nothing has precached (DispatchSpawn crashes on those).
+     *
+     * Everything the entity needs before its spawn has to be in the keyvalues;
+     * for fields without one use CreateEntityByName + DispatchSpawn.
+     *
+     * @param pszClassName Classname
+     * @param pKeyValues   Spawn keyvalues, taken over; nullptr for none
+     * @return The entity, nullptr if the game made none
+     */
+    virtual CBaseEntity* SpawnEntityByClassname(const char* pszClassName, CEntityKeyValues* pKeyValues = nullptr) = 0;
 };
 
 #define GET_GAME_RULES()                          g_pSource2ModEntities->GetGameRules()
