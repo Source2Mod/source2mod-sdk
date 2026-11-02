@@ -94,7 +94,7 @@ protected:
 
 * @brief Interface for interacting with entities and Entity I/O system.
   */
-#define SOURCE2MOD_ENTITIES_INTERFACE "ISource2ModEntities005"
+#define SOURCE2MOD_ENTITIES_INTERFACE "ISource2ModEntities006"
 
 class CEntityKeyValues;
 
@@ -237,6 +237,21 @@ public:
      * @return The entity, nullptr if the game made none
      */
     virtual CBaseEntity* SpawnEntityByClassname(const char* pszClassName, CEntityKeyValues* pKeyValues = nullptr) = 0;
+
+    /* =========================
+    ISource2ModEntities006
+    ========================= */
+
+    /**
+     * @brief Spawn keyvalues from the game's own allocator, the way it makes them
+     *        for a map's entities. Anything given is set on them right away.
+     *
+     * @param pszClassName Its classname key, nullptr for none
+     * @param pOrigin      Its origin key, nullptr for none
+     * @param pAngles      Its angles key, nullptr for none
+     * @return The keyvalues for a spawn, which releases them; nullptr with no map loaded
+     */
+    virtual CEntityKeyValues* CreateEntityKeyValues(const char* pszClassName = nullptr, const Vector* pOrigin = nullptr, const QAngle* pAngles = nullptr) = 0;
 };
 
 #define GET_GAME_RULES()                          g_pSource2ModEntities->GetGameRules()

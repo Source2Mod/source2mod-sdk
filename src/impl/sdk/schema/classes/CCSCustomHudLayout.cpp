@@ -87,7 +87,10 @@ CCSCustomHudLayout* CCSCustomHudLayout::Create(const char* pszLayout, const char
 
     const std::string sLayoutPath = LAYOUT_PATH_PREFIX + std::string(pszLayout) + LAYOUT_PATH_SUFFIX;
 
-    auto* pKeyValues = new CEntityKeyValues();
+    auto* pKeyValues = g_pSource2ModEntities->CreateEntityKeyValues("custom_hud_layout");
+    if (!pKeyValues)
+        return nullptr;
+
     pKeyValues->SetString("layout", sLayoutPath.c_str());
 
     if (pszTargetName && *pszTargetName)

@@ -55,9 +55,11 @@ methodmap Source2ModEntities
 	 * for a weapon nothing has precached. What it needs before its spawn goes in the keyvalues.
 	 *
 	 * @param keyValues  Its entries become the spawn keyvalues; null for none
+	 * @param origin     Where it spawns
+	 * @param angles     How it is turned
 	 * @return           The entity, NULL_ENTITY if the game made none
 	 */
-	public static native CBaseEntity SpawnEntityByClassname(const char[] className, StringMap keyValues = null);
+	public static native CBaseEntity SpawnEntityByClassname(const char[] className, StringMap keyValues = null, const float origin[3] = NULL_VECTOR, const float angles[3] = NULL_VECTOR);
 
 	/** An input, as a map's I/O sends it. */
 	public static native void AcceptInput(CEntityInstance target, const char[] input, CEntityInstance activator = NULL_ENTITY,
