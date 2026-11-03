@@ -170,6 +170,7 @@ public:
     SCHEMA_FIELD(uint32_t, m_numSpectatorsCountMax);
     SCHEMA_FIELD(uint32_t, m_numSpectatorsCountMaxTV);
     SCHEMA_FIELD(uint32_t, m_numSpectatorsCountMaxLnk);
+    SCHEMA_FIELD(bool, m_bQueuedMatchmakingReportedRoundStatsPendingSend);
     SCHEMA_FIELD(int32_t, m_nCTsAliveAtFreezetimeEnd);
     SCHEMA_FIELD(int32_t, m_nTerroristsAliveAtFreezetimeEnd);
     SCHEMA_FIELD(bool, m_bForceTeamChangeSilent);
