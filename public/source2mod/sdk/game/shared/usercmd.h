@@ -71,21 +71,39 @@ class CUserCmd : public CUserCmdBaseHost<CSGOUserCmdPB>
 {
 };
 
+static_assert(sizeof(CUserCmd) == 0x58, "CUserCmd: header + CSGOUserCmdPB no longer 0x58 bytes");
+
 // The command as the server processes it: the buttons resolved from the
-// message, and what is not part of it.
+// message, then engine bookkeeping. The layout follows the game's own array of
+// commands: CCSPlayerController::ProcessUserCmd steps 0x90 bytes per command on
+// Linux and 0x98 on Windows, with the CInButtonState at +0x58 on both
+// (checked in IDA on 2026-11-06).
 class CUserCmdExtended : public CUserCmd
 {
 public:
-    CInButtonState buttonstates;
+    // The game's CInButtonState (vtable + m_pButtonStates[3]); the schema
+    // class only has accessors, so it is reached through this storage.
+    CInButtonState* GetButtonState() { return reinterpret_cast<CInButtonState*>(m_ButtonState); }
+    const CInButtonState* GetButtonState() const { return reinterpret_cast<const CInButtonState*>(m_ButtonState); }
 
-    // Not part of the player message
-    uint32_t unknown;
+private:
+    alignas(8) uint8_t m_ButtonState[0x20];
 };
 
 class PlayerCommand : public CUserCmdExtended
 {
-public:
-    uint32_t flags;
-    PlayerCommand* unknowncmd;
-    PlayerCommand* parentcmd;
+private:
+    // Engine bookkeeping (8 bytes more on Windows); nothing here is known well
+    // enough to name, only its size is.
+#ifdef _WIN32
+    [[maybe_unused]] uint8_t m_Tail[0x20];
+#else
+    [[maybe_unused]] uint8_t m_Tail[0x18];
+#endif
 };
+
+#ifdef _WIN32
+static_assert(sizeof(PlayerCommand) == 0x98, "PlayerCommand: the game steps 0x98 bytes per command on Windows");
+#else
+static_assert(sizeof(PlayerCommand) == 0x90, "PlayerCommand: the game steps 0x90 bytes per command on Linux");
+#endif
