@@ -42,7 +42,7 @@
 * (comments allowed). Source2Mod then owns the files:
 *
 * @code
-* addons/source2mod/configs/<PluginName>/
+* addons/source2mod/configs/<plugin>/
 *   <name>.example.json   the defaults, verbatim; rewritten whenever they change
 *   <name>.json           the admin's file; created from the defaults when missing
 * @endcode

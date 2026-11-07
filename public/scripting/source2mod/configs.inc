@@ -3,7 +3,7 @@
  *
  * A plugin registers a config by name with its defaults as JSON text
  * (comments allowed). Source2Mod keeps the files under
- * configs/<plugin name>/: <name>.example.json is the defaults verbatim,
+ * configs/<plugin file, no .smx>/: <name>.example.json is the defaults verbatim,
  * <name>.json is the admin's file, created from the defaults when it is
  * missing. What Root() reads is the admin's file merged over the defaults --
  * every key the defaults have is there -- and the callback runs again
@@ -69,7 +69,7 @@ typedef Source2ModConfigValidator = function bool (Source2ModConfig config, ISou
 methodmap Source2ModConfig < Handle
 {
 	/**
-	 * Registers configs/<plugin name>/<name>.json and reads it. The callback
+	 * Registers configs/<plugin file, no .smx>/<name>.json and reads it. The callback
 	 * runs once before this returns (ConfigChange_Loaded), then on every reload.
 	 *
 	 * @param name      File stem: letters, digits, '_', '-', '.' and '/' for a subfolder.

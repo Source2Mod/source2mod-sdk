@@ -42,7 +42,7 @@
 * (comments allowed). Source2Mod then owns the files:
 *
 * @code
-* addons/source2mod/configs/<PluginName>/
+* addons/source2mod/configs/<plugin>/
 *   <name>.example.json   the defaults, verbatim; rewritten whenever they change
 *   <name>.json           the admin's file; created from the defaults when missing
 * @endcode
@@ -155,9 +155,9 @@ public:
     /**
     * @brief Declares one config of this plugin.
     *
-    * @param pszName     File stem under configs/<PluginName>/: letters, digits,
+    * @param pszName     File stem under configs/<plugin>/: letters, digits,
     *                    '_', '-', '.' and '/' for a subfolder; no "..", no
-    *                    extension. "config" is configs/<PluginName>/config.json.
+    *                    extension. "config" is configs/<plugin>/config.json.
     * @param pszDefaults The defaults as JSON text, comments allowed; the root
     *                    must be an object. Copied.
     * @param nFlags      SOURCE2MOD_CONFIG_* flags.

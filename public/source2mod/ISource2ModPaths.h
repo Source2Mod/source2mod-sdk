@@ -65,7 +65,7 @@ Core Source2Mod Paths
 * @code
 * addons/source2mod/
 *   configs/              core.json, and one directory per plugin
-*     <PluginName>/       this plugin's own configs
+*     <plugin>/       this plugin's own configs
 *   gamedata/             every .json here is read into the game config
 *   plugins/              the .smx files themselves
 *   shared/               data more than one plugin reads
@@ -119,7 +119,10 @@ public:
 
     /**
 
-    * @brief This plugin's own config directory, configs/<PluginName>.
+    * @brief This plugin's own config directory, configs/<plugin>: the plugin's file
+    * name without .smx ("redirect_manager", the "name" of plugin-metadata.json),
+    * not its display name. A folder named after GetName() from before is moved
+    * over on first use.
     *
     * The directory is not created for you; it is where the plugin's files are
     * expected to have been installed.
