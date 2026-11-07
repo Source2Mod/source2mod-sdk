@@ -78,6 +78,18 @@ Forward declarations
     */
 using GameEventHandler = Source2ModCallback<Action(IGameEvent* event, bool post, bool& dontBroadcast)>;
 
+/**
+ * @brief Who listens to an event, as the game event manager keeps it
+ * (CGameEventManager's listener types).
+ */
+enum class Source2ModEventListenerType : int
+{
+    Any = -1,       ///< every listener
+    Server = 0,     ///< AddListener(..., bServerSide = true): plugins and the game
+    Client = 1,     ///< AddListener(..., bServerSide = false)
+    ClientStub = 2, ///< a client, from the listen bits it sent (CSource1LegacyListenEvents)
+};
+
 /* =========================
 Core Source2Mod Events
 ========================= */
@@ -91,7 +103,7 @@ Core Source2Mod Events
 * * Modify event data
 * * Block event propagation
     */
-#define SOURCE2MOD_EVENTS_INTERFACE "ISource2ModEvents003"
+#define SOURCE2MOD_EVENTS_INTERFACE "ISource2ModEvents004"
 
 class ISource2ModEvents
 {
@@ -132,6 +144,65 @@ public:
     /// ISource2ModClients::FireEventToClient: fires @p event to this client's
     /// legacy listener only. Does not take ownership: the caller still frees it.
     virtual void FireEventToClient(CPlayerSlot slot, IGameEvent* event) = 0;
+
+    /* ---- The game event manager's event table (revision 004) ---- */
+
+    /**
+     * @brief How many events the game defines. Event ids (IGameEvent::GetID,
+     * LookupEventId) run from 0 to GetEventCount() - 1.
+     *
+     * @return 0 before the event files are loaded
+     */
+    virtual int GetEventCount() = 0;
+
+    /**
+     * @brief The name of an event id.
+     *
+     * @return nullptr for an id the game does not have
+     */
+    virtual const char* GetEventName(int eventId) = 0;
+
+    /**
+     * @brief The id of an event: its descriptor's index in the event table,
+     * the bit a client's listen bits use for it (IGameEvent::GetID of one).
+     *
+     * @return -1 for an event the game does not have
+     */
+    virtual int GetEventID(const char* pchName) = 0;
+
+    /**
+     * @brief How many listeners an event has. The game only creates an event
+     * (CreateEvent without bForce) when at least one listens; a hook keeps
+     * Source2Mod's own listener on it.
+     *
+     * @param pchName Event name
+     * @param type Which listeners to count; Any for all of them
+     * @return -1 for an event the game does not have
+     */
+    virtual int GetEventListenerCount(const char* pchName, Source2ModEventListenerType type) = 0;
+
+    /**
+     * @brief Whether a client listens to an event: its listen bits
+     * (CSource1LegacyListenEvents) made it a ClientStub listener of it. Only
+     * then does the event reach that client.
+     */
+    virtual bool IsClientListening(CPlayerSlot slot, const char* pchName) = 0;
+
+    /**
+     * @brief The .gameevents file that defined the event last
+     * ("resource/game.gameevents").
+     *
+     * @return nullptr for an event the game does not have
+     */
+    virtual const char* GetEventFile(const char* pchName) = 0;
+
+    /// Whether the event is "local": never sent to clients. false for an
+    /// event the game does not have.
+    virtual bool IsEventLocal(const char* pchName) = 0;
+
+    /// Whether the event is sent reliably. false for an event the game does
+    /// not have.
+    virtual bool IsEventReliable(const char* pchName) = 0;
 };
 
 /**

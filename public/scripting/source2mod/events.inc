@@ -165,6 +165,15 @@ methodmap IGameEventManager2
  */
 typedef Source2ModGameEventHandler = function Source2ModAction (IGameEvent event, bool post, bool &dontBroadcast);
 
+/** Who listens to an event (C++ Source2ModEventListenerType). */
+enum Source2ModEventListenerType
+{
+	Listener_Any = -1,     /**< every listener */
+	Listener_Server = 0,   /**< AddListener with bServerSide: plugins and the game */
+	Listener_Client = 1,   /**< AddListener without bServerSide */
+	Listener_ClientStub = 2 /**< a client, from the listen bits it sent */
+};
+
 methodmap Source2ModEvents
 {
 	/** @return The id UnhookGameEvent takes, 0 when the event does not exist */
@@ -174,4 +183,46 @@ methodmap Source2ModEvents
 
 	/** CServerSideClient.FireEventToClient: to this client's legacy listener only; the event stays the script's. */
 	public static native void FireEventToClient(CPlayerSlot slot, IGameEvent event);
+
+	/**
+	 * How many events the game defines; event ids (IGameEvent.GetID,
+	 * IGameEventManager2.LookupEventId) run from 0 to GetEventCount() - 1.
+	 */
+	public static native int GetEventCount();
+
+	/** The name of an event id; false for an id the game does not have. */
+	public static native bool GetEventName(int eventId, char[] buffer, int maxlen);
+
+	/**
+	 * The id of an event: its index in the event table, the bit a client's
+	 * listen bits use for it; -1 for an event the game does not have.
+	 */
+	public static native int GetEventID(const char[] name);
+
+	/**
+	 * How many listeners an event has. The game only creates an event
+	 * (CreateEvent without force) when at least one listens; a hook keeps
+	 * Source2Mod's own listener on it.
+	 *
+	 * @return          -1 for an event the game does not have
+	 */
+	public static native int GetEventListenerCount(const char[] name, Source2ModEventListenerType type = Listener_Any);
+
+	/**
+	 * Whether a client listens to an event (its listen bits made it a
+	 * Listener_ClientStub of it); only then does the event reach it.
+	 */
+	public static native bool IsClientListening(CPlayerSlot slot, const char[] name);
+
+	/**
+	 * The .gameevents file that defined the event last
+	 * ("resource/game.gameevents"); false for an event the game does not have.
+	 */
+	public static native bool GetEventFile(const char[] name, char[] buffer, int maxlen);
+
+	/** Whether the event is never sent to clients; false for an event the game does not have. */
+	public static native bool IsEventLocal(const char[] name);
+
+	/** Whether the event is sent reliably; false for an event the game does not have. */
+	public static native bool IsEventReliable(const char[] name);
 }
