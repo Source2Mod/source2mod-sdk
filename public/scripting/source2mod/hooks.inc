@@ -107,6 +107,7 @@ enum HookPoint
 	HookPoint_GameServerSteamAPIActivated,
 	HookPoint_GameServerSteamAPIDeactivated,
 	HookPoint_LoadEventsFromFile,
+	HookPoint_ClientFullyConnect,      /**< the client finished loading (signon full) */
 
 	// Source2ModHooks.HookFunction.
 	HookPoint_Function = 300
@@ -205,7 +206,7 @@ methodmap ClientDisconnectContext
 	public native int GetNetworkId(char[] buffer, int maxlen);
 }
 
-/** ClientVoice, ClientSettingsChanged. */
+/** ClientVoice, ClientSettingsChanged, ClientFullyConnect. */
 methodmap ClientSlotContext
 {
 	property CPlayerSlot slot

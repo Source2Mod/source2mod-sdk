@@ -602,7 +602,7 @@ struct ClientDisconnectContext
     SOURCE2MOD_HOOK_NO_RETURN
 };
 
-/// ClientVoice, ClientSettingsChanged: which client.
+/// ClientVoice, ClientSettingsChanged, ClientFullyConnect: which client.
 struct ClientSlotContext
 {
     CPlayerSlot slot;
