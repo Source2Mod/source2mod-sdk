@@ -219,6 +219,71 @@ void EntityNetworkStateChanged(uintptr_t pEntity, uint nOffset);
 void ChainNetworkStateChanged(uintptr_t pNetworkVarChainer, uint nOffset);
 void NetworkVarStateChanged(uintptr_t pNetworkVar, uint32_t nOffset, uint32 nNetworkStateChangedOffset);
 
+namespace schema
+{
+    /**
+     * The owner of the inline object a field accessor handed out last on this
+     * thread: `pawn->m_vecViewOffset()` records the pawn, so the following
+     * `.m_vecZ = h` can tell the pawn. Needed for an inline class the engine
+     * embeds WITHOUT a NetworkVar_<field> wrapper (CBaseModelEntity::
+     * m_vecViewOffset, CNetworkViewOffsetVector): there is no vtable to send the
+     * change through, the object's first qword is plain data (0 for the view
+     * offset). Classes with a wrapper (m_Collision, m_Glow, m_fog) keep going
+     * through the wrapper, so nothing changes for them.
+     */
+    struct InlineOwner
+    {
+        uintptr_t object = 0;   // the inline object handed out
+        uintptr_t owner = 0;    // the object holding the field
+        uintptr_t ownerVtable = 0;
+        uint32_t offset = 0;    // the field's offset in the owner
+        int16_t chain = 0;      // the owner's CNetworkVarChainer offset, 0 for none
+        bool ownerInline = false;
+    };
+
+    inline thread_local InlineOwner t_inlineOwner;
+
+    template <typename T, typename = void>
+    struct is_inline_schema_class : std::false_type {};
+    template <typename T>
+    struct is_inline_schema_class<T, std::void_t<decltype(T::SchemaNetworkStateChangedOffset)>>
+        : std::bool_constant<T::SchemaNetworkStateChangedOffset != 0> {};
+
+    inline void RecordInlineOwner(uintptr_t object, uintptr_t owner, uint32_t offset, int16_t chain, bool ownerInline)
+    {
+        t_inlineOwner = { object, owner, *reinterpret_cast<uintptr_t*>(owner), offset, chain, ownerInline };
+    }
+
+    /// The change of a field of an inline object at `object`.
+    inline void InlineStateChanged(uintptr_t object, uint32_t offset, uint32 nNetworkStateChangedOffset)
+    {
+        const InlineOwner& o = t_inlineOwner;
+        if (o.object == object && o.owner)
+        {
+            // A NetworkVar wrapper's vtable sits in the same module as the
+            // owner's vtable; anything else (0 for the view offset) is data.
+            const uintptr_t first = *reinterpret_cast<uintptr_t*>(object);
+            const uintptr_t distance = first > o.ownerVtable ? first - o.ownerVtable : o.ownerVtable - first;
+            const bool wrapped = first != 0 && o.ownerVtable != 0 && distance < 0x8000000;
+
+            if (!wrapped)
+            {
+                // The whole inline field of the owner, as Utilities.SetStateChanged(
+                // pawn, "CBaseModelEntity", "m_vecViewOffset") does it.
+                if (o.chain != 0)
+                    ChainNetworkStateChanged(o.owner + o.chain, o.offset);
+                else if (!o.ownerInline)
+                    EntityNetworkStateChanged(o.owner, o.offset);
+                else
+                    NetworkVarStateChanged(o.owner, o.offset, 1);
+                return;
+            }
+        }
+
+        NetworkVarStateChanged(object, offset, nNetworkStateChangedOffset);
+    }
+}
+
 /* =========================
 Schema API
 ========================= */
@@ -461,6 +526,12 @@ Schema field macros
 																															 \
 			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                             \
                                                                                                                              \
+			if constexpr (schema::is_inline_schema_class<std::remove_cv_t<type>>::value)                                      \
+			{                                                                                                                 \
+				static const auto m_chain = schema::FindChainOffset(m_className, m_classNameHash);                               \
+				schema::RecordInlineOwner(pThisClass + m_key.offset + extra_offset, pThisClass,                                  \
+				                          m_key.offset + extra_offset, m_chain, m_networkStateChangedOffset != 0);               \
+			}                                                                                                                 \
 			return *reinterpret_cast<std::add_pointer_t<type>>(pThisClass + m_key.offset + extra_offset);                    \
 		}                                                                                                                    \
 		/*Const overload, so a const method of the owning class can read the*/                                               \
@@ -543,7 +614,7 @@ Schema field macros
 				if (!m_networkStateChangedOffset)                                                                            \
 					EntityNetworkStateChanged(pThisClass, m_key.offset + extra_offset);									     \
 				else                                                                                                         \
-					NetworkVarStateChanged(pThisClass, m_key.offset + extra_offset, m_networkStateChangedOffset);			 \
+					schema::InlineStateChanged(pThisClass, m_key.offset + extra_offset, m_networkStateChangedOffset);			 \
 			}                                                                                                                \
 		}                                                                                                                    \
 				/*The engine's element accessor for this field, when it has one. See*/                                               \
@@ -698,6 +769,12 @@ Schema field macros
 																															 \
 			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                             \
                                                                                                                              \
+			if constexpr (schema::is_inline_schema_class<std::remove_cv_t<type>>::value)                                      \
+			{                                                                                                                 \
+				static const auto m_chain = schema::FindChainOffset(m_className, m_classNameHash);                               \
+				schema::RecordInlineOwner(pThisClass + m_key.offset + extra_offset, pThisClass,                                  \
+				                          m_key.offset + extra_offset, m_chain, m_networkStateChangedOffset != 0);               \
+			}                                                                                                                 \
 			return reinterpret_cast<std::add_pointer_t<type>>(pThisClass + m_key.offset + extra_offset);                     \
 		}                                                                                                                    \
 		/*Const overload, so a const method of the owning class can read the*/                                               \
@@ -731,7 +808,7 @@ Schema field macros
 				if (!m_networkStateChangedOffset)                                                                            \
 					EntityNetworkStateChanged(pThisClass, m_key.offset + extra_offset);									     \
 				else                                                                                                         \
-					NetworkVarStateChanged(pThisClass, m_key.offset + extra_offset, m_networkStateChangedOffset);			 \
+					schema::InlineStateChanged(pThisClass, m_key.offset + extra_offset, m_networkStateChangedOffset);			 \
 			}                                                                                                                \
 		}                                                                                                                    \
 		operator type*()                                                                                                     \
@@ -825,6 +902,8 @@ Schema class macros
 			return s_fn ? s_fn(eAction, pObject) : nullptr;							\
 		}																			\
 	public:																			\
+		/*Inline (embedded) class marker for the owner's field accessor.*/	\
+		static constexpr int SchemaNetworkStateChangedOffset = offset;		\
 		/*Allocated on the game's heap and constructed; SchemaFree() releases it.*/ \
 		static ThisClass* SchemaCreate()											\
 		{																			\

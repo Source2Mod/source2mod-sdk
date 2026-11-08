@@ -346,6 +346,13 @@ static bool ChecksPathIndex(const unsigned char* pCode)
 
 static int FindNetworkStateChangedIndex(void** pVtable)
 {
+    // An inline object the engine embeds without a NetworkVar wrapper has no
+    // vtable: its first qword is data (CBaseModelEntity::m_vecViewOffset: 0,
+    // which crashed the server on the read below). Only a pointer into a
+    // loaded module can be a vtable.
+    if (!pVtable || !g_pSource2ModModules->GetFromAddress(pVtable))
+        return -1;
+
     // The vtable ends where its slots stop pointing into code (Linux: the next
     // vtable's offset-to-top, Windows: its RTTI locator).
     for (int i = 0; i < 256 && IsInModuleText(pVtable[i], pVtable); ++i)
