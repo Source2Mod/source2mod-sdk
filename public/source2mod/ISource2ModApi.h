@@ -352,6 +352,22 @@ public:
      * fields in schema::IsGuidelineField, giving knife skins).
      */
     virtual bool FollowsServerGuidelines() = 0;
+
+    /* =========================
+    More engine interfaces (plugin API 11)
+    ========================= */
+
+    // The engine's app systems s2sdk has a class for, connected once by the
+    // core. Null when the server does not load that system.
+    virtual IResourceSystem* GetResourceSystem() = 0;                     // ResourceSystem013
+    virtual IResourceManifestRegistry* GetResourceManifestRegistry() = 0; // ResourceManifestRegistry001
+    virtual IResourceHandleUtils* GetResourceHandleUtils() = 0;           // ResourceHandleUtils001
+    virtual IFlattenedSerializers* GetFlattenedSerializers() = 0;         // FlattenedSerializersVersion001
+    virtual ISerializedEntities* GetSerializedEntities() = 0;             // SerializedEntitiesVersion001
+    virtual IGameTypes* GetGameTypes() = 0;                               // GameTypes001
+    virtual IScriptManager* GetScriptManager() = 0;                       // VScriptManager010
+    virtual IAsyncFileSystem2* GetAsyncFileSystem() = 0;                  // VAsyncFileSystem2_001
+    virtual IProcessUtils* GetProcessUtils() = 0;                         // VProcessUtils002
 };
 
 #endif //_INCLUDE_ISOURCE2MOD_API_H

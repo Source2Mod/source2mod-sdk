@@ -347,7 +347,11 @@ inline bool Source2ModKHookVersionMatches(const char* coreHeader, const char* co
 // 8 still loaded through the core's pluginapi008.h until 10.
 // 10: ISource2ModAddresses is gone, ISource2ModFunctions finds a game function by
 // its gamedata name. Slots moved, so a plugin built against an older API is refused.
-#define SOURCE2MOD_PLAPI_VERSION 10
+// 11: ISource2ModAPI gains getters for more engine interfaces at its end
+// (resource system, flattened serializers, serialized entities, game types,
+// script manager, ...), filled by SOURCE2MOD_FILLGAMEVARS. A plugin built
+// against 10 keeps working; one built against 11 needs a core that has them.
+#define SOURCE2MOD_PLAPI_VERSION 11
 /// The oldest plugin API the core still loads.
 #define SOURCE2MOD_PLAPI_MIN 10
 
@@ -777,7 +781,16 @@ Globals
     g_pEngineServiceMgr          = (api)->GetEngineServiceMgr(); \
     g_pHostStateMgr              = (api)->GetHostStateMgr(); \
     g_pLocalize                  = (api)->GetLocalize(); \
-    g_pFullFileSystem            = (api)->GetFileSystem();
+    g_pFullFileSystem            = (api)->GetFileSystem(); \
+    g_pResourceSystem            = (api)->GetResourceSystem(); \
+    g_pResourceManifestRegistry  = (api)->GetResourceManifestRegistry(); \
+    g_pResourceHandleUtils       = (api)->GetResourceHandleUtils(); \
+    g_pFlattenedSerializers      = (api)->GetFlattenedSerializers(); \
+    g_pSerializedEntities        = (api)->GetSerializedEntities(); \
+    g_pGameTypes                 = (api)->GetGameTypes(); \
+    g_pScriptManager             = (api)->GetScriptManager(); \
+    g_pAsyncFileSystem           = (api)->GetAsyncFileSystem(); \
+    g_pProcessUtils              = (api)->GetProcessUtils();
 
 /**
 
