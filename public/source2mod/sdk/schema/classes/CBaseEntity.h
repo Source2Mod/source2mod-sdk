@@ -52,6 +52,7 @@
 #include "thinkfunc_t.h"
 
 #include <ehandle.h>
+#include <entity2/entitykeyvalues.h>
 #include <entityhandle.h>
 #include <igameevents.h>
 #include <shareddefs.h>
@@ -63,6 +64,7 @@
 #include <vector.h>
 
 #include <cstdint>
+#include <functional>
 
 class CBaseFilter;
 class CBodyComponent;
@@ -174,6 +176,33 @@ public:
     static T* New(const char* pszClassName)
     {    
         return reinterpret_cast<T*>(CreateEntityByName(pszClassName));
+    }
+    /// <summary>Creates an entity by classname with the key values it spawns with: origin and angles as CEntitySystem::CreateEntityKeyValues sets them, anything else (targetname, model, spawnflags, ...) through fnKeyValues. bSpawn spawns it with them right away; without it the entity is only created and placed (Teleport), fnKeyValues is not used and DispatchSpawn is the caller's.</summary>
+    template<typename T>
+    static T* New(const char* pszClassName, bool bSpawn, const Vector* pOrigin = nullptr, const QAngle* pAngles = nullptr, const std::function<void(CEntityKeyValues*)>& fnKeyValues = nullptr)
+    {
+        CBaseEntity* pEntity = CreateEntityByName(pszClassName);
+        if (!pEntity)
+            return nullptr;
+
+        if (!bSpawn)
+        {
+            if (pOrigin || pAngles)
+                pEntity->Teleport(pOrigin, pAngles, nullptr);
+            return reinterpret_cast<T*>(pEntity);
+        }
+
+        CEntityKeyValues* pKeyValues = new CEntityKeyValues();
+        pKeyValues->AddRef();
+        if (pOrigin)
+            pKeyValues->SetVector("origin", *pOrigin);
+        if (pAngles)
+            pKeyValues->SetQAngle("angles", *pAngles);
+        if (fnKeyValues)
+            fnKeyValues(pKeyValues);
+        pEntity->DispatchSpawn(pKeyValues);
+        pKeyValues->Release();
+        return reinterpret_cast<T*>(pEntity);
     }
     /// <summary>Get entity by index.</summary>
     template<typename T>

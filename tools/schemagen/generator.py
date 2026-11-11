@@ -460,6 +460,8 @@ MANUAL_METHODS: dict[str, list[str]] = {
         "static CBaseEntity* CreateEntityByName(const char* pszClassName);",
         "/// <summary>Create entity by classname.</summary>",
         "template<typename T>\n    static T* New(const char* pszClassName)\n    {    \n        return reinterpret_cast<T*>(CreateEntityByName(pszClassName));\n    }",
+        "/// <summary>Creates an entity by classname with the key values it spawns with: origin and angles as CEntitySystem::CreateEntityKeyValues sets them, anything else (targetname, model, spawnflags, ...) through fnKeyValues. bSpawn spawns it with them right away; without it the entity is only created and placed (Teleport), fnKeyValues is not used and DispatchSpawn is the caller's.</summary>",
+        "template<typename T>\n    static T* New(const char* pszClassName, bool bSpawn, const Vector* pOrigin = nullptr, const QAngle* pAngles = nullptr, const std::function<void(CEntityKeyValues*)>& fnKeyValues = nullptr)\n    {\n        CBaseEntity* pEntity = CreateEntityByName(pszClassName);\n        if (!pEntity)\n            return nullptr;\n\n        if (!bSpawn)\n        {\n            if (pOrigin || pAngles)\n                pEntity->Teleport(pOrigin, pAngles, nullptr);\n            return reinterpret_cast<T*>(pEntity);\n        }\n\n        CEntityKeyValues* pKeyValues = new CEntityKeyValues();\n        pKeyValues->AddRef();\n        if (pOrigin)\n            pKeyValues->SetVector(\"origin\", *pOrigin);\n        if (pAngles)\n            pKeyValues->SetQAngle(\"angles\", *pAngles);\n        if (fnKeyValues)\n            fnKeyValues(pKeyValues);\n        pEntity->DispatchSpawn(pKeyValues);\n        pKeyValues->Release();\n        return reinterpret_cast<T*>(pEntity);\n    }",
         "/// <summary>Get entity by index.</summary>",
         "template<typename T>\n    static T* FromIndex(int iIndex)\n    {    \n        return reinterpret_cast<T*>(GetEntitySystem()->GetEntityInstance(CEntityIndex(iIndex)));\n    }",
         "/// <summary>Get entity by entity index.</summary>",
@@ -1129,6 +1131,11 @@ def write_class(
 
     if inherits and class_name != "CBaseEntity":
         own_includes.add("CBaseEntity.h")
+
+    # New(classname, bSpawn, ...) builds the spawn key values inline
+    if class_name == "CBaseEntity":
+        external_includes.add("entity2/entitykeyvalues.h")
+        std_includes.add("functional")
 
     for inc in includes:
         if inc.startswith("#"):
