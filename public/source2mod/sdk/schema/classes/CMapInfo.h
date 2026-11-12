@@ -78,6 +78,7 @@ public:
     SCHEMA_FIELD(float, m_flEnvPuddleRippleDirection);
     SCHEMA_FIELD(float, m_flEnvWetnessCoverage);
     SCHEMA_FIELD(float, m_flEnvWetnessDryingAmount);
+    SCHEMA_FIELD(bool, m_bFrostEnabled);
 
 public:
     static CMapInfo* New(const char* className)
