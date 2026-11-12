@@ -193,6 +193,7 @@ class ISource2Server;
 #include "ISource2ModModules.h"
 #include "ISource2ModVoice.h"
 #include "ISource2ModSpawnGroups.h"
+#include "ISource2ModSnapshots.h"
 #include "ISource2ModMenus.h"
 #include "ISource2ModSQL.h"
 #include "ISource2ModNetworkMessages.h"
@@ -645,6 +646,7 @@ Globals
     ISource2ModWebSockets*      g_pSource2ModWebSockets      = nullptr; \
     ISource2ModTransmit*        g_pSource2ModTransmit        = nullptr; \
     ISource2ModSpawnGroups*     g_pSource2ModSpawnGroups     = nullptr; \
+    ISource2ModSnapshots*       g_pSource2ModSnapshots       = nullptr; \
     ISource2ModNatives*         g_pSource2ModNatives         = nullptr; \
     ISource2ModSchemaMethods*   g_pSource2ModSchemaMethods   = nullptr;
 
@@ -706,6 +708,7 @@ Globals
     extern ISource2ModWebSockets*      g_pSource2ModWebSockets; \
     extern ISource2ModTransmit*        g_pSource2ModTransmit; \
     extern ISource2ModSpawnGroups*     g_pSource2ModSpawnGroups; \
+    extern ISource2ModSnapshots*       g_pSource2ModSnapshots; \
     extern ISource2ModNatives*         g_pSource2ModNatives; \
     extern ISource2ModSchemaMethods*   g_pSource2ModSchemaMethods; \
     namespace KHook { extern KHook::IKHook* __exported__khook; }
@@ -754,6 +757,7 @@ Globals
     g_pSource2ModWebSockets      = (ISource2ModWebSockets*)     (api)->Source2ModFactory(SOURCE2MOD_WEBSOCKETS_INTERFACE,      nullptr, nullptr); \
     g_pSource2ModTransmit        = (ISource2ModTransmit*)       (api)->Source2ModFactory(SOURCE2MOD_TRANSMIT_INTERFACE,        nullptr, nullptr); \
     g_pSource2ModSpawnGroups     = (ISource2ModSpawnGroups*)    (api)->Source2ModFactory(SOURCE2MOD_SPAWNGROUPS_INTERFACE,     nullptr, nullptr); \
+    g_pSource2ModSnapshots       = (ISource2ModSnapshots*)      (api)->Source2ModFactory(SOURCE2MOD_SNAPSHOTS_INTERFACE,       nullptr, nullptr); \
     g_pSource2ModNatives         = (ISource2ModNatives*)        (api)->Source2ModFactory(SOURCE2MOD_NATIVES_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModSchemaMethods   = (ISource2ModSchemaMethods*)  (api)->Source2ModFactory(SOURCE2MOD_SCHEMAMETHODS_INTERFACE,   nullptr, nullptr);
 
