@@ -65,6 +65,23 @@ methodmap Source2ModEntities
 	public static native void AcceptInput(CEntityInstance target, const char[] input, CEntityInstance activator = NULL_ENTITY,
 	                                      CEntityInstance caller = NULL_ENTITY, const char[] value = "");
 
+	/**
+	 * The same with a typed value: the input gets it as that type instead of a
+	 * string it parses (SetHealth with an int, SetRenderColor with a color, ...).
+	 *
+	 * @return  Whether the target handled the input
+	 */
+	public static native bool AcceptInputInt(CEntityInstance target, const char[] input, int value,
+	                                         CEntityInstance activator = NULL_ENTITY, CEntityInstance caller = NULL_ENTITY);
+	public static native bool AcceptInputFloat(CEntityInstance target, const char[] input, float value,
+	                                           CEntityInstance activator = NULL_ENTITY, CEntityInstance caller = NULL_ENTITY);
+	public static native bool AcceptInputBool(CEntityInstance target, const char[] input, bool value,
+	                                          CEntityInstance activator = NULL_ENTITY, CEntityInstance caller = NULL_ENTITY);
+	public static native bool AcceptInputVector(CEntityInstance target, const char[] input, const float value[3],
+	                                            CEntityInstance activator = NULL_ENTITY, CEntityInstance caller = NULL_ENTITY);
+	public static native bool AcceptInputColor(CEntityInstance target, const char[] input, int r, int g, int b, int a = 255,
+	                                           CEntityInstance activator = NULL_ENTITY, CEntityInstance caller = NULL_ENTITY);
+
 	/** The same, queued: runs after `delay` seconds. */
 	public static native void AddEntityIOEvent(CEntityInstance target, const char[] input, CEntityInstance activator = NULL_ENTITY,
 	                                           CEntityInstance caller = NULL_ENTITY, const char[] value = "", float delay = 0.0);

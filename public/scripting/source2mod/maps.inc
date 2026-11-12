@@ -92,3 +92,46 @@ methodmap Source2ModMaps
 	 */
 	public static native ArrayList ReadMapList(const char[] name = "default", int flags = 0, ArrayList list = null);
 }
+
+/**
+ * The game's game types, modes and map groups (IGameTypes: gamemodes.txt and
+ * gamemodes_server.txt). Every native answers "nothing" (-1, 0, "", null) when
+ * the server has no game types system.
+ */
+methodmap Source2ModGameTypes
+{
+	/** game_type of the running mode, -1 when unknown. */
+	public static native int GetCurrentGameType();
+
+	/** game_mode of the running mode, -1 when unknown. */
+	public static native int GetCurrentGameMode();
+
+	/** Name of the running mode ("casual", "competitive", ...). @return Bytes written */
+	public static native int GetCurrentGameModeName(char[] buffer, int maxlen);
+
+	/** The running map group ("mg_active", a workshop collection, ...). @return Bytes written */
+	public static native int GetCurrentMapGroup(char[] buffer, int maxlen);
+
+	/** Name of a game_type ("classic", "gungame", ...). @return Bytes written */
+	public static native int GetGameTypeName(int gameType, char[] buffer, int maxlen);
+
+	/** Name of a game_mode within a game_type. @return Bytes written */
+	public static native int GetGameModeName(int gameType, int gameMode, char[] buffer, int maxlen);
+
+	/** Whether the map group exists. */
+	public static native bool IsValidMapGroup(const char[] mapGroup);
+
+	/**
+	 * The maps of a map group.
+	 *
+	 * @param list   Appended to; a new list when null.
+	 * @return       The list, null when the group does not exist.
+	 */
+	public static native ArrayList GetMapGroupMaps(const char[] mapGroup, ArrayList list = null);
+
+	/** A random map of the group. @return Bytes written, 0 when the group has none */
+	public static native int GetRandomMap(const char[] mapGroup, char[] buffer, int maxlen);
+
+	/** maxplayers the game sets for a game_type / game_mode. */
+	public static native int GetMaxPlayers(int gameType, int gameMode);
+}
