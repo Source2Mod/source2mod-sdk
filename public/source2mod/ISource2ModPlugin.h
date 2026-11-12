@@ -192,6 +192,7 @@ class ISource2Server;
 #include "ISource2ModMaps.h"
 #include "ISource2ModModules.h"
 #include "ISource2ModVoice.h"
+#include "ISource2ModSpawnGroups.h"
 #include "ISource2ModMenus.h"
 #include "ISource2ModSQL.h"
 #include "ISource2ModNetworkMessages.h"
@@ -351,7 +352,9 @@ inline bool Source2ModKHookVersionMatches(const char* coreHeader, const char* co
 // (resource system, flattened serializers, serialized entities, game types,
 // script manager, ...), filled by SOURCE2MOD_FILLGAMEVARS. A plugin built
 // against 10 keeps working; one built against 11 needs a core that has them.
-#define SOURCE2MOD_PLAPI_VERSION 11
+// 12: ISource2ModSpawnGroups (SpawnGroups() at the end of ISource2ModAPI). Plugins
+// built against 10 or 11 keep working.
+#define SOURCE2MOD_PLAPI_VERSION 12
 /// The oldest plugin API the core still loads.
 #define SOURCE2MOD_PLAPI_MIN 10
 
@@ -641,6 +644,7 @@ Globals
     ISource2ModUtils*           g_pSource2ModUtils           = nullptr; \
     ISource2ModWebSockets*      g_pSource2ModWebSockets      = nullptr; \
     ISource2ModTransmit*        g_pSource2ModTransmit        = nullptr; \
+    ISource2ModSpawnGroups*     g_pSource2ModSpawnGroups     = nullptr; \
     ISource2ModNatives*         g_pSource2ModNatives         = nullptr; \
     ISource2ModSchemaMethods*   g_pSource2ModSchemaMethods   = nullptr;
 
@@ -701,6 +705,7 @@ Globals
     extern ISource2ModUtils*           g_pSource2ModUtils; \
     extern ISource2ModWebSockets*      g_pSource2ModWebSockets; \
     extern ISource2ModTransmit*        g_pSource2ModTransmit; \
+    extern ISource2ModSpawnGroups*     g_pSource2ModSpawnGroups; \
     extern ISource2ModNatives*         g_pSource2ModNatives; \
     extern ISource2ModSchemaMethods*   g_pSource2ModSchemaMethods; \
     namespace KHook { extern KHook::IKHook* __exported__khook; }
@@ -748,6 +753,7 @@ Globals
     g_pSource2ModUtils           = (ISource2ModUtils*)          (api)->Source2ModFactory(SOURCE2MOD_UTILS_INTERFACE,           nullptr, nullptr); \
     g_pSource2ModWebSockets      = (ISource2ModWebSockets*)     (api)->Source2ModFactory(SOURCE2MOD_WEBSOCKETS_INTERFACE,      nullptr, nullptr); \
     g_pSource2ModTransmit        = (ISource2ModTransmit*)       (api)->Source2ModFactory(SOURCE2MOD_TRANSMIT_INTERFACE,        nullptr, nullptr); \
+    g_pSource2ModSpawnGroups     = (ISource2ModSpawnGroups*)    (api)->Source2ModFactory(SOURCE2MOD_SPAWNGROUPS_INTERFACE,     nullptr, nullptr); \
     g_pSource2ModNatives         = (ISource2ModNatives*)        (api)->Source2ModFactory(SOURCE2MOD_NATIVES_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModSchemaMethods   = (ISource2ModSchemaMethods*)  (api)->Source2ModFactory(SOURCE2MOD_SCHEMAMETHODS_INTERFACE,   nullptr, nullptr);
 

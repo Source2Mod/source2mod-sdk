@@ -140,6 +140,7 @@ class ISource2ModTargeting;
 class ISource2ModTranslations;
 class ISource2ModUtils;
 class ISource2ModVoice;
+class ISource2ModSpawnGroups;
 class ISource2ModWebSockets;
 
 typedef void* (*CreateInterfaceFn)(const char* pName, int* pReturnCode);
@@ -368,6 +369,12 @@ public:
     virtual IScriptManager* GetScriptManager() = 0;                       // VScriptManager010
     virtual IAsyncFileSystem2* GetAsyncFileSystem() = 0;                  // VAsyncFileSystem2_001
     virtual IProcessUtils* GetProcessUtils() = 0;                         // VProcessUtils002
+
+    /* =========================
+    Plugin API 12
+    ========================= */
+
+    virtual ISource2ModSpawnGroups* SpawnGroups() = 0;
 };
 
 #endif //_INCLUDE_ISOURCE2MOD_API_H

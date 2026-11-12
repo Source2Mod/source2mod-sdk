@@ -1,6 +1,6 @@
 /**
- * Source2Mod SourcePawn API: network string tables and spawn groups, on the
- * engine's own interfaces.
+ * Source2Mod SourcePawn API: network string tables, on the engine's own
+ * interfaces (spawn groups are in source2mod/spawngroups).
  *
  * A NetworkStringTable is the table's id: tables are made anew for every map,
  * so find it again after a map change. INVALID_STRING_TABLE when there is none.
@@ -48,24 +48,3 @@ methodmap NetworkStringTable
 }
 
 #define INVALID_STRING_TABLE view_as<NetworkStringTable>(-1)
-
-/**
- * Spawn groups. Source2ModGameSystems' events tell when one is ready:
- * resources go in on SpawnGroupPrecache with the handle from Load. A handle is
- * reused once its group is gone, so forget it on SpawnGroupUncache. What a script
- * loaded is unloaded when the script goes.
- */
-methodmap Source2ModSpawnGroups
-{
-	/**
-	 * @param world  What to load ("maps/prefabs/...").
-	 * @param name   A name for FindByName and the server's log.
-	 * @return The handle, 0 on failure
-	 */
-	public static native int Load(const char[] world, const char[] name, bool blockUntilLoaded = false);
-
-	public static native void Unload(int handle);
-	public static native int FindByName(const char[] name);
-	public static native bool IsLoaded(int handle);
-	public static native bool IsLoading(int handle);
-}

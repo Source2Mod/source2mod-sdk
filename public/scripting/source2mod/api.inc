@@ -32,6 +32,7 @@
 #include <source2mod/permissions>
 #include <source2mod/trace>
 #include <source2mod/gamesystems>
+#include <source2mod/spawngroups>
 #include <source2mod/json>
 #include <source2mod/configs>
 #include <source2mod/http>
