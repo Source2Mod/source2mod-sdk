@@ -74,33 +74,29 @@
 Signon groups
 ========================= */
 
-// s2sdk does not declare these. The values are the engine's own, checked
-// against the RTTI of libengine2.so/libserver.so and the group name each
-// binding returns from GetGroup(); 1-3 are unused by any message.
-enum SignonGroup_t : int32_t
-{
-    SG_INVALID      = -1,
-    SG_GENERIC      = 0,
-    SG_LOCALPLAYER  = 1,
-    SG_OTHERPLAYER  = 2,
-    SG_ENTITIES     = 3,
-    SG_SOUNDS       = 4,
-    SG_EVENTS       = 5,
-    SG_VOICE        = 6,
-    SG_STRINGTABLE  = 7,
-    SG_MOVE         = 8,
-    SG_STRINGCMD    = 9,
-    SG_SIGNON       = 10,
-    SG_SYSTEM       = 11,
-    SG_DECALS       = 12,
-    SG_USERMSG      = 13,
-    SG_CLIENTMSG    = 14,
-    SG_SPAWNGROUPS  = 15,
-    SG_ENGINE       = 16,
-    SG_HLTVREPLAY   = 17,
+// SignonGroup_t is s2sdk's (inetworkmessages.h, SIGNONGROUP_*). The short
+// SG_* names stay for the code that uses them; 1-3 are unused by any message.
+inline constexpr SignonGroup_t SG_INVALID     = SIGNONGROUP_INVALID;
+inline constexpr SignonGroup_t SG_GENERIC     = SIGNONGROUP_GENERIC;
+inline constexpr SignonGroup_t SG_LOCALPLAYER = SIGNONGROUP_LOCAL_PLAYER;
+inline constexpr SignonGroup_t SG_OTHERPLAYER = SIGNONGROUP_OTHER_PLAYERS;
+inline constexpr SignonGroup_t SG_ENTITIES    = SIGNONGROUP_ENTITIES;
+inline constexpr SignonGroup_t SG_SOUNDS      = SIGNONGROUP_SOUNDS;
+inline constexpr SignonGroup_t SG_EVENTS      = SIGNONGROUP_EVENTS;
+inline constexpr SignonGroup_t SG_VOICE       = SIGNONGROUP_VOICE;
+inline constexpr SignonGroup_t SG_STRINGTABLE = SIGNONGROUP_STRING_TABLE;
+inline constexpr SignonGroup_t SG_MOVE        = SIGNONGROUP_MOVE;
+inline constexpr SignonGroup_t SG_STRINGCMD   = SIGNONGROUP_STRING_COMMAND;
+inline constexpr SignonGroup_t SG_SIGNON      = SIGNONGROUP_SIGNON;
+inline constexpr SignonGroup_t SG_SYSTEM      = SIGNONGROUP_SYSTEM;
+inline constexpr SignonGroup_t SG_DECALS      = SIGNONGROUP_DECALS;
+inline constexpr SignonGroup_t SG_USERMSG     = SIGNONGROUP_USER_MESSAGES;
+inline constexpr SignonGroup_t SG_CLIENTMSG   = SIGNONGROUP_CLIENT_MESSAGES;
+inline constexpr SignonGroup_t SG_SPAWNGROUPS = SIGNONGROUP_SPAWN_GROUPS;
+inline constexpr SignonGroup_t SG_ENGINE      = SIGNONGROUP_GAME_ENGINE;
+inline constexpr SignonGroup_t SG_HLTVREPLAY  = SIGNONGROUP_HLTV_REPLAY;
 
-    SG_TOTAL        = 18,
-};
+inline constexpr int SG_TOTAL = SIGNONGROUP_HLTV_REPLAY + 1;
 
 inline constexpr const char* k_pszNetGroupNames[ SG_TOTAL ] =
 {
