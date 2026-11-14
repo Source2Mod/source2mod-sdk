@@ -41,23 +41,16 @@
 #include "source2mod/ISource2ModPlugin.h"
 SOURCE2MOD_GLOBALVARS();
 
+// The group of the hitbox the damage's trace hit: CTakeDamageInfo's trace (m_pTrace, not in the schema) -> CGameTrace::m_pHitbox -> CHitBox::m_nGroupId. No trace (fall, world, burn damage): invalid; a trace that hit no hitbox: generic.
 HitGroup_t CTakeDamageInfo::GetHitGroup() const
 {
-    static int offset = g_pSource2ModGameConfig->GetOffset("CTakeDamageInfo::HitGroup");
-
-    if (offset <= 0)
+    const CGameTrace* trace = m_pTrace();
+    if (!trace)
         return HitGroup_t::HITGROUP_INVALID;
 
-    const uintptr_t base = reinterpret_cast<uintptr_t>(this);
-
-    const uintptr_t v4 = *reinterpret_cast<const uintptr_t*>(base + offset);
-    if (!v4)
-        return HitGroup_t::HITGROUP_INVALID;
-
-    const uintptr_t v1 = *reinterpret_cast<const uintptr_t*>(v4 + 16);
-    if (!v1)
+    const CHitBox* hitbox = trace->m_pHitbox;
+    if (!hitbox)
         return HitGroup_t::HITGROUP_GENERIC;
 
-    const int32_t group = *reinterpret_cast<const int32_t*>(v1 + 56);
-    return static_cast<HitGroup_t>(group);
+    return static_cast<HitGroup_t>(hitbox->m_nGroupId);
 }

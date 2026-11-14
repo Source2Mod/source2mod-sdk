@@ -104,14 +104,15 @@ public:
 	SCHEMA_FIELD(CUtlLeanVector<int>, m_DestructibleHitGroupRequests) // CUtlLeanVector<DestructiblePartDamageRequest_t>
 	SCHEMA_FIELD(bool, m_bInTakeDamageFlow)
 
-	// Not in the schema. m_pTrace is also what GetHitGroup() reads
-	// ("CTakeDamageInfo::HitGroup" in gamedata).
+	// Not in the schema. m_pTrace is also what GetHitGroup() reads.
 	DAMAGE_FIXED_FIELD(CGameTrace*, m_pTrace, 0x68)
 	DAMAGE_FIXED_FIELD(void*, m_hScriptInstance, 0xe0)
 	DAMAGE_FIXED_FIELD(AttackerInfo_t, m_AttackerInfo, 0xe8)
 
-	// m_iHitGroupId (0x78) is left out on purpose: the game does not fill it
-	// in, GetHitGroup() is the hit group.
+	// m_iHitGroupId (0x78) is left out on purpose: the game's own init of every
+	// CTakeDamageInfo sets it to -1 (HITGROUP_INVALID) and no server code writes
+	// it after that (IDA, libserver 2026-10-23; 63 bullet hits on a DS on
+	// 2026-11-14 all read -1). GetHitGroup() is the hit group.
 
 private:
 	// The game's object: 280 bytes on 2026-10-23, room left for it to grow.
