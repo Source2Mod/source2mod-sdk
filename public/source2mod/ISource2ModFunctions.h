@@ -132,6 +132,7 @@ enum class Source2ModType : int32_t
 };
 
 struct GameTime_t;
+class CEntityInstance;
 
 /**
  * What a C++ type is as a Source2ModType, where the rules of TypeOf() below
@@ -163,6 +164,28 @@ namespace source2mod_functions_detail
     struct HasTypeTraits<T, std::void_t<decltype(Source2ModTypeTraits<T>::value)>> : std::true_type
     {
     };
+
+    template <typename T, typename = void>
+    struct IsComplete : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct IsComplete<T, std::void_t<decltype(sizeof(T))>> : std::true_type
+    {
+    };
+
+    // A pointer to an entity class (CEntityInstance among its bases, its
+    // definition included): Entity, which a hook's first parameter needs for
+    // HookFilter::designerName.
+    template <typename P>
+    constexpr bool IsEntityClass()
+    {
+        if constexpr (std::is_class_v<P> && IsComplete<P>::value)
+            return std::is_base_of_v<::CEntityInstance, P>;
+        else
+            return false;
+    }
 
     template <size_t N>
     constexpr Source2ModType IntOfSize()
@@ -249,6 +272,21 @@ namespace source2mod_functions_detail
     template <typename Sig>
     struct Signature;
 
+    // A function's description (Source2ModFunctionTypes): a pointer to an
+    // entity class is Entity there, which a hook's first parameter needs for
+    // HookFilter::designerName. A call's check (Call<Sig>) keeps Pointer,
+    // which every core takes for an entity.
+    template <typename T>
+    constexpr Source2ModType DescribedTypeOf(Source2ModType t)
+    {
+        if constexpr (std::is_pointer_v<T>)
+        {
+            if (t == Source2ModType::Pointer && IsEntityClass<std::remove_cv_t<std::remove_pointer_t<T>>>())
+                return Source2ModType::Entity;
+        }
+        return t;
+    }
+
     template <typename R, typename... P>
     struct Signature<R(P...)>
     {
@@ -257,6 +295,8 @@ namespace source2mod_functions_detail
         static constexpr int kCount = sizeof...(P);
         static constexpr Source2ModType kReturn = TypeOf<R>();
         static constexpr Source2ModType kParams[sizeof...(P) + 1] = { ParamTypeOf<P>()..., Source2ModType::Void };
+        static constexpr Source2ModType kDescribedReturn = DescribedTypeOf<R>(TypeOf<R>());
+        static constexpr Source2ModType kDescribedParams[sizeof...(P) + 1] = { DescribedTypeOf<P>(ParamTypeOf<P>())..., Source2ModType::Void };
     };
 
     // A function's type in any spelling -- a function type, a pointer to one,
@@ -468,7 +508,7 @@ constexpr FunctionTypes Source2ModFunctionTypes()
 {
     using Of = source2mod_functions_detail::FunctionOf<std::remove_cv_t<std::remove_reference_t<F>>>;
     using S = source2mod_functions_detail::Signature<typename Of::Sig>;
-    return FunctionTypes{ S::kReturn, S::kParams, S::kCount, Of::kMember };
+    return FunctionTypes{ S::kDescribedReturn, S::kDescribedParams, S::kCount, Of::kMember };
 }
 
 template <typename F>
@@ -570,6 +610,14 @@ public:
     {
         const int index = KHook::GetVtableIndex(method);
         return index < 0 ? nullptr : FromVirtual(index, Source2ModFunctionTypes<M>());
+    }
+
+    /// A free function of the plugin's process: its address and types from the pointer.
+    template <typename R, typename... P>
+    ISource2ModFunction* Create(R (*function)(P...))
+    {
+        constexpr FunctionTypes types = Source2ModFunctionTypes<R (*)(P...)>();
+        return Create(reinterpret_cast<void*>(function), nullptr, -1, false, types.returnType, types.params, types.count);
     }
 
     template <typename F>
