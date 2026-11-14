@@ -59,7 +59,7 @@
 class CCSGameModeRules
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CCSGameModeRules);
+    DECLARE_SCHEMA_CLASS(CCSGameModeRules);
 
     SCHEMA_FIELD(CNetworkVarChainer, __m_pChainEntity);
 };

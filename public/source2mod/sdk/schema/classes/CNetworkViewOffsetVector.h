@@ -59,7 +59,7 @@
 class CNetworkViewOffsetVector
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CNetworkViewOffsetVector);
+    DECLARE_SCHEMA_CLASS(CNetworkViewOffsetVector);
 
     SCHEMA_FIELD(float, m_vecX);
     SCHEMA_FIELD(float, m_vecY);

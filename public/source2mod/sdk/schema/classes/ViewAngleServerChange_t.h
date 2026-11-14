@@ -60,7 +60,7 @@
 class ViewAngleServerChange_t
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(ViewAngleServerChange_t);
+    DECLARE_SCHEMA_CLASS(ViewAngleServerChange_t);
 
     SCHEMA_FIELD(FixAngleSet_t, nType);
     SCHEMA_FIELD(QAngle, qAngle);

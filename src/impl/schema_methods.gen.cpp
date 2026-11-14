@@ -27,6 +27,7 @@
 #include "source2mod/sdk/schema/classes/CBasePlayerWeapon.h"
 #include "source2mod/sdk/schema/classes/CCSCustomHudLayout.h"
 #include "source2mod/ISource2ModCustomHud.h"
+#include "source2mod/ISource2ModFunctions.h"
 #include "source2mod/sdk/schema/classes/CCSGameRules.h"
 #include "source2mod/ISource2ModMenus.h"
 #include "source2mod/sdk/schema/classes/CCSObserverPawn.h"
@@ -802,32 +803,42 @@ namespace
         return schema::FindChainOffset(className, classNameHash);
     }
 
-    SchemaGenClassOpsFn_t Thunk150(const char* className)
+    schema::ClassNsc Thunk150(const char* className, uint32_t classNameHash)
+    {
+        return schema::GetClassNsc(className, classNameHash);
+    }
+
+    SchemaGenClassOpsFn_t Thunk151(const char* className)
     {
         return schema::GetClassOps(className);
     }
 
-    int32_t Thunk151(const char* className)
+    int32_t Thunk152(const char* className)
     {
         return schema::GetClassSize(className);
     }
 
-    SchemaKey Thunk152(const char* className, uint32_t classKey, const char* memberName, uint32_t memberKey)
+    SchemaKey Thunk153(const char* className, uint32_t classKey, const char* memberName, uint32_t memberKey)
     {
         return schema::GetOffset(className, classKey, memberName, memberKey);
     }
 
-    int32_t Thunk153(const char* pszClassName, const char* pszPropName)
+    int32_t Thunk154(const char* pszClassName, const char* pszPropName)
     {
         return schema::GetServerOffset(pszClassName, pszPropName);
     }
 
-    void* Thunk154(size_t size)
+    void* Thunk155(size_t size)
     {
         return schema::MissingFieldStorage(size);
     }
 
-    void Thunk155(CEntityInstance* entity, const char* className, const char* propName)
+    bool Thunk156(uintptr_t object, uint32_t offset)
+    {
+        return schema::NetworkVarStateChanged(object, offset);
+    }
+
+    void Thunk157(CEntityInstance* entity, const char* className, const char* propName)
     {
         return schema::SetStateChanged(entity, className, propName);
     }
@@ -986,12 +997,14 @@ extern const Source2ModSchemaMethodEntry g_Source2ModSchemaMethodTable[] = {
     { "NetworkVarStateChanged(uintptr_t,uint32_t,uint32)", reinterpret_cast<void*>(&Thunk147) },
     { "schema::FindChainOffset(const char*)", reinterpret_cast<void*>(&Thunk148) },
     { "schema::FindChainOffset(const char*,uint32_t)", reinterpret_cast<void*>(&Thunk149) },
-    { "schema::GetClassOps(const char*)", reinterpret_cast<void*>(&Thunk150) },
-    { "schema::GetClassSize(const char*)", reinterpret_cast<void*>(&Thunk151) },
-    { "schema::GetOffset(const char*,uint32_t,const char*,uint32_t)", reinterpret_cast<void*>(&Thunk152) },
-    { "schema::GetServerOffset(const char*,const char*)", reinterpret_cast<void*>(&Thunk153) },
-    { "schema::MissingFieldStorage(size_t)", reinterpret_cast<void*>(&Thunk154) },
-    { "schema::SetStateChanged(CEntityInstance*,const char*,const char*)", reinterpret_cast<void*>(&Thunk155) },
+    { "schema::GetClassNsc(const char*,uint32_t)", reinterpret_cast<void*>(&Thunk150) },
+    { "schema::GetClassOps(const char*)", reinterpret_cast<void*>(&Thunk151) },
+    { "schema::GetClassSize(const char*)", reinterpret_cast<void*>(&Thunk152) },
+    { "schema::GetOffset(const char*,uint32_t,const char*,uint32_t)", reinterpret_cast<void*>(&Thunk153) },
+    { "schema::GetServerOffset(const char*,const char*)", reinterpret_cast<void*>(&Thunk154) },
+    { "schema::MissingFieldStorage(size_t)", reinterpret_cast<void*>(&Thunk155) },
+    { "schema::NetworkVarStateChanged(uintptr_t,uint32_t)", reinterpret_cast<void*>(&Thunk156) },
+    { "schema::SetStateChanged(CEntityInstance*,const char*,const char*)", reinterpret_cast<void*>(&Thunk157) },
 };
 
 extern const size_t g_Source2ModSchemaMethodCount = sizeof(g_Source2ModSchemaMethodTable) / sizeof(g_Source2ModSchemaMethodTable[0]);

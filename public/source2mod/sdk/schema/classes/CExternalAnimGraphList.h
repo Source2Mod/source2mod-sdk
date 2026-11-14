@@ -59,7 +59,7 @@
 class CExternalAnimGraphList
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CExternalAnimGraphList);
+    DECLARE_SCHEMA_CLASS(CExternalAnimGraphList);
 
 };
 

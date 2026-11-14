@@ -63,7 +63,7 @@ class CBaseEntity;
 class CAttributeManager
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CAttributeManager);
+    DECLARE_SCHEMA_CLASS(CAttributeManager);
 
     SCHEMA_FIELD(CUtlVector<CHandle<CBaseEntity>>, m_Providers);
     SCHEMA_FIELD(int32_t, m_iReapplyProvisionParity);

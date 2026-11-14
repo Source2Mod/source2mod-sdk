@@ -59,7 +59,7 @@
 class CPathQueryComponent : public CEntityComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CPathQueryComponent);
+    DECLARE_SCHEMA_CLASS(CPathQueryComponent);
 
 };
 

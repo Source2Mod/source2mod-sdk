@@ -61,7 +61,7 @@ class InfoForResourceTypeCTextureBase;
 class CLightComponent : public CEntityComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CLightComponent);
+    DECLARE_SCHEMA_CLASS(CLightComponent);
 
     SCHEMA_FIELD(CNetworkVarChainer, __m_pChainEntity);
     SCHEMA_FIELD(Color, m_Color);

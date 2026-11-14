@@ -60,7 +60,7 @@
 class Relationship_t
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(Relationship_t);
+    DECLARE_SCHEMA_CLASS(Relationship_t);
 
     SCHEMA_FIELD(Disposition_t, disposition);
     SCHEMA_FIELD(int32_t, priority);

@@ -27,6 +27,7 @@
 #include "source2mod/sdk/schema/classes/CBasePlayerWeapon.h"
 #include "source2mod/sdk/schema/classes/CCSCustomHudLayout.h"
 #include "source2mod/ISource2ModCustomHud.h"
+#include "source2mod/ISource2ModFunctions.h"
 #include "source2mod/sdk/schema/classes/CCSGameRules.h"
 #include "source2mod/ISource2ModMenus.h"
 #include "source2mod/sdk/schema/classes/CCSObserverPawn.h"
@@ -1850,6 +1851,18 @@ int16_t schema::FindChainOffset(const char* className, uint32_t classNameHash)
     return s_fn(className, classNameHash);
 }
 
+schema::ClassNsc schema::GetClassNsc(const char* className, uint32_t classNameHash)
+{
+    using Fn = schema::ClassNsc (*)(const char*, uint32_t);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("schema::GetClassNsc(const char*,uint32_t)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<schema::ClassNsc>();
+    return s_fn(className, classNameHash);
+}
+
 SchemaGenClassOpsFn_t schema::GetClassOps(const char* className)
 {
     using Fn = SchemaGenClassOpsFn_t (*)(const char*);
@@ -1908,6 +1921,18 @@ void* schema::MissingFieldStorage(size_t size)
     if (!s_fn)
         return Source2ModSchemaMissing<void*>();
     return s_fn(size);
+}
+
+bool schema::NetworkVarStateChanged(uintptr_t object, uint32_t offset)
+{
+    using Fn = bool (*)(uintptr_t, uint32_t);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("schema::NetworkVarStateChanged(uintptr_t,uint32_t)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<bool>();
+    return s_fn(object, offset);
 }
 
 void schema::SetStateChanged(CEntityInstance* entity, const char* className, const char* propName)

@@ -59,7 +59,7 @@
 class InfoForResourceTypeIParticleSystemDefinition
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(InfoForResourceTypeIParticleSystemDefinition);
+    DECLARE_SCHEMA_CLASS(InfoForResourceTypeIParticleSystemDefinition);
 
 };
 

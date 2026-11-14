@@ -67,7 +67,7 @@ class SpawnPoint;
 class CCSGameRules : public CTeamplayRules
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CCSGameRules);
+    DECLARE_SCHEMA_CLASS(CCSGameRules);
 
     SCHEMA_FIELD(bool, m_bFreezePeriod);
     SCHEMA_FIELD(bool, m_bWarmupPeriod);

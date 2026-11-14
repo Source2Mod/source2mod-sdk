@@ -59,7 +59,7 @@
 class IPhysicsBodyList
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(IPhysicsBodyList);
+    DECLARE_SCHEMA_CLASS(IPhysicsBodyList);
 
 };
 

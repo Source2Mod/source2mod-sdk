@@ -59,7 +59,7 @@
 class SoundeventBoxHelperNetworked_t
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(SoundeventBoxHelperNetworked_t);
+    DECLARE_SCHEMA_CLASS(SoundeventBoxHelperNetworked_t);
 
     SCHEMA_FIELD(Vector, vOrigin);
     SCHEMA_FIELD(QAngle, qAngles);

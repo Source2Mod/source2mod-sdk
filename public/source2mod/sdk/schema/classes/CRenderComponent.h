@@ -59,7 +59,7 @@
 class CRenderComponent : public CEntityComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CRenderComponent);
+    DECLARE_SCHEMA_CLASS(CRenderComponent);
 
     SCHEMA_FIELD(CNetworkVarChainer, __m_pChainEntity);
     SCHEMA_FIELD(bool, m_bIsRenderingWithViewModels);

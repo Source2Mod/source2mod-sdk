@@ -60,7 +60,7 @@
 class CCS2UIPawnGraphController : public CAnimGraphControllerBase
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CCS2UIPawnGraphController);
+    DECLARE_SCHEMA_CLASS(CCS2UIPawnGraphController);
 
 };
 

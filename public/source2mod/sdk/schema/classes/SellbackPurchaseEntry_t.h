@@ -59,7 +59,7 @@
 class SellbackPurchaseEntry_t
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(SellbackPurchaseEntry_t);
+    DECLARE_SCHEMA_CLASS(SellbackPurchaseEntry_t);
 
     SCHEMA_FIELD(uint16_t, m_unDefIdx);
     SCHEMA_FIELD(int32_t, m_nCost);

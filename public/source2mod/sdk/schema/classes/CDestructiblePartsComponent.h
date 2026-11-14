@@ -62,7 +62,7 @@ class CBaseModelEntity;
 class CDestructiblePartsComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CDestructiblePartsComponent);
+    DECLARE_SCHEMA_CLASS(CDestructiblePartsComponent);
 
     SCHEMA_FIELD(CNetworkVarChainer, __m_pChainEntity);
     SCHEMA_FIELD(CUtlVector<uint16_t>, m_vecDamageTakenByHitGroup);

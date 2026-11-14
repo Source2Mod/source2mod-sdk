@@ -59,7 +59,7 @@
 class CNavHullVData
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CNavHullVData);
+    DECLARE_SCHEMA_CLASS(CNavHullVData);
 
     SCHEMA_FIELD(bool, m_bAgentEnabled);
     SCHEMA_FIELD(float, m_agentRadius);

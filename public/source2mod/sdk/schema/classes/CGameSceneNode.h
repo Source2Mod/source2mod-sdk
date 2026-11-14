@@ -62,7 +62,7 @@ class CSkeletonInstance;
 class CGameSceneNode
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CGameSceneNode);
+    DECLARE_SCHEMA_CLASS(CGameSceneNode);
 
     SCHEMA_FIELD(CTransform, m_nodeToWorld);
     SCHEMA_FIELD(CEntityInstance*, m_pOwner);

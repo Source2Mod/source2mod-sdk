@@ -59,7 +59,7 @@
 class CBaseModelEntity__BodyGroupRequest_t
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CBaseModelEntity__BodyGroupRequest_t);
+    DECLARE_SCHEMA_CLASS(CBaseModelEntity__BodyGroupRequest_t);
 
     SCHEMA_FIELD(uint32_t, m_uRequestID);
     SCHEMA_FIELD_POINTER(CUtlStringToken, m_nGroupName);

@@ -62,7 +62,7 @@ class CPathMover;
 class FuncMoverMovementSummary_t
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(FuncMoverMovementSummary_t);
+    DECLARE_SCHEMA_CLASS(FuncMoverMovementSummary_t);
 
     SCHEMA_FIELD(float, flStartT);
     SCHEMA_FIELD(float, flEndT);

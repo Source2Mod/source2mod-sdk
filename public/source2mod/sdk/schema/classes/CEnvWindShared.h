@@ -61,7 +61,7 @@ class CBaseEntity;
 class CEnvWindShared
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CEnvWindShared);
+    DECLARE_SCHEMA_CLASS(CEnvWindShared);
 
     SCHEMA_FIELD(float, m_flStartTime);
     SCHEMA_FIELD(uint32_t, m_iWindSeed);

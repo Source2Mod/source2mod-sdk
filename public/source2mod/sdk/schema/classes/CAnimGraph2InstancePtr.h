@@ -59,7 +59,7 @@
 class CAnimGraph2InstancePtr
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CAnimGraph2InstancePtr);
+    DECLARE_SCHEMA_CLASS(CAnimGraph2InstancePtr);
 
 };
 

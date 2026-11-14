@@ -59,7 +59,7 @@
 class CTouchExpansionComponent : public CEntityComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CTouchExpansionComponent);
+    DECLARE_SCHEMA_CLASS(CTouchExpansionComponent);
 
 };
 

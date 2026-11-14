@@ -59,7 +59,7 @@
 class ActorClipEntry_t
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(ActorClipEntry_t);
+    DECLARE_SCHEMA_CLASS(ActorClipEntry_t);
 
     SCHEMA_FIELD(CUtlString, m_sClipName);
     SCHEMA_FIELD(bool, m_bLooping);

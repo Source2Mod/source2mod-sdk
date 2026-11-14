@@ -60,7 +60,7 @@
 class CDynamicPropGraphController : public CAnimGraphControllerBase
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CDynamicPropGraphController);
+    DECLARE_SCHEMA_CLASS(CDynamicPropGraphController);
 
 };
 

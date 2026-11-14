@@ -59,7 +59,7 @@
 class CHitboxComponent : public CEntityComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CHitboxComponent);
+    DECLARE_SCHEMA_CLASS(CHitboxComponent);
 
     SCHEMA_FIELD(float, m_flBoundsExpandRadius);
 };

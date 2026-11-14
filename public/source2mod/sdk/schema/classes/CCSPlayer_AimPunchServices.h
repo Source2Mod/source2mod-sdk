@@ -60,7 +60,7 @@
 class CCSPlayer_AimPunchServices : public CPlayerPawnComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CCSPlayer_AimPunchServices);
+    DECLARE_SCHEMA_CLASS(CCSPlayer_AimPunchServices);
 
     SCHEMA_FIELD(int32_t, m_predictableBaseTick);
     SCHEMA_FIELD(float, m_predictableBaseTickInterpAmount);

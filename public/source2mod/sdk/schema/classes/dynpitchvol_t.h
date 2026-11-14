@@ -60,7 +60,7 @@
 class dynpitchvol_t : public dynpitchvol_base_t
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(dynpitchvol_t);
+    DECLARE_SCHEMA_CLASS(dynpitchvol_t);
 
 };
 

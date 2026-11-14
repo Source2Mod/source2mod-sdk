@@ -62,7 +62,7 @@
 class CPrecipitationVData : public CEntitySubclassVDataBase
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CPrecipitationVData);
+    DECLARE_SCHEMA_CLASS(CPrecipitationVData);
 
     SCHEMA_FIELD(float, m_flInnerDistance);
     SCHEMA_FIELD(ParticleAttachment_t, m_nAttachType);

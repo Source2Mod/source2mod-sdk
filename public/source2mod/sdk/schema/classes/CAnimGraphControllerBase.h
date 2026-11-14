@@ -60,7 +60,7 @@
 class CAnimGraphControllerBase
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CAnimGraphControllerBase);
+    DECLARE_SCHEMA_CLASS(CAnimGraphControllerBase);
 
     SCHEMA_FIELD(ExternalAnimGraphHandle_t, m_hExternalGraph);
 };

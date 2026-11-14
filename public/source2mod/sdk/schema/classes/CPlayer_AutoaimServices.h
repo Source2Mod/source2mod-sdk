@@ -60,7 +60,7 @@
 class CPlayer_AutoaimServices : public CPlayerPawnComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CPlayer_AutoaimServices);
+    DECLARE_SCHEMA_CLASS(CPlayer_AutoaimServices);
 
 };
 

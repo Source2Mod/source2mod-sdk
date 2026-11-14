@@ -61,7 +61,7 @@ class CBaseEntity;
 class PhysicsRagdollPose_t
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(PhysicsRagdollPose_t);
+    DECLARE_SCHEMA_CLASS(PhysicsRagdollPose_t);
 
     SCHEMA_FIELD(CUtlVector<CTransform>, m_RelativeTransforms);
     SCHEMA_FIELD(CHandle<CBaseEntity>, m_hOwner);

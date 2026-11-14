@@ -59,7 +59,7 @@
 class CRangeFloat
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CRangeFloat);
+    DECLARE_SCHEMA_CLASS(CRangeFloat);
 
     SCHEMA_FIELD_POINTER(float, m_pValue);
 };

@@ -59,7 +59,7 @@
 class CNetworkOriginCellCoordQuantizedVector
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CNetworkOriginCellCoordQuantizedVector);
+    DECLARE_SCHEMA_CLASS(CNetworkOriginCellCoordQuantizedVector);
 
     SCHEMA_FIELD(uint16_t, m_cellX);
     SCHEMA_FIELD(uint16_t, m_cellY);

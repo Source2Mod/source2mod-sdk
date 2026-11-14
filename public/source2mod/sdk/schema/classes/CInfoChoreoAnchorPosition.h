@@ -62,7 +62,7 @@ class CBaseEntity;
 class CInfoChoreoAnchorPosition
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CInfoChoreoAnchorPosition);
+    DECLARE_SCHEMA_CLASS(CInfoChoreoAnchorPosition);
 
     SCHEMA_FIELD(Vector, m_vOriginLS);
     SCHEMA_FIELD(Quaternion, m_qAnglesLS);

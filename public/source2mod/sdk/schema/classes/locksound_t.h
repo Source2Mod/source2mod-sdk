@@ -59,7 +59,7 @@
 class locksound_t
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(locksound_t);
+    DECLARE_SCHEMA_CLASS(locksound_t);
 
     SCHEMA_FIELD(CGameSoundEventName, sLockedSound);
     SCHEMA_FIELD(CGameSoundEventName, sUnlockedSound);

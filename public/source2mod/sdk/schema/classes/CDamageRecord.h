@@ -63,7 +63,7 @@ class CCSPlayerPawn;
 class CDamageRecord
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CDamageRecord);
+    DECLARE_SCHEMA_CLASS(CDamageRecord);
 
     SCHEMA_FIELD(CHandle<CCSPlayerPawn>, m_PlayerDamager);
     SCHEMA_FIELD(CHandle<CCSPlayerPawn>, m_PlayerRecipient);

@@ -61,7 +61,7 @@
 class CCSCustomHudLayoutState
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CCSCustomHudLayoutState);
+    DECLARE_SCHEMA_CLASS(CCSCustomHudLayoutState);
 
     SCHEMA_FIELD(int32_t, m_playerSlot);
     SCHEMA_FIELD(bool, m_bInputCaptureEnabled);

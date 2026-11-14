@@ -60,7 +60,7 @@
 class CExampleSchemaVData_PolymorphicDerivedB : public CExampleSchemaVData_PolymorphicBase
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CExampleSchemaVData_PolymorphicDerivedB);
+    DECLARE_SCHEMA_CLASS(CExampleSchemaVData_PolymorphicDerivedB);
 
     SCHEMA_FIELD(int32_t, m_nDerivedB);
 };

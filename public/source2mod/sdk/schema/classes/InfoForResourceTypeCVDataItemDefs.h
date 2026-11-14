@@ -59,7 +59,7 @@
 class InfoForResourceTypeCVDataItemDefs
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(InfoForResourceTypeCVDataItemDefs);
+    DECLARE_SCHEMA_CLASS(InfoForResourceTypeCVDataItemDefs);
 
 };
 

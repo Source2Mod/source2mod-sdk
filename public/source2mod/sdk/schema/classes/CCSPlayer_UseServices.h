@@ -62,7 +62,7 @@ class CBaseEntity;
 class CCSPlayer_UseServices : public CPlayer_UseServices
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CCSPlayer_UseServices);
+    DECLARE_SCHEMA_CLASS(CCSPlayer_UseServices);
 
     SCHEMA_FIELD(CHandle<CBaseEntity>, m_hLastKnownUseEntity);
     SCHEMA_FIELD(float, m_flLastUseTimeStamp);

@@ -60,7 +60,7 @@
 class CCS2ChickenGraphController : public CAnimGraphControllerBase
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CCS2ChickenGraphController);
+    DECLARE_SCHEMA_CLASS(CCS2ChickenGraphController);
 
     SCHEMA_FIELD(bool, m_bHasActionCompletedEvent);
 };

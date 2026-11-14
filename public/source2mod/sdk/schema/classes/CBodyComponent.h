@@ -61,7 +61,7 @@ class CGameSceneNode;
 class CBodyComponent : public CEntityComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CBodyComponent);
+    DECLARE_SCHEMA_CLASS(CBodyComponent);
 
     SCHEMA_FIELD(CGameSceneNode*, m_pSceneNode);
     SCHEMA_FIELD(CNetworkVarChainer, __m_pChainEntity);

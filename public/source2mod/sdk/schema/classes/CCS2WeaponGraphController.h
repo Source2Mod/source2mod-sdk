@@ -60,7 +60,7 @@
 class CCS2WeaponGraphController : public CAnimGraphControllerBase
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CCS2WeaponGraphController);
+    DECLARE_SCHEMA_CLASS(CCS2WeaponGraphController);
 
 };
 

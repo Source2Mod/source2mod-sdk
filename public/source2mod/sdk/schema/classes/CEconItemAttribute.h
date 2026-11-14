@@ -59,7 +59,7 @@
 class CEconItemAttribute
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CEconItemAttribute);
+    DECLARE_SCHEMA_CLASS(CEconItemAttribute);
 
     SCHEMA_FIELD(uint16_t, m_iAttributeDefinitionIndex);
     SCHEMA_FIELD(float, m_flValue);

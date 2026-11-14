@@ -60,7 +60,7 @@
 class CCSPlayer_DamageReactServices : public CPlayerPawnComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CCSPlayer_DamageReactServices);
+    DECLARE_SCHEMA_CLASS(CCSPlayer_DamageReactServices);
 
 };
 

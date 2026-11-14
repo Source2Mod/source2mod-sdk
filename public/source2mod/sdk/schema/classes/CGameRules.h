@@ -59,7 +59,7 @@
 class CGameRules
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CGameRules);
+    DECLARE_SCHEMA_CLASS(CGameRules);
 
     SCHEMA_FIELD(CNetworkVarChainer, __m_pChainEntity);
     SCHEMA_FIELD_POINTER(char, m_szQuestName);

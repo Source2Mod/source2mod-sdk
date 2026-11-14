@@ -221,66 +221,99 @@ void NetworkVarStateChanged(uintptr_t pNetworkVar, uint32_t nOffset, uint32 nNet
 
 namespace schema
 {
-    /**
-     * The owner of the inline object a field accessor handed out last on this
-     * thread: `pawn->m_vecViewOffset()` records the pawn, so the following
-     * `.m_vecZ = h` can tell the pawn. Needed for an inline class the engine
-     * embeds WITHOUT a NetworkVar_<field> wrapper (CBaseModelEntity::
-     * m_vecViewOffset, CNetworkViewOffsetVector): there is no vtable to send the
-     * change through, the object's first qword is plain data (0 for the view
-     * offset). Classes with a wrapper (m_Collision, m_Glow, m_fog) keep going
-     * through the wrapper, so nothing changes for them.
+    /*
+     * How a field change of a schema class reaches the network is read off the
+     * running game's schema, once per class, so a class only has to be declared
+     * (DECLARE_SCHEMA_CLASS) -- whether it is an entity, a component, an object
+     * the engine embeds in a NetworkVar wrapper or a plain struct is not the
+     * declaration's business:
+     *
+     *   chain    the class (or a base) has __m_pChainEntity: through its
+     *            CNetworkVarChainer, to the entity it belongs to (components,
+     *            CGameRules, the player services)
+     *   entity   the class is CEntityInstance or derives from it: the entity's own
+     *            NetworkStateChanged
+     *   virtual  the class has virtual members: an object the engine embeds as
+     *            NetworkVar_<field> (m_Collision, m_Glow, CEconItemView); the
+     *            wrapper's StateChanged slot, found in the object's vtable, adds
+     *            the field's offset and passes it to the owner
+     *   plain    none of these (CNetworkViewOffsetVector in m_vecViewOffset): the
+     *            owner's field as a whole, when the owner's accessor handed this
+     *            object out on this thread
      */
+
+    /// A class's way to the network, packed: bits 0-15 the chain offset, then
+    /// the flags below. 0 while the schema is not there yet.
+    using ClassNsc = uint32_t;
+    inline constexpr ClassNsc CLASS_NSC_ENTITY = 1u << 16;
+    inline constexpr ClassNsc CLASS_NSC_VIRTUAL = 1u << 17;
+    inline constexpr ClassNsc CLASS_NSC_KNOWN = 1u << 18;
+
+    ClassNsc GetClassNsc(const char* className, uint32_t classNameHash);
+
+    /// Through the StateChanged slot of the NetworkVar wrapper `object` is
+    /// embedded in; false when its vtable has no such slot.
+    bool NetworkVarStateChanged(uintptr_t object, uint32_t offset);
+
+    /// The object a field accessor handed out last on this thread, and where it
+    /// sits: `pawn->m_vecViewOffset()` records the pawn, so the following
+    /// `.m_vecZ = h` can tell it.
     struct InlineOwner
     {
-        uintptr_t object = 0;   // the inline object handed out
-        uintptr_t owner = 0;    // the object holding the field
-        uintptr_t ownerVtable = 0;
+        uintptr_t object = 0;
+        uintptr_t owner = 0;
+        ClassNsc ownerNsc = 0;
         uint32_t offset = 0;    // the field's offset in the owner
-        int16_t chain = 0;      // the owner's CNetworkVarChainer offset, 0 for none
-        bool ownerInline = false;
     };
 
     inline thread_local InlineOwner t_inlineOwner;
 
+    /// Whether T is a class declared with DECLARE_SCHEMA_CLASS.
     template <typename T, typename = void>
-    struct is_inline_schema_class : std::false_type {};
+    struct is_schema_class : std::false_type {};
     template <typename T>
-    struct is_inline_schema_class<T, std::void_t<decltype(T::SchemaNetworkStateChangedOffset)>>
-        : std::bool_constant<T::SchemaNetworkStateChangedOffset != 0> {};
+    struct is_schema_class<T, std::void_t<decltype(&T::SchemaCreate)>> : std::true_type {};
 
-    inline void RecordInlineOwner(uintptr_t object, uintptr_t owner, uint32_t offset, int16_t chain, bool ownerInline)
+    inline void RecordInlineOwner(uintptr_t object, uintptr_t owner, ClassNsc ownerNsc, uint32_t offset)
     {
-        t_inlineOwner = { object, owner, *reinterpret_cast<uintptr_t*>(owner), offset, chain, ownerInline };
+        t_inlineOwner = { object, owner, ownerNsc, offset };
     }
 
-    /// The change of a field of an inline object at `object`.
-    inline void InlineStateChanged(uintptr_t object, uint32_t offset, uint32 nNetworkStateChangedOffset)
+    /// The class's ClassNsc, asked again until the schema has the class.
+    inline ClassNsc CachedClassNsc(ClassNsc& cache, const char* className, uint32_t classNameHash)
     {
-        const InlineOwner& o = t_inlineOwner;
-        if (o.object == object && o.owner)
+        if (!(cache & CLASS_NSC_KNOWN))
+            cache = GetClassNsc(className, classNameHash);
+        return cache;
+    }
+
+    /// The change of the field at `offset` in `object`, of a class whose way to
+    /// the network is `nsc`.
+    inline void FieldStateChanged(uintptr_t object, ClassNsc nsc, uint32_t offset)
+    {
+        if (const int16_t chain = static_cast<int16_t>(nsc & 0xFFFF))
         {
-            // A NetworkVar wrapper's vtable sits in the same module as the
-            // owner's vtable; anything else (0 for the view offset) is data.
-            const uintptr_t first = *reinterpret_cast<uintptr_t*>(object);
-            const uintptr_t distance = first > o.ownerVtable ? first - o.ownerVtable : o.ownerVtable - first;
-            const bool wrapped = first != 0 && o.ownerVtable != 0 && distance < 0x8000000;
-
-            if (!wrapped)
-            {
-                // The whole inline field of the owner, as Utilities.SetStateChanged(
-                // pawn, "CBaseModelEntity", "m_vecViewOffset") does it.
-                if (o.chain != 0)
-                    ChainNetworkStateChanged(o.owner + o.chain, o.offset);
-                else if (!o.ownerInline)
-                    EntityNetworkStateChanged(o.owner, o.offset);
-                else
-                    NetworkVarStateChanged(o.owner, o.offset, 1);
-                return;
-            }
+            ChainNetworkStateChanged(object + chain, offset);
+            return;
         }
+        if (nsc & CLASS_NSC_ENTITY)
+        {
+            EntityNetworkStateChanged(object, offset);
+            return;
+        }
+        if ((nsc & CLASS_NSC_VIRTUAL) && NetworkVarStateChanged(object, offset))
+            return;
 
-        NetworkVarStateChanged(object, offset, nNetworkStateChangedOffset);
+        // A plain struct (or one in no wrapper): the owner's whole field.
+        const InlineOwner o = t_inlineOwner;
+        if (o.object != object || !o.owner || o.owner == object)
+            return;
+        if (const int16_t chain = static_cast<int16_t>(o.ownerNsc & 0xFFFF))
+            ChainNetworkStateChanged(o.owner + chain, o.offset);
+        else if (o.ownerNsc & CLASS_NSC_ENTITY)
+            EntityNetworkStateChanged(o.owner, o.offset);
+        else if (o.ownerNsc & CLASS_NSC_VIRTUAL)
+            NetworkVarStateChanged(o.owner, o.offset);
     }
 }
 
@@ -471,6 +504,17 @@ inline constexpr bool schema_writable_v =
 
 /**
 
+* @brief What a field's operator-> returns: a pointer for an embedded schema
+* * class, so `pawn->m_Glow->m_bGlowing = true` reaches the inner field's
+* * setter; the reference otherwise, so handles and pointers keep chaining
+* * (`pawn->m_hController->...`, `pawn->m_pWeaponServices->...`).
+  */
+template <typename T>
+using schema_arrow_t = std::conditional_t<schema::is_schema_class<std::remove_cv_t<T>>::value,
+                                          std::add_pointer_t<T>, std::add_lvalue_reference_t<T>>;
+
+/**
+
 * @brief Puts a parameter in a non-deduced context.
 * * The field setters are templates only so enable_if can pick an overload; T
 * * must stay the field's own type. Deduced from the argument, `m_nByte = 1`
@@ -510,335 +554,323 @@ using schema_bits_t = typename schema_bits<T>::type;
 Schema field macros
 ========================= */
 
-#define SCHEMA_FIELD_OFFSET(type, varName, extra_offset)                                                                     \
-	class varName##_prop                                                                                                     \
-	{                                                                                                                     \
-	public:                                                                                                                  \
-		/*The deleted copy ctor below is user-declared, which suppresses the*/                                               \
-		/*implicit default one -- without this a schema class that has a real*/                                              \
-		/*constructor cannot initialise its own fields.*/                                                                    \
-		varName##_prop() = default;                                                                                          \
-		std::add_lvalue_reference_t<type> Get()                                                                              \
-		{                                                                                                                    \
-			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);              \
-			if (!m_key.valid) return schema::MissingField<type>();                                             \
-			static const auto m_offset = offsetof(ThisClass, varName);														 \
-																															 \
-			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                             \
-                                                                                                                             \
-			if constexpr (schema::is_inline_schema_class<std::remove_cv_t<type>>::value)                                      \
-			{                                                                                                                 \
-				static const auto m_chain = schema::FindChainOffset(m_className, m_classNameHash);                               \
-				schema::RecordInlineOwner(pThisClass + m_key.offset + extra_offset, pThisClass,                                  \
-				                          m_key.offset + extra_offset, m_chain, m_networkStateChangedOffset != 0);               \
-			}                                                                                                                 \
-			return *reinterpret_cast<std::add_pointer_t<type>>(pThisClass + m_key.offset + extra_offset);                    \
-		}                                                                                                                    \
-		/*Const overload, so a const method of the owning class can read the*/                                               \
-		/*field. Reading only needs the wrapper's address, which const does*/                                                \
-		/*not get in the way of.*/                                                                                           \
-		std::add_lvalue_reference_t<const type> Get() const                                                                  \
-		{                                                                                                                    \
-			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);                 \
-			if (!m_key.valid) return schema::MissingField<const type>();                                             \
-			static const auto m_offset = offsetof(ThisClass, varName);                                                          \
-                                                                                                                       \
-			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                                \
-                                                                                                                       \
-			return *reinterpret_cast<std::add_pointer_t<const type>>(pThisClass + m_key.offset + extra_offset);                 \
-		}                                                                                                                    \
-		template <typename T = type>                                                                                         \
-		std::enable_if_t<std::is_pointer_v<T>, void>                                                                         \
-		Set(schema_identity_t<T> val)                                                                                       \
-		{                                                                                                                    \
-			static const bool m_guarded = schema::IsGuidelineField(#varName);                                                \
-			if (m_guarded && schema::GuidelinesBlockWrite(m_className, #varName)) return;                                    \
-			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);              \
-			if (!m_key.valid) return;                                                                          \
-			static const auto m_offset = offsetof(ThisClass, varName);                                                       \
-																															 \
-			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                             \
-																															 \
-			NetworkStateChanged();                                                                                           \
-			*reinterpret_cast<T*>(pThisClass + m_key.offset + extra_offset) = val;                                           \
-		}																													 \
-		template <typename T = type>                                                                                         \
-		std::enable_if_t<!std::is_pointer_v<T> && std::is_trivially_copyable_v<T>, void>                                     \
-		Set(schema_identity_t<T> val)                                                                                       \
-	    {                                                                                                                 \
-			static const bool m_guarded = schema::IsGuidelineField(#varName);                                                \
-			if (m_guarded && schema::GuidelinesBlockWrite(m_className, #varName)) return;                                    \
-    		static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);              \
-    		if (!m_key.valid) return;                                                                          \
-			static const auto m_offset = offsetof(ThisClass, varName);                                                       \
-																															 \
-			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                             \
-																															 \
-			NetworkStateChanged();                                                                                           \
-			*reinterpret_cast<T*>(pThisClass + m_key.offset + extra_offset) = val;                                           \
-		}																													 \
-		template <typename T = type>                                                                                         \
-		std::enable_if_t<!std::is_pointer_v<T> && !std::is_trivially_copyable_v<T>, void>                                    \
-		Set(const schema_identity_t<T>& val)                                                                                \
-		{                                                                                                                    \
-			static const bool m_guarded = schema::IsGuidelineField(#varName);                                                \
-			if (m_guarded && schema::GuidelinesBlockWrite(m_className, #varName)) return;                                    \
-			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);              \
-			if (!m_key.valid) return;                                                                          \
-			static const auto m_offset = offsetof(ThisClass, varName);                                                       \
-																															 \
-			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                             \
-																															 \
-			NetworkStateChanged();                                                                                           \
-			memcpy(                                                                                                          \
-			reinterpret_cast<void*>(pThisClass + m_key.offset + extra_offset),												 \
-			&val,																											 \
-			sizeof(type)																									 \
-			);                                                                                                               \
-		}																													 \
-		void NetworkStateChanged()                                                                                           \
-		{                                                                                                                    \
-			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);				 \
-			if (!m_key.valid) return;                                                                          \
-			static const auto m_chain = schema::FindChainOffset(m_className, m_classNameHash);								 \
-			static const auto m_offset = offsetof(ThisClass, varName);														 \
-																															 \
-			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                             \
-                                                                                                                             \
-			if (m_chain != 0 && m_key.networked)                                                                             \
-			{                                                                                                                \
-				ChainNetworkStateChanged(pThisClass + m_chain, m_key.offset + extra_offset);								 \
-			}                                                                                                                \
-			else if (m_key.networked)                                                                                        \
-			{                                                                                                                \
-				if (!m_networkStateChangedOffset)                                                                            \
-					EntityNetworkStateChanged(pThisClass, m_key.offset + extra_offset);									     \
-				else                                                                                                         \
-					schema::InlineStateChanged(pThisClass, m_key.offset + extra_offset, m_networkStateChangedOffset);			 \
-			}                                                                                                                \
-		}                                                                                                                    \
+#define SCHEMA_FIELD_OFFSET(type, varName, extra_offset)                                                                             \
+	class varName##_prop                                                                                                             \
+	{                                                                                                                                \
+	public:                                                                                                                          \
+		/*The deleted copy ctor below is user-declared, which suppresses the*/                                                       \
+		/*implicit default one -- without this a schema class that has a real*/                                                      \
+		/*constructor cannot initialise its own fields.*/                                                                            \
+		varName##_prop() = default;                                                                                                  \
+		std::add_lvalue_reference_t<type> Get()                                                                                      \
+		{                                                                                                                            \
+			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);                      \
+			if (!m_key.valid) return schema::MissingField<type>();                                                                   \
+			static const auto m_offset = offsetof(ThisClass, varName);                                                               \
+                                                                                                                                     \
+			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                                     \
+                                                                                                                                     \
+			if constexpr (schema::is_schema_class<std::remove_cv_t<type>>::value)                                                    \
+			{                                                                                                                        \
+				static schema::ClassNsc m_nsc = 0;                                                                                   \
+				schema::RecordInlineOwner(pThisClass + m_key.offset + extra_offset, pThisClass,                                      \
+				                          schema::CachedClassNsc(m_nsc, m_className, m_classNameHash), m_key.offset + extra_offset); \
+			}                                                                                                                        \
+			return *reinterpret_cast<std::add_pointer_t<type>>(pThisClass + m_key.offset + extra_offset);                            \
+		}                                                                                                                            \
+		/*Const overload, so a const method of the owning class can read the*/                                                       \
+		/*field. Reading only needs the wrapper's address, which const does*/                                                        \
+		/*not get in the way of.*/                                                                                                   \
+		std::add_lvalue_reference_t<const type> Get() const                                                                          \
+		{                                                                                                                            \
+			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);                      \
+			if (!m_key.valid) return schema::MissingField<const type>();                                                             \
+			static const auto m_offset = offsetof(ThisClass, varName);                                                               \
+                                                                                                                                     \
+			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                                     \
+                                                                                                                                     \
+			return *reinterpret_cast<std::add_pointer_t<const type>>(pThisClass + m_key.offset + extra_offset);                      \
+		}                                                                                                                            \
+		template <typename T = type>                                                                                                 \
+		std::enable_if_t<std::is_pointer_v<T>, void>                                                                                 \
+		Set(schema_identity_t<T> val)                                                                                                \
+		{                                                                                                                            \
+			static const bool m_guarded = schema::IsGuidelineField(#varName);                                                        \
+			if (m_guarded && schema::GuidelinesBlockWrite(m_className, #varName)) return;                                            \
+			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);                      \
+			if (!m_key.valid) return;                                                                                                \
+			static const auto m_offset = offsetof(ThisClass, varName);                                                               \
+                                                                                                                                     \
+			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                                     \
+                                                                                                                                     \
+			NetworkStateChanged();                                                                                                   \
+			*reinterpret_cast<T*>(pThisClass + m_key.offset + extra_offset) = val;                                                   \
+		}                                                                                                                            \
+		template <typename T = type>                                                                                                 \
+		std::enable_if_t<!std::is_pointer_v<T> && std::is_trivially_copyable_v<T>, void>                                             \
+		Set(schema_identity_t<T> val)                                                                                                \
+	    {                                                                                                                            \
+			static const bool m_guarded = schema::IsGuidelineField(#varName);                                                        \
+			if (m_guarded && schema::GuidelinesBlockWrite(m_className, #varName)) return;                                            \
+    		static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);                      \
+    		if (!m_key.valid) return;                                                                                                \
+			static const auto m_offset = offsetof(ThisClass, varName);                                                               \
+                                                                                                                                     \
+			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                                     \
+                                                                                                                                     \
+			NetworkStateChanged();                                                                                                   \
+			*reinterpret_cast<T*>(pThisClass + m_key.offset + extra_offset) = val;                                                   \
+		}                                                                                                                            \
+		template <typename T = type>                                                                                                 \
+		std::enable_if_t<!std::is_pointer_v<T> && !std::is_trivially_copyable_v<T>, void>                                            \
+		Set(const schema_identity_t<T>& val)                                                                                         \
+		{                                                                                                                            \
+			static const bool m_guarded = schema::IsGuidelineField(#varName);                                                        \
+			if (m_guarded && schema::GuidelinesBlockWrite(m_className, #varName)) return;                                            \
+			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);                      \
+			if (!m_key.valid) return;                                                                                                \
+			static const auto m_offset = offsetof(ThisClass, varName);                                                               \
+                                                                                                                                     \
+			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                                     \
+                                                                                                                                     \
+			NetworkStateChanged();                                                                                                   \
+			memcpy(                                                                                                                  \
+			reinterpret_cast<void*>(pThisClass + m_key.offset + extra_offset),                                                       \
+			&val,                                                                                                                    \
+			sizeof(type)                                                                                                             \
+			);                                                                                                                       \
+		}                                                                                                                            \
+		void NetworkStateChanged()                                                                                                   \
+		{                                                                                                                            \
+			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);                      \
+			if (!m_key.valid) return;                                                                                                \
+			if (!m_key.networked) return;                                                                                            \
+			static const auto m_offset = offsetof(ThisClass, varName);                                                               \
+                                                                                                                                     \
+			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                                     \
+                                                                                                                                     \
+			static schema::ClassNsc m_nsc = 0;                                                                                       \
+			schema::FieldStateChanged(pThisClass, schema::CachedClassNsc(m_nsc, m_className, m_classNameHash),                       \
+			                          m_key.offset + extra_offset);                                                                  \
+		}                                                                                                                            \
 				/*The engine's element accessor for this field, when it has one. See*/                                               \
-		/*SchemaKey::manipulator -- needed for collections whose layout is not*/                                             \
-		/*a plain CUtlVector.*/                                                                                             \
-		SchemaCollectionManipulatorFn_t GetManipulator()                                                                    \
-		{                                                                                                                   \
-			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);              \
-			return m_key.manipulator;                                                                                       \
-		}                                                                                                                   \
-		operator std::add_lvalue_reference_t<type>()                                                                         \
-		{                                                                                                                    \
-			return Get();                                                                                                    \
-		}                                                                                                                    \
-		std::add_lvalue_reference_t<type> operator()()                                                                       \
-		{                                                                                                                    \
-			return Get();                                                                                                    \
-		}                                                                                                                    \
-		std::add_lvalue_reference_t<type> operator->()                                                                       \
-		{                                                                                                                    \
-			return Get();                                                                                                    \
-		}                                                                                                                    \
-		operator std::add_lvalue_reference_t<const type>() const                                                             \
-		{                                                                                                                    \
-			return Get();                                                                                                          \
-		}                                                                                                                    \
-		std::add_lvalue_reference_t<const type> operator()() const                                                           \
-		{                                                                                                                    \
-			return Get();                                                                                                          \
-		}                                                                                                                    \
-		std::add_lvalue_reference_t<const type> operator->() const                                                           \
-		{                                                                                                                    \
-			return Get();                                                                                                          \
-		}                                                                                                                    \
-		template <typename T = type>                                                                                         \
-		std::enable_if_t<schema_writable_v<T>, void>                                                                         \
-		operator()(schema_identity_t<T> val)                                                                                \
-		{                                                                                                                    \
-			Set(val);                                                                                                        \
-		}																													 \
-		template <typename T = type>                                                                                         \
-		std::enable_if_t<schema_writable_v<T>, varName##_prop&>                                                              \
-		operator=(schema_identity_t<T> val)                                                                                 \
-		{                                                                                                                    \
-			Set(val);                                                                                                        \
-			return *this;                                                                                                    \
-		}																													 \
-		/*Read-modify-write operators. Without them `m_x++` and `m_x |= F` still*/                                           \
-		/*compile -- through the implicit conversion to type& above -- but they*/                                            \
-		/*write past Set(), so NetworkStateChanged() never runs. These go*/                                                  \
-		/*through Set(). `m_x()++` stays the raw, unannounced write.*/                                                       \
-		template <typename T = type>                                                                                         \
-		std::enable_if_t<schema_arithmetic_v<T>, varName##_prop&>                                                            \
-		operator++()                                                                                                         \
-		{                                                                                                                    \
-			Set(static_cast<T>(static_cast<T>(Get()) + 1));                                                                         \
-			return *this;                                                                                                    \
-		}                                                                                                                    \
-		template <typename T = type>                                                                                         \
-		std::enable_if_t<schema_arithmetic_v<T>, T>                                                                          \
-		operator++(int)                                                                                                      \
-		{                                                                                                                    \
-			T old = Get();                                                                                                   \
-			Set(static_cast<T>(old + 1));                                                                                    \
-			return old;                                                                                                      \
-		}                                                                                                                    \
-		template <typename T = type>                                                                                         \
-		std::enable_if_t<schema_arithmetic_v<T>, varName##_prop&>                                                            \
-		operator--()                                                                                                         \
-		{                                                                                                                    \
-			Set(static_cast<T>(static_cast<T>(Get()) - 1));                                                                         \
-			return *this;                                                                                                    \
-		}                                                                                                                    \
-		template <typename T = type>                                                                                         \
-		std::enable_if_t<schema_arithmetic_v<T>, T>                                                                          \
-		operator--(int)                                                                                                      \
-		{                                                                                                                    \
-			T old = Get();                                                                                                   \
-			Set(static_cast<T>(old - 1));                                                                                    \
-			return old;                                                                                                      \
-		}                                                                                                                    \
-		template <typename U, typename T = type>                                                                             \
-		std::enable_if_t<schema_arithmetic_v<T>, varName##_prop&>                                                            \
-		operator+=(U val)                                                                                                    \
-		{                                                                                                                    \
-			Set(static_cast<T>(Get() + val));                                                                                \
-			return *this;                                                                                                    \
-		}                                                                                                                    \
-		template <typename U, typename T = type>                                                                             \
-		std::enable_if_t<schema_arithmetic_v<T>, varName##_prop&>                                                            \
-		operator-=(U val)                                                                                                    \
-		{                                                                                                                    \
-			Set(static_cast<T>(Get() - val));                                                                                \
-			return *this;                                                                                                    \
-		}                                                                                                                    \
-		template <typename U, typename T = type>                                                                             \
-		std::enable_if_t<schema_arithmetic_v<T>, varName##_prop&>                                                            \
-		operator*=(U val)                                                                                                    \
-		{                                                                                                                    \
-			Set(static_cast<T>(Get() * val));                                                                                \
-			return *this;                                                                                                    \
-		}                                                                                                                    \
-		template <typename U, typename T = type>                                                                             \
-		std::enable_if_t<schema_arithmetic_v<T>, varName##_prop&>                                                            \
-		operator/=(U val)                                                                                                    \
-		{                                                                                                                    \
-			Set(static_cast<T>(Get() / val));                                                                                \
-			return *this;                                                                                                    \
-		}                                                                                                                    \
-		/*Bitwise ones also cover enum fields: computed in the underlying type,*/                                            \
-		/*so a scoped enum of flags needs no operators of its own.*/                                                         \
-		template <typename U, typename T = type>                                                                             \
-		std::enable_if_t<schema_bitwise_v<T>, varName##_prop&>                                                               \
-		operator|=(U val)                                                                                                    \
-		{                                                                                                                    \
-			Set(static_cast<T>(static_cast<schema_bits_t<T>>(Get()) | static_cast<schema_bits_t<T>>(val)));                  \
-			return *this;                                                                                                    \
-		}                                                                                                                    \
-		template <typename U, typename T = type>                                                                             \
-		std::enable_if_t<schema_bitwise_v<T>, varName##_prop&>                                                               \
-		operator&=(U val)                                                                                                    \
-		{                                                                                                                    \
-			Set(static_cast<T>(static_cast<schema_bits_t<T>>(Get()) & static_cast<schema_bits_t<T>>(val)));                  \
-			return *this;                                                                                                    \
-		}                                                                                                                    \
-		template <typename U, typename T = type>                                                                             \
-		std::enable_if_t<schema_bitwise_v<T>, varName##_prop&>                                                               \
-		operator^=(U val)                                                                                                    \
-		{                                                                                                                    \
-			Set(static_cast<T>(static_cast<schema_bits_t<T>>(Get()) ^ static_cast<schema_bits_t<T>>(val)));                  \
-			return *this;                                                                                                    \
-		}                                                                                                                    \
-	private:                                                                                                                 \
-		/*Prevent accidentally copying this wrapper class instead of the underlying field*/                                  \
-		varName##_prop(const varName##_prop&) = delete;                                                                      \
-		static constexpr auto m_varNameHash = hash_32_fnv1a_const(#varName);                                                 \
+		/*SchemaKey::manipulator -- needed for collections whose layout is not*/                                                     \
+		/*a plain CUtlVector.*/                                                                                                      \
+		SchemaCollectionManipulatorFn_t GetManipulator()                                                                             \
+		{                                                                                                                            \
+			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);                      \
+			return m_key.manipulator;                                                                                                \
+		}                                                                                                                            \
+		operator std::add_lvalue_reference_t<type>()                                                                                 \
+		{                                                                                                                            \
+			return Get();                                                                                                            \
+		}                                                                                                                            \
+		std::add_lvalue_reference_t<type> operator()()                                                                               \
+		{                                                                                                                            \
+			return Get();                                                                                                            \
+		}                                                                                                                            \
+		template <typename T = type>                                                                                                 \
+		schema_arrow_t<T> operator->()                                                                                               \
+		{                                                                                                                            \
+			if constexpr (std::is_pointer_v<schema_arrow_t<T>>) return &Get();                                                       \
+			else return Get();                                                                                                       \
+		}                                                                                                                            \
+		operator std::add_lvalue_reference_t<const type>() const                                                                     \
+		{                                                                                                                            \
+			return Get();                                                                                                            \
+		}                                                                                                                            \
+		std::add_lvalue_reference_t<const type> operator()() const                                                                   \
+		{                                                                                                                            \
+			return Get();                                                                                                            \
+		}                                                                                                                            \
+		template <typename T = type>                                                                                                 \
+		schema_arrow_t<const T> operator->() const                                                                                   \
+		{                                                                                                                            \
+			if constexpr (std::is_pointer_v<schema_arrow_t<const T>>) return &Get();                                                 \
+			else return Get();                                                                                                       \
+		}                                                                                                                            \
+		template <typename T = type>                                                                                                 \
+		std::enable_if_t<schema_writable_v<T>, void>                                                                                 \
+		operator()(schema_identity_t<T> val)                                                                                         \
+		{                                                                                                                            \
+			Set(val);                                                                                                                \
+		}                                                                                                                            \
+		template <typename T = type>                                                                                                 \
+		std::enable_if_t<schema_writable_v<T>, varName##_prop&>                                                                      \
+		operator=(schema_identity_t<T> val)                                                                                          \
+		{                                                                                                                            \
+			Set(val);                                                                                                                \
+			return *this;                                                                                                            \
+		}                                                                                                                            \
+		/*Read-modify-write operators. Without them `m_x++` and `m_x |= F` still*/                                                   \
+		/*compile -- through the implicit conversion to type& above -- but they*/                                                    \
+		/*write past Set(), so NetworkStateChanged() never runs. These go*/                                                          \
+		/*through Set(). `m_x()++` stays the raw, unannounced write.*/                                                               \
+		template <typename T = type>                                                                                                 \
+		std::enable_if_t<schema_arithmetic_v<T>, varName##_prop&>                                                                    \
+		operator++()                                                                                                                 \
+		{                                                                                                                            \
+			Set(static_cast<T>(static_cast<T>(Get()) + 1));                                                                          \
+			return *this;                                                                                                            \
+		}                                                                                                                            \
+		template <typename T = type>                                                                                                 \
+		std::enable_if_t<schema_arithmetic_v<T>, T>                                                                                  \
+		operator++(int)                                                                                                              \
+		{                                                                                                                            \
+			T old = Get();                                                                                                           \
+			Set(static_cast<T>(old + 1));                                                                                            \
+			return old;                                                                                                              \
+		}                                                                                                                            \
+		template <typename T = type>                                                                                                 \
+		std::enable_if_t<schema_arithmetic_v<T>, varName##_prop&>                                                                    \
+		operator--()                                                                                                                 \
+		{                                                                                                                            \
+			Set(static_cast<T>(static_cast<T>(Get()) - 1));                                                                          \
+			return *this;                                                                                                            \
+		}                                                                                                                            \
+		template <typename T = type>                                                                                                 \
+		std::enable_if_t<schema_arithmetic_v<T>, T>                                                                                  \
+		operator--(int)                                                                                                              \
+		{                                                                                                                            \
+			T old = Get();                                                                                                           \
+			Set(static_cast<T>(old - 1));                                                                                            \
+			return old;                                                                                                              \
+		}                                                                                                                            \
+		template <typename U, typename T = type>                                                                                     \
+		std::enable_if_t<schema_arithmetic_v<T>, varName##_prop&>                                                                    \
+		operator+=(U val)                                                                                                            \
+		{                                                                                                                            \
+			Set(static_cast<T>(Get() + val));                                                                                        \
+			return *this;                                                                                                            \
+		}                                                                                                                            \
+		template <typename U, typename T = type>                                                                                     \
+		std::enable_if_t<schema_arithmetic_v<T>, varName##_prop&>                                                                    \
+		operator-=(U val)                                                                                                            \
+		{                                                                                                                            \
+			Set(static_cast<T>(Get() - val));                                                                                        \
+			return *this;                                                                                                            \
+		}                                                                                                                            \
+		template <typename U, typename T = type>                                                                                     \
+		std::enable_if_t<schema_arithmetic_v<T>, varName##_prop&>                                                                    \
+		operator*=(U val)                                                                                                            \
+		{                                                                                                                            \
+			Set(static_cast<T>(Get() * val));                                                                                        \
+			return *this;                                                                                                            \
+		}                                                                                                                            \
+		template <typename U, typename T = type>                                                                                     \
+		std::enable_if_t<schema_arithmetic_v<T>, varName##_prop&>                                                                    \
+		operator/=(U val)                                                                                                            \
+		{                                                                                                                            \
+			Set(static_cast<T>(Get() / val));                                                                                        \
+			return *this;                                                                                                            \
+		}                                                                                                                            \
+		/*Bitwise ones also cover enum fields: computed in the underlying type,*/                                                    \
+		/*so a scoped enum of flags needs no operators of its own.*/                                                                 \
+		template <typename U, typename T = type>                                                                                     \
+		std::enable_if_t<schema_bitwise_v<T>, varName##_prop&>                                                                       \
+		operator|=(U val)                                                                                                            \
+		{                                                                                                                            \
+			Set(static_cast<T>(static_cast<schema_bits_t<T>>(Get()) | static_cast<schema_bits_t<T>>(val)));                          \
+			return *this;                                                                                                            \
+		}                                                                                                                            \
+		template <typename U, typename T = type>                                                                                     \
+		std::enable_if_t<schema_bitwise_v<T>, varName##_prop&>                                                                       \
+		operator&=(U val)                                                                                                            \
+		{                                                                                                                            \
+			Set(static_cast<T>(static_cast<schema_bits_t<T>>(Get()) & static_cast<schema_bits_t<T>>(val)));                          \
+			return *this;                                                                                                            \
+		}                                                                                                                            \
+		template <typename U, typename T = type>                                                                                     \
+		std::enable_if_t<schema_bitwise_v<T>, varName##_prop&>                                                                       \
+		operator^=(U val)                                                                                                            \
+		{                                                                                                                            \
+			Set(static_cast<T>(static_cast<schema_bits_t<T>>(Get()) ^ static_cast<schema_bits_t<T>>(val)));                          \
+			return *this;                                                                                                            \
+		}                                                                                                                            \
+	private:                                                                                                                         \
+		/*Prevent accidentally copying this wrapper class instead of the underlying field*/                                          \
+		varName##_prop(const varName##_prop&) = delete;                                                                              \
+		static constexpr auto m_varNameHash = hash_32_fnv1a_const(#varName);                                                         \
 	} varName{};
 
-#define SCHEMA_FIELD_POINTER_OFFSET(type, varName, extra_offset)                                                             \
-	class varName##_prop                                                                                                     \
-	{                                                                                                                     \
-	public:                                                                                                                  \
-		/*The deleted copy ctor below is user-declared, which suppresses the*/                                               \
-		/*implicit default one -- without this a schema class that has a real*/                                              \
-		/*constructor cannot initialise its own fields.*/                                                                    \
-		varName##_prop() = default;                                                                                          \
-		type* Get()                                                                                                          \
-		{                                                                                                                    \
-			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);				 \
-			if (!m_key.valid) return &schema::MissingField<type>();                                            \
-			static const auto m_offset = offsetof(ThisClass, varName);														 \
-																															 \
-			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                             \
-                                                                                                                             \
-			if constexpr (schema::is_inline_schema_class<std::remove_cv_t<type>>::value)                                      \
-			{                                                                                                                 \
-				static const auto m_chain = schema::FindChainOffset(m_className, m_classNameHash);                               \
-				schema::RecordInlineOwner(pThisClass + m_key.offset + extra_offset, pThisClass,                                  \
-				                          m_key.offset + extra_offset, m_chain, m_networkStateChangedOffset != 0);               \
-			}                                                                                                                 \
-			return reinterpret_cast<std::add_pointer_t<type>>(pThisClass + m_key.offset + extra_offset);                     \
-		}                                                                                                                    \
-		/*Const overload, so a const method of the owning class can read the*/                                               \
-		/*field. Reading only needs the wrapper's address, which const does*/                                                \
-		/*not get in the way of.*/                                                                                           \
-		const type* Get() const                                                                                              \
-		{                                                                                                                    \
-			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);                 \
-			if (!m_key.valid) return &schema::MissingField<const type>();                                            \
-			static const auto m_offset = offsetof(ThisClass, varName);                                                          \
-                                                                                                                       \
-			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                                \
-                                                                                                                       \
-			return reinterpret_cast<std::add_pointer_t<const type>>(pThisClass + m_key.offset + extra_offset);                  \
-		}                                                                                                                    \
-		void NetworkStateChanged() /*Call this after editing the field*/                                                     \
-		{                                                                                                                    \
-			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);				 \
-			if (!m_key.valid) return;                                                                          \
-			static const auto m_chain = schema::FindChainOffset(m_className, m_classNameHash);								 \
-			static const auto m_offset = offsetof(ThisClass, varName);														 \
-																															 \
-			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                             \
-                                                                                                                             \
-			if (m_chain != 0 && m_key.networked)                                                                             \
-			{                                                                                                                \
-				ChainNetworkStateChanged(pThisClass + m_chain, m_key.offset + extra_offset);								 \
-			}                                                                                                                \
-			else if (m_key.networked)                                                                                        \
-			{                                                                                                                \
-				if (!m_networkStateChangedOffset)                                                                            \
-					EntityNetworkStateChanged(pThisClass, m_key.offset + extra_offset);									     \
-				else                                                                                                         \
-					schema::InlineStateChanged(pThisClass, m_key.offset + extra_offset, m_networkStateChangedOffset);			 \
-			}                                                                                                                \
-		}                                                                                                                    \
-		operator type*()                                                                                                     \
-		{                                                                                                                    \
-			return Get();                                                                                                    \
-		}                                                                                                                    \
-		type* operator()()                                                                                                   \
-		{                                                                                                                    \
-			return Get();                                                                                                    \
-		}                                                                                                                    \
-		type* operator->()                                                                                                   \
-		{                                                                                                                    \
-			return Get();                                                                                                    \
-		}                                                                                                                    \
-		operator const type*() const                                                                                         \
-		{                                                                                                                    \
-			return Get();                                                                                                          \
-		}                                                                                                                    \
-		const type* operator()() const                                                                                       \
-		{                                                                                                                    \
-			return Get();                                                                                                          \
-		}                                                                                                                    \
-		const type* operator->() const                                                                                       \
-		{                                                                                                                    \
-			return Get();                                                                                                          \
-		}                                                                                                                    \
-	private:                                                                                                                 \
-		/*Prevent accidentally copying this wrapper class instead of the underlying field*/                                  \
-		varName##_prop(const varName##_prop&) = delete;                                                                      \
-		static constexpr auto m_varNameHash = hash_32_fnv1a_const(#varName);                                                 \
+#define SCHEMA_FIELD_POINTER_OFFSET(type, varName, extra_offset)                                                                     \
+	class varName##_prop                                                                                                             \
+	{                                                                                                                                \
+	public:                                                                                                                          \
+		/*The deleted copy ctor below is user-declared, which suppresses the*/                                                       \
+		/*implicit default one -- without this a schema class that has a real*/                                                      \
+		/*constructor cannot initialise its own fields.*/                                                                            \
+		varName##_prop() = default;                                                                                                  \
+		type* Get()                                                                                                                  \
+		{                                                                                                                            \
+			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);                      \
+			if (!m_key.valid) return &schema::MissingField<type>();                                                                  \
+			static const auto m_offset = offsetof(ThisClass, varName);                                                               \
+                                                                                                                                     \
+			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                                     \
+                                                                                                                                     \
+			if constexpr (schema::is_schema_class<std::remove_cv_t<type>>::value)                                                    \
+			{                                                                                                                        \
+				static schema::ClassNsc m_nsc = 0;                                                                                   \
+				schema::RecordInlineOwner(pThisClass + m_key.offset + extra_offset, pThisClass,                                      \
+				                          schema::CachedClassNsc(m_nsc, m_className, m_classNameHash), m_key.offset + extra_offset); \
+			}                                                                                                                        \
+			return reinterpret_cast<std::add_pointer_t<type>>(pThisClass + m_key.offset + extra_offset);                             \
+		}                                                                                                                            \
+		/*Const overload, so a const method of the owning class can read the*/                                                       \
+		/*field. Reading only needs the wrapper's address, which const does*/                                                        \
+		/*not get in the way of.*/                                                                                                   \
+		const type* Get() const                                                                                                      \
+		{                                                                                                                            \
+			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);                      \
+			if (!m_key.valid) return &schema::MissingField<const type>();                                                            \
+			static const auto m_offset = offsetof(ThisClass, varName);                                                               \
+                                                                                                                                     \
+			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                                     \
+                                                                                                                                     \
+			return reinterpret_cast<std::add_pointer_t<const type>>(pThisClass + m_key.offset + extra_offset);                       \
+		}                                                                                                                            \
+		void NetworkStateChanged() /*Call this after editing the field*/                                                             \
+		{                                                                                                                            \
+			static const auto m_key = schema::GetOffset(m_className, m_classNameHash, #varName, m_varNameHash);                      \
+			if (!m_key.valid) return;                                                                                                \
+			if (!m_key.networked) return;                                                                                            \
+			static const auto m_offset = offsetof(ThisClass, varName);                                                               \
+                                                                                                                                     \
+			uintptr_t pThisClass = ((uintptr_t)this - m_offset);                                                                     \
+                                                                                                                                     \
+			static schema::ClassNsc m_nsc = 0;                                                                                       \
+			schema::FieldStateChanged(pThisClass, schema::CachedClassNsc(m_nsc, m_className, m_classNameHash),                       \
+			                          m_key.offset + extra_offset);                                                                  \
+		}                                                                                                                            \
+		operator type*()                                                                                                             \
+		{                                                                                                                            \
+			return Get();                                                                                                            \
+		}                                                                                                                            \
+		type* operator()()                                                                                                           \
+		{                                                                                                                            \
+			return Get();                                                                                                            \
+		}                                                                                                                            \
+		type* operator->()                                                                                                           \
+		{                                                                                                                            \
+			return Get();                                                                                                            \
+		}                                                                                                                            \
+		operator const type*() const                                                                                                 \
+		{                                                                                                                            \
+			return Get();                                                                                                            \
+		}                                                                                                                            \
+		const type* operator()() const                                                                                               \
+		{                                                                                                                            \
+			return Get();                                                                                                            \
+		}                                                                                                                            \
+		const type* operator->() const                                                                                               \
+		{                                                                                                                            \
+			return Get();                                                                                                            \
+		}                                                                                                                            \
+	private:                                                                                                                         \
+		/*Prevent accidentally copying this wrapper class instead of the underlying field*/                                          \
+		varName##_prop(const varName##_prop&) = delete;                                                                              \
+		static constexpr auto m_varNameHash = hash_32_fnv1a_const(#varName);                                                         \
 	} varName{};
 
 /**
@@ -868,7 +900,7 @@ Schema field macros
         static const int32_t offset = [] {                                                             \
             const int32_t nOffset = schema::GetServerOffset(#className, #propName);                    \
             if (nOffset == -1)                                                                         \
-                Warning("SCHEMA_FIELD_OLD: '" #className "::" #propName "' was not found!\n");         \
+                Warning("SCHEMA_FIELD_OLD:'" #className "::" #propName "' was not found!\n");          \
             return nOffset;                                                                            \
         }();                                                                                           \
         return *reinterpret_cast<std::add_pointer_t<type>>(reinterpret_cast<intptr_t>(this) + offset); \
@@ -880,8 +912,10 @@ Schema class macros
 
 /**
 
-* @brief Declares schema-enabled class.
-* * offset != 0 marks a non-entity (embedded) class; the value itself is not used any more
+* @brief Declares a schema class: any class in the game's schema, entity or not.
+* * How its fields' changes reach the network (the entity, a component's chain,
+* * the NetworkVar wrapper of an embedded object, or the owner of a plain struct)
+* * is read off the schema at runtime -- see schema::GetClassNsc().
   */
 /*
  * SchemaCreate() / SchemaConstruct() / SchemaDestruct() / SchemaFree() go
@@ -890,39 +924,31 @@ Schema class macros
  * needed. SchemaCreate() returns null and the others do nothing when the
  * running game has no ops for the class.
  */
-#define DECLARE_SCHEMA_CLASS_BASE(ClassName, offset)								\
-	private:																		\
-		typedef ClassName ThisClass;												\
-		static constexpr const char* m_className = #ClassName;						\
-		static constexpr uint32_t m_classNameHash = hash_32_fnv1a_const(#ClassName);\
-		static constexpr int m_networkStateChangedOffset = offset;					\
-		static void* SchemaClassOps(SchemaClassManipulatorAction_t eAction, void* pObject) \
-		{																			\
-			static const SchemaGenClassOpsFn_t s_fn = schema::GetClassOps(m_className); \
-			return s_fn ? s_fn(eAction, pObject) : nullptr;							\
-		}																			\
-	public:																			\
-		/*Inline (embedded) class marker for the owner's field accessor.*/	\
-		static constexpr int SchemaNetworkStateChangedOffset = offset;		\
-		/*Allocated on the game's heap and constructed; SchemaFree() releases it.*/ \
-		static ThisClass* SchemaCreate()											\
-		{																			\
+#define DECLARE_SCHEMA_CLASS_BASE(ClassName, ...)                                                              \
+	private:                                                                                                   \
+		typedef ClassName ThisClass;                                                                           \
+		static constexpr const char* m_className = #ClassName;                                                 \
+		static constexpr uint32_t m_classNameHash = hash_32_fnv1a_const(#ClassName);                           \
+		static void* SchemaClassOps(SchemaClassManipulatorAction_t eAction, void* pObject)                     \
+		{                                                                                                      \
+			static const SchemaGenClassOpsFn_t s_fn = schema::GetClassOps(m_className);                        \
+			return s_fn ? s_fn(eAction, pObject) : nullptr;                                                    \
+		}                                                                                                      \
+	public:                                                                                                    \
+		/*Allocated on the game's heap and constructed; SchemaFree() releases it.*/                            \
+		static ThisClass* SchemaCreate()                                                                       \
+		{                                                                                                      \
 			return static_cast<ThisClass*>(SchemaClassOps(SCHEMA_CLASS_MANIPULATOR_ACTION_ALLOCATE, nullptr)); \
-		}																			\
-		void SchemaFree() { SchemaClassOps(SCHEMA_CLASS_MANIPULATOR_ACTION_DEALLOCATE, this); } \
-		/*The game's default constructor / destructor on this object's memory.*/	\
-		void SchemaConstruct() { SchemaClassOps(SCHEMA_CLASS_MANIPULATOR_ACTION_CONSTRUCT_IN_PLACE, this); } \
-		void SchemaDestruct() { SchemaClassOps(SCHEMA_CLASS_MANIPULATOR_ACTION_DESCTRUCT_IN_PLACE, this); } \
+		}                                                                                                      \
+		void SchemaFree() { SchemaClassOps(SCHEMA_CLASS_MANIPULATOR_ACTION_DEALLOCATE, this); }                \
+		/*The game's default constructor / destructor on this object's memory.*/                               \
+		void SchemaConstruct() { SchemaClassOps(SCHEMA_CLASS_MANIPULATOR_ACTION_CONSTRUCT_IN_PLACE, this); }   \
+		void SchemaDestruct() { SchemaClassOps(SCHEMA_CLASS_MANIPULATOR_ACTION_DESCTRUCT_IN_PLACE, this); }    \
 	public:
-#define DECLARE_SCHEMA_CLASS(className) DECLARE_SCHEMA_CLASS_BASE(className, 0)
-/**
+#define DECLARE_SCHEMA_CLASS(className) DECLARE_SCHEMA_CLASS_BASE(className)
 
-* @brief Declares inline schema class (non-entity).
-* * Use this for non-entity classes such as CCollisionProperty or CGlowProperty
-* * Their NetworkStateChanged is a virtual of the NetworkVar_<field> wrapper the engine embeds them in, not CEntityInstance's;
-* * its vtable slot is found at runtime (NetworkVarStateChanged), so no index is kept per class
-* * Though some classes like CGameRules will instead use their CNetworkVarChainer as a link back to the parent entity
-  */
-#define DECLARE_SCHEMA_CLASS_INLINE(className) DECLARE_SCHEMA_CLASS_BASE(className, 1)
+/// Deprecated, use DECLARE_SCHEMA_CLASS: entity and embedded classes are told
+/// apart at runtime now, so both declare the same.
+#define DECLARE_SCHEMA_CLASS_INLINE(className) DECLARE_SCHEMA_CLASS_BASE(className)
 
 #endif // SCHEMA_H

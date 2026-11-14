@@ -59,7 +59,7 @@
 class dynpitchvol_base_t
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(dynpitchvol_base_t);
+    DECLARE_SCHEMA_CLASS(dynpitchvol_base_t);
 
     SCHEMA_FIELD(int32_t, preset);
     SCHEMA_FIELD(int32_t, pitchrun);

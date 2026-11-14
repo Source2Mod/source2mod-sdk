@@ -60,7 +60,7 @@
 class CCSObserver_ObserverServices : public CPlayer_ObserverServices
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CCSObserver_ObserverServices);
+    DECLARE_SCHEMA_CLASS(CCSObserver_ObserverServices);
 
 };
 

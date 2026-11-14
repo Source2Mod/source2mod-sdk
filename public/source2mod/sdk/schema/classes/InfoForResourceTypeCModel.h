@@ -59,7 +59,7 @@
 class InfoForResourceTypeCModel
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(InfoForResourceTypeCModel);
+    DECLARE_SCHEMA_CLASS(InfoForResourceTypeCModel);
 
 };
 

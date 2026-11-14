@@ -62,7 +62,7 @@ class CBasePlayerWeapon;
 class CPlayer_ItemServices : public CPlayerPawnComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CPlayer_ItemServices);
+    DECLARE_SCHEMA_CLASS(CPlayer_ItemServices);
 
 
 public:

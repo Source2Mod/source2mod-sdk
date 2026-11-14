@@ -59,7 +59,7 @@
 class fogparams_t
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(fogparams_t);
+    DECLARE_SCHEMA_CLASS(fogparams_t);
 
     SCHEMA_FIELD(Vector, dirPrimary);
     SCHEMA_FIELD(Color, colorPrimary);

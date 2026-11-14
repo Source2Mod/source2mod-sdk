@@ -62,7 +62,7 @@
 class CBasePlayerWeaponVData : public CEntitySubclassVDataBase
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CBasePlayerWeaponVData);
+    DECLARE_SCHEMA_CLASS(CBasePlayerWeaponVData);
 
     SCHEMA_FIELD(bool, m_bBuiltRightHanded);
     SCHEMA_FIELD(bool, m_bAllowFlipping);

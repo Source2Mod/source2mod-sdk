@@ -61,7 +61,7 @@
 class CAttributeContainer : public CAttributeManager
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CAttributeContainer);
+    DECLARE_SCHEMA_CLASS(CAttributeContainer);
 
     SCHEMA_FIELD(CEconItemView, m_Item);
 };

@@ -62,7 +62,7 @@ class CBaseEntity;
 class CCSPlayer_HostageServices : public CPlayerPawnComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CCSPlayer_HostageServices);
+    DECLARE_SCHEMA_CLASS(CCSPlayer_HostageServices);
 
     SCHEMA_FIELD(CHandle<CBaseEntity>, m_hCarriedHostage);
     SCHEMA_FIELD(CHandle<CBaseEntity>, m_hCarriedHostageProp);

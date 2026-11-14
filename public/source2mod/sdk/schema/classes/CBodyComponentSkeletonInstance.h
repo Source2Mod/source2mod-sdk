@@ -61,7 +61,7 @@
 class CBodyComponentSkeletonInstance : public CBodyComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CBodyComponentSkeletonInstance);
+    DECLARE_SCHEMA_CLASS(CBodyComponentSkeletonInstance);
 
     SCHEMA_FIELD(CSkeletonInstance, m_skeletonInstance);
 };

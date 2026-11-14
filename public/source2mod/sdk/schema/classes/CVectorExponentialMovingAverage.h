@@ -59,7 +59,7 @@
 class CVectorExponentialMovingAverage
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CVectorExponentialMovingAverage);
+    DECLARE_SCHEMA_CLASS(CVectorExponentialMovingAverage);
 
 };
 

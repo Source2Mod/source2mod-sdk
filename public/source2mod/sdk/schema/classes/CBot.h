@@ -62,7 +62,7 @@ class CCSPlayerPawn;
 class CBot
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CBot);
+    DECLARE_SCHEMA_CLASS(CBot);
 
     SCHEMA_FIELD(CCSPlayerController*, m_pController);
     SCHEMA_FIELD(CCSPlayerPawn*, m_pPlayer);

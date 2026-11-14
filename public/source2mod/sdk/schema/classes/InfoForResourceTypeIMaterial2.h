@@ -59,7 +59,7 @@
 class InfoForResourceTypeIMaterial2
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(InfoForResourceTypeIMaterial2);
+    DECLARE_SCHEMA_CLASS(InfoForResourceTypeIMaterial2);
 
 };
 

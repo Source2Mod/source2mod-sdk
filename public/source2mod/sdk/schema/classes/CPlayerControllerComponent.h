@@ -61,7 +61,7 @@ class CCSPlayerController;
 class CPlayerControllerComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CPlayerControllerComponent);
+    DECLARE_SCHEMA_CLASS(CPlayerControllerComponent);
 
     SCHEMA_FIELD(CNetworkVarChainer, __m_pChainEntity);
 

@@ -60,7 +60,7 @@
 class CMultiplayRules : public CGameRules
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CMultiplayRules);
+    DECLARE_SCHEMA_CLASS(CMultiplayRules);
 
 };
 

@@ -59,7 +59,7 @@
 class CConstantForceController
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CConstantForceController);
+    DECLARE_SCHEMA_CLASS(CConstantForceController);
 
     SCHEMA_FIELD(Vector, m_linear);
     SCHEMA_FIELD(RotationVector, m_angular);

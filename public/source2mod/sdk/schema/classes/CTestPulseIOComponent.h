@@ -59,7 +59,7 @@
 class CTestPulseIOComponent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CTestPulseIOComponent);
+    DECLARE_SCHEMA_CLASS(CTestPulseIOComponent);
 
     SCHEMA_FIELD(CUtlString, m_ComponentData);
 };

@@ -59,7 +59,7 @@
 class InfoForResourceTypeCTextureBase
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(InfoForResourceTypeCTextureBase);
+    DECLARE_SCHEMA_CLASS(InfoForResourceTypeCTextureBase);
 
 };
 

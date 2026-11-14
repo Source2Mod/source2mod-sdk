@@ -32,27 +32,27 @@ class CCSPlayerPawn;
  * offset (checked against the 2026-10-23 binaries). Like a SCHEMA_FIELD it
  * holds no data: it is a view onto the object at `offset`.
  */
-#define DAMAGE_FIXED_FIELD(type, varName, offset)                                                       \
-	class varName##_prop                                                                                \
-	{                                                                                                   \
-	public:                                                                                             \
-		varName##_prop() = default;                                                                     \
-		std::add_lvalue_reference_t<type> Get()                                                         \
-		{                                                                                               \
-			return *reinterpret_cast<std::add_pointer_t<type>>(reinterpret_cast<uintptr_t>(this) - offsetof(ThisClass, varName) + (offset)); \
-		}                                                                                               \
-		std::add_lvalue_reference_t<std::add_const_t<type>> Get() const                                 \
-		{                                                                                               \
+#define DAMAGE_FIXED_FIELD(type, varName, offset)                                                                                                              \
+	class varName##_prop                                                                                                                                       \
+	{                                                                                                                                                          \
+	public:                                                                                                                                                    \
+		varName##_prop() = default;                                                                                                                            \
+		std::add_lvalue_reference_t<type> Get()                                                                                                                \
+		{                                                                                                                                                      \
+			return *reinterpret_cast<std::add_pointer_t<type>>(reinterpret_cast<uintptr_t>(this) - offsetof(ThisClass, varName) + (offset));                   \
+		}                                                                                                                                                      \
+		std::add_lvalue_reference_t<std::add_const_t<type>> Get() const                                                                                        \
+		{                                                                                                                                                      \
 			return *reinterpret_cast<std::add_pointer_t<std::add_const_t<type>>>(reinterpret_cast<uintptr_t>(this) - offsetof(ThisClass, varName) + (offset)); \
-		}                                                                                               \
-		operator std::add_lvalue_reference_t<type>() { return Get(); }                                  \
-		operator std::add_lvalue_reference_t<std::add_const_t<type>>() const { return Get(); }          \
-		std::add_lvalue_reference_t<type> operator()() { return Get(); }                                \
-		std::add_lvalue_reference_t<std::add_const_t<type>> operator()() const { return Get(); }        \
-		std::add_pointer_t<type> operator&() { return &Get(); }                                         \
-		varName##_prop& operator=(std::add_lvalue_reference_t<std::add_const_t<type>> val) { Get() = val; return *this; } \
-	private:                                                                                            \
-		varName##_prop(const varName##_prop&) = delete;                                                 \
+		}                                                                                                                                                      \
+		operator std::add_lvalue_reference_t<type>() { return Get(); }                                                                                         \
+		operator std::add_lvalue_reference_t<std::add_const_t<type>>() const { return Get(); }                                                                 \
+		std::add_lvalue_reference_t<type> operator()() { return Get(); }                                                                                       \
+		std::add_lvalue_reference_t<std::add_const_t<type>> operator()() const { return Get(); }                                                               \
+		std::add_pointer_t<type> operator&() { return &Get(); }                                                                                                \
+		varName##_prop& operator=(std::add_lvalue_reference_t<std::add_const_t<type>> val) { Get() = val; return *this; }                                      \
+	private:                                                                                                                                                   \
+		varName##_prop(const varName##_prop&) = delete;                                                                                                        \
 	} varName;
 
 /*
@@ -66,7 +66,7 @@ class CCSPlayerPawn;
 class CTakeDamageInfo
 {
 	// Not an entity: a networked write would take the embedded route.
-	DECLARE_SCHEMA_CLASS_INLINE(CTakeDamageInfo);
+	DECLARE_SCHEMA_CLASS(CTakeDamageInfo);
 
 public:
 	CTakeDamageInfo();

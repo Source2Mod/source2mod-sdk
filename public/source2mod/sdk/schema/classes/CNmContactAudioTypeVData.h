@@ -59,7 +59,7 @@
 class CNmContactAudioTypeVData
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CNmContactAudioTypeVData);
+    DECLARE_SCHEMA_CLASS(CNmContactAudioTypeVData);
 
 };
 

@@ -59,7 +59,7 @@
 class INavObstacle
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(INavObstacle);
+    DECLARE_SCHEMA_CLASS(INavObstacle);
 
     SCHEMA_FIELD(uint64_t, m_nId);
 };

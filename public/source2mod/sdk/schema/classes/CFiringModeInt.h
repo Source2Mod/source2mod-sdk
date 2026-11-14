@@ -59,7 +59,7 @@
 class CFiringModeInt
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CFiringModeInt);
+    DECLARE_SCHEMA_CLASS(CFiringModeInt);
 
     SCHEMA_FIELD_POINTER(int32_t, m_nValues);
 };

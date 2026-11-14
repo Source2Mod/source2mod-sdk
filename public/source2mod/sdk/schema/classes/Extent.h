@@ -59,7 +59,7 @@
 class Extent
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(Extent);
+    DECLARE_SCHEMA_CLASS(Extent);
 
     SCHEMA_FIELD(Vector, lo);
     SCHEMA_FIELD(Vector, hi);

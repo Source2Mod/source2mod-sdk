@@ -60,7 +60,7 @@
 class CBodyComponentBaseModelEntity : public CBodyComponentSkeletonInstance
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CBodyComponentBaseModelEntity);
+    DECLARE_SCHEMA_CLASS(CBodyComponentBaseModelEntity);
 
 };
 

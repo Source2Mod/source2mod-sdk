@@ -60,7 +60,7 @@
 class CCSObserver_UseServices : public CPlayer_UseServices
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CCSObserver_UseServices);
+    DECLARE_SCHEMA_CLASS(CCSObserver_UseServices);
 
 };
 

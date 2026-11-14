@@ -60,7 +60,7 @@
 class CCSObserver_MovementServices : public CPlayer_MovementServices
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CCSObserver_MovementServices);
+    DECLARE_SCHEMA_CLASS(CCSObserver_MovementServices);
 
 };
 

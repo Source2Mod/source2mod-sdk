@@ -94,7 +94,7 @@ static void SchemaWarn(const char* pszFormat, const char* pszArg1, const char* p
 #ifdef SOURCE2MOD_CORE
     FP_WARN("{}", szMessage);
 #else
-    Warning("%s\n", szMessage);
+    SOURCE2MOD_SDK_WARNING("%s\n", szMessage);
 #endif
 }
 
@@ -365,14 +365,14 @@ static int FindNetworkStateChangedIndex(void** pVtable)
 }
 
 // The slot is found at runtime from the object's own vtable, so no index has to
-// be kept per class (nNetworkStateChangedOffset only marks the class as inline).
-// A plain object that is not embedded in a NetworkVar has no such slot: no-op.
-void NetworkVarStateChanged(uintptr_t pNetworkVar, uint32_t nOffset, uint32 /*nNetworkStateChangedOffset*/)
+// be kept per class. A plain object that is not embedded in a NetworkVar has no
+// such slot: false, nothing called.
+bool schema::NetworkVarStateChanged(uintptr_t object, uint32_t offset)
 {
     static std::unordered_map<void**, int> s_indices;
     static std::mutex s_mutex;
 
-    void** pVtable = *reinterpret_cast<void***>(pNetworkVar);
+    void** pVtable = *reinterpret_cast<void***>(object);
 
     int index;
     {
@@ -384,10 +384,59 @@ void NetworkVarStateChanged(uintptr_t pNetworkVar, uint32_t nOffset, uint32 /*nN
     }
 
     if (index < 0)
-        return;
+        return false;
 
-    NetworkStateChangedData data(nOffset);
-    CALL_VIRTUAL(void, index, (void*)pNetworkVar, &data);
+    NetworkStateChangedData data(offset);
+    CALL_VIRTUAL(void, index, (void*)object, &data);
+    return true;
+}
+
+// For plugins built before schema::GetClassNsc(): their field setters call it
+// for every non-entity class.
+void NetworkVarStateChanged(uintptr_t pNetworkVar, uint32_t nOffset, uint32 /*nNetworkStateChangedOffset*/)
+{
+    schema::NetworkVarStateChanged(pNetworkVar, nOffset);
+}
+
+schema::ClassNsc schema::GetClassNsc(const char* className, uint32_t classNameHash)
+{
+    static std::unordered_map<uint32_t, ClassNsc> s_classes;
+    static std::mutex s_mutex;
+
+    {
+        std::lock_guard<std::mutex> lock(s_mutex);
+        auto it = s_classes.find(classNameHash);
+        if (it != s_classes.end())
+            return it->second;
+    }
+
+    if (!GetSchemaSystem())
+        return 0;
+
+    SchemaClassInfoData_t* pClassInfo = FindServerClass(className);
+    ClassNsc nsc = CLASS_NSC_KNOWN;
+
+    if (pClassInfo)
+    {
+        nsc |= static_cast<uint16_t>(FindChainOffset(className, classNameHash));
+
+        for (SchemaClassInfoData_t* pClass = pClassInfo; pClass;
+             pClass = pClass->m_nNumBaseClasses ? pClass->m_pBaseClasses[0].m_pClass : nullptr)
+        {
+            if (V_strcmp(pClass->m_pName, "CEntityInstance") == 0)
+            {
+                nsc |= CLASS_NSC_ENTITY;
+                break;
+            }
+        }
+
+        if (pClassInfo->m_nClassFlags1 & SCHEMA_CF1_HAS_VIRTUAL_MEMBERS)
+            nsc |= CLASS_NSC_VIRTUAL;
+    }
+
+    std::lock_guard<std::mutex> lock(s_mutex);
+    s_classes.emplace(classNameHash, nsc);
+    return nsc;
 }
 
 void EntityNetworkStateChanged(uintptr_t pEntity, uint nOffset)

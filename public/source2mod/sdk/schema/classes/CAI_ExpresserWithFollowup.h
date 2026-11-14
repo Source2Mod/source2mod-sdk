@@ -60,7 +60,7 @@
 class CAI_ExpresserWithFollowup : public CAI_Expresser
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CAI_ExpresserWithFollowup);
+    DECLARE_SCHEMA_CLASS(CAI_ExpresserWithFollowup);
 
 };
 

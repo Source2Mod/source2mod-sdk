@@ -59,7 +59,7 @@
 class CNmTarget
 {
 public:
-    DECLARE_SCHEMA_CLASS_INLINE(CNmTarget);
+    DECLARE_SCHEMA_CLASS(CNmTarget);
 
     SCHEMA_FIELD(CTransform, m_transform);
     SCHEMA_FIELD(CGlobalSymbol, m_boneID);
