@@ -131,8 +131,45 @@ enum class Source2ModType : int32_t
     FloatRef,
 };
 
+struct GameTime_t;
+
+/**
+ * What a C++ type is as a Source2ModType, where the rules of TypeOf() below
+ * get it wrong: a small class passed by value that holds a float, say.
+ *
+ * @code
+ * template <> struct Source2ModTypeTraits<MyFloatWrapper> { static constexpr Source2ModType value = Source2ModType::Float; };
+ * @endcode
+ */
+template <typename T>
+struct Source2ModTypeTraits
+{
+};
+
+template <>
+struct Source2ModTypeTraits<GameTime_t>
+{
+    static constexpr Source2ModType value = Source2ModType::Float;
+};
+
 namespace source2mod_functions_detail
 {
+    template <typename T, typename = void>
+    struct HasTypeTraits : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct HasTypeTraits<T, std::void_t<decltype(Source2ModTypeTraits<T>::value)>> : std::true_type
+    {
+    };
+
+    template <size_t N>
+    constexpr Source2ModType IntOfSize()
+    {
+        return N == 8 ? Source2ModType::Int64 : N == 2 ? Source2ModType::Int16 : N == 1 ? Source2ModType::Int8 : Source2ModType::Int32;
+    }
+
     // What a C++ parameter or return type is in Source2ModType terms.
     // `Pointer` stands for any pointer: it matches entity, object and pointer
     // in the gamedata, whichever the C++ side calls it.
@@ -140,7 +177,9 @@ namespace source2mod_functions_detail
     constexpr Source2ModType TypeOf()
     {
         using U = std::remove_cv_t<T>;
-        if constexpr (std::is_void_v<U>)
+        if constexpr (HasTypeTraits<U>::value)
+            return Source2ModTypeTraits<U>::value;
+        else if constexpr (std::is_void_v<U>)
             return Source2ModType::Void;
         else if constexpr (std::is_same_v<U, bool>)
             return Source2ModType::Bool;
@@ -186,6 +225,27 @@ namespace source2mod_functions_detail
             return Source2ModType::Pointer;
     }
 
+    // A parameter: as TypeOf(), except a small trivially copyable class by
+    // value (CPlayerSlot, CEntityHandle, CSplitScreenSlot), which both ABIs
+    // pass in an integer register like an integer of its size. A larger or
+    // non-trivial one goes by reference: a pointer.
+    template <typename T>
+    constexpr Source2ModType ParamTypeOf()
+    {
+        using U = std::remove_cv_t<T>;
+        if constexpr (HasTypeTraits<U>::value)
+            return Source2ModTypeTraits<U>::value;
+        else if constexpr (std::is_class_v<U> && !std::is_same_v<U, ::Vector> && !std::is_same_v<U, ::QAngle>)
+        {
+            if constexpr (std::is_trivially_copyable_v<U> && (sizeof(U) == 1 || sizeof(U) == 2 || sizeof(U) == 4 || sizeof(U) == 8))
+                return IntOfSize<sizeof(U)>();
+            else
+                return Source2ModType::Pointer;
+        }
+        else
+            return TypeOf<T>();
+    }
+
     template <typename Sig>
     struct Signature;
 
@@ -196,8 +256,50 @@ namespace source2mod_functions_detail
         using Pointer = R (*)(P...);
         static constexpr int kCount = sizeof...(P);
         static constexpr Source2ModType kReturn = TypeOf<R>();
-        static constexpr Source2ModType kParams[sizeof...(P) + 1] = { TypeOf<P>()..., Source2ModType::Void };
+        static constexpr Source2ModType kParams[sizeof...(P) + 1] = { ParamTypeOf<P>()..., Source2ModType::Void };
     };
+
+    // A function's type in any spelling -- a function type, a pointer to one,
+    // a pointer to member (const / noexcept too), or a typedef / using of any
+    // of them -- as the Signature it is called with (`this` first for a
+    // member) and whether it is a member.
+    template <typename F>
+    struct FunctionOf;
+
+    template <typename R, typename... P>
+    struct FunctionOf<R(P...)>
+    {
+        using Sig = R(P...);
+        static constexpr bool kMember = false;
+    };
+
+    template <typename R, typename... P>
+    struct FunctionOf<R(P...) noexcept> : FunctionOf<R(P...)>
+    {
+    };
+
+    template <typename F>
+    struct FunctionOf<F*> : FunctionOf<F>
+    {
+    };
+
+    template <typename F>
+    struct FunctionOf<F&> : FunctionOf<F>
+    {
+    };
+
+#define SOURCE2MOD_FUNCTION_OF_MEMBER(QUALIFIERS)               \
+    template <typename R, typename C, typename... P>            \
+    struct FunctionOf<R (C::*)(P...) QUALIFIERS>                \
+    {                                                           \
+        using Sig = R(C*, P...);                                \
+        static constexpr bool kMember = true;                   \
+    };
+    SOURCE2MOD_FUNCTION_OF_MEMBER()
+    SOURCE2MOD_FUNCTION_OF_MEMBER(const)
+    SOURCE2MOD_FUNCTION_OF_MEMBER(noexcept)
+    SOURCE2MOD_FUNCTION_OF_MEMBER(const noexcept)
+#undef SOURCE2MOD_FUNCTION_OF_MEMBER
 
     template <typename A>
     void* AsThis(A&& arg)
@@ -345,6 +447,36 @@ struct FunctionTypes
     bool isMember = false;                      // the first parameter is `this`
 };
 
+/**
+ * The FunctionTypes of a C++ function type, read off the type instead of
+ * listed by hand: a pointer to member (a virtual of an engine interface), a
+ * function pointer, a function type, or a typedef / using of one.
+ *
+ * @code
+ * Source2ModFunctionTypes<decltype(&IVEngineServer2::SetClientListening)>()   // bool (IVEngineServer2* this, CPlayerSlot, CPlayerSlot, bool)
+ * using SwitchTeam_t = void (CCSPlayerController::*)(int);
+ * Source2ModFunctionTypes<SwitchTeam_t>()                                    // member: this, int
+ * Source2ModFunctionTypes<void(CBaseEntity*, bool)>()                        // free function of these parameters
+ * Source2ModFunctionTypes(&IVEngineServer2::SetClientListening)             // the same from a value
+ * @endcode
+ *
+ * A small trivially copyable class by value is an integer of its size;
+ * Source2ModTypeTraits says otherwise for one that is not (GameTime_t: Float).
+ */
+template <typename F>
+constexpr FunctionTypes Source2ModFunctionTypes()
+{
+    using Of = source2mod_functions_detail::FunctionOf<std::remove_cv_t<std::remove_reference_t<F>>>;
+    using S = source2mod_functions_detail::Signature<typename Of::Sig>;
+    return FunctionTypes{ S::kReturn, S::kParams, S::kCount, Of::kMember };
+}
+
+template <typename F>
+constexpr FunctionTypes Source2ModFunctionTypes(F)
+{
+    return Source2ModFunctionTypes<F>();
+}
+
 class ISource2ModFunctions
 {
 public:
@@ -420,6 +552,76 @@ public:
     /// searched too. FromDatamap("CBaseButton", "CBaseButtonButtonUse", types).
     /// Null before a map is up: the entity system holds the classes.
     virtual ISource2ModFunction* FromDatamap(const char* className, const char* functionName, const FunctionTypes& types) = 0;
+
+    /*
+     * The same with the types read off a C++ function type instead of a
+     * FunctionTypes (Source2ModFunctionTypes): a pointer to member for a
+     * member function, so `this` and isMember come with it.
+     *
+     *   FromVirtual(&IVEngineServer2::SetClientListening)       // slot and types from the method
+     *   FromGameConfig<void (CCSPlayerController::*)(int)>("CCSPlayerController::SwitchTeam")
+     *   using Think_t = void (CBaseEntity::*)();
+     *   FromDatamap<Think_t>("CBaseButton", "CBaseButtonButtonUse")
+     */
+
+    /// A virtual of an engine interface or a class: its slot (KHook::GetVtableIndex) and types from the method.
+    template <typename M, std::enable_if_t<std::is_member_function_pointer_v<M>, int> = 0>
+    ISource2ModFunction* FromVirtual(M method)
+    {
+        const int index = KHook::GetVtableIndex(method);
+        return index < 0 ? nullptr : FromVirtual(index, Source2ModFunctionTypes<M>());
+    }
+
+    template <typename F>
+    ISource2ModFunction* FromVirtual(int index)
+    {
+        return FromVirtual(index, Source2ModFunctionTypes<F>());
+    }
+
+    template <typename F>
+    ISource2ModFunction* FromGameConfig(const char* name)
+    {
+        return FromGameConfig(name, Source2ModFunctionTypes<F>());
+    }
+
+    template <typename F>
+    ISource2ModFunction* FromSignature(ISource2ModModule* module, const char* signature, const char* section = "")
+    {
+        return FromSignature(module, signature, Source2ModFunctionTypes<F>(), section);
+    }
+
+    template <typename F>
+    ISource2ModFunction* FromSignatureRelative(ISource2ModModule* module, const char* signature, int offset, int nextInstructionOffset,
+                                               const char* section = "")
+    {
+        return FromSignatureRelative(module, signature, offset, nextInstructionOffset, Source2ModFunctionTypes<F>(), section);
+    }
+
+    template <typename F>
+    ISource2ModFunction* FromSymbol(ISource2ModModule* module, const char* symbol)
+    {
+        return FromSymbol(module, symbol, Source2ModFunctionTypes<F>());
+    }
+
+    template <typename F>
+    ISource2ModFunction* FromVirtualTable(ISource2ModModule* module, const char* className, int index, const char* baseName = "")
+    {
+        return FromVirtualTable(module, className, index, Source2ModFunctionTypes<F>(), baseName);
+    }
+
+    /// A virtual of one class's vtable: its slot and types from the method.
+    template <typename M, std::enable_if_t<std::is_member_function_pointer_v<M>, int> = 0>
+    ISource2ModFunction* FromVirtualTable(ISource2ModModule* module, const char* className, M method, const char* baseName = "")
+    {
+        const int index = KHook::GetVtableIndex(method);
+        return index < 0 ? nullptr : FromVirtualTable(module, className, index, Source2ModFunctionTypes<M>(), baseName);
+    }
+
+    template <typename F>
+    ISource2ModFunction* FromDatamap(const char* className, const char* functionName)
+    {
+        return FromDatamap(className, functionName, Source2ModFunctionTypes<F>());
+    }
 };
 
 /**

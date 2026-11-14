@@ -247,6 +247,21 @@ methodmap Source2ModFunction < Handle
 	public native void AddParam(Source2ModType type);
 
 	/**
+	 * The return type and every parameter at once, written like a prototype
+	 * in the gamedata's type names (void, bool, int8..int64, int, float,
+	 * double, entity, object, pointer, string, vector, vector_value,
+	 * buffer_string, int_ref, bool_ref, float_ref): `this` of a member function
+	 * is the first parameter, and a name after a type is only for the reader.
+	 * Replaces the return type the function was made with and any AddParam.
+	 *
+	 *     Source2ModFunction fn = Source2ModFunction.FromVirtual(index, Source2ModType_Bool);
+	 *     fn.SetTypes("bool (pointer this, int32 receiver, int32 sender, bool listen)");
+	 *
+	 * @return true; an unknown type name is an error.
+	 */
+	public native bool SetTypes(const char[] signature);
+
+	/**
 	 * What the function is: for one from Find, as its gamedata entry has it;
 	 * for one the script built, as built (FromVirtual* are virtuals and
 	 * members). `this` of a member function is parameter 0.
