@@ -250,7 +250,7 @@ methodmap Source2ModFunction < Handle
 	 * The return type and every parameter at once, written like a prototype
 	 * in the gamedata's type names (void, bool, int8..int64, int, float,
 	 * double, entity, object, pointer, string, vector, vector_value,
-	 * buffer_string, int_ref, bool_ref, float_ref): `this` of a member function
+	 * buffer_string, command, int_ref, bool_ref, float_ref): `this` of a member function
 	 * is the first parameter, and a name after a type is only for the reader.
 	 * Replaces the return type the function was made with and any AddParam.
 	 *
