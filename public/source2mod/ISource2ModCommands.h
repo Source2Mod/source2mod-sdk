@@ -318,14 +318,14 @@ public:
 /// RegisterConCommand(name, handler) or RegisterConCommand(name, handler, permission).
 #define REGISTER_CHAT_LISTENER(pchName, ...) g_pSource2ModCommands->RegisterChatListener(pchName, __VA_ARGS__)
 #define REGISTER_CON_COMMAND(pchName, ...)   g_pSource2ModCommands->RegisterConCommand(pchName, __VA_ARGS__)
-#define HOOK_CON_COMMAND(pchName, ...) g_pSource2ModCommands->HookConCommand(pchName, __VA_ARGS__)
+#define HOOK_CON_COMMAND(pchName, ...)g_pSource2ModCommands->HookConCommand(pchName, __VA_ARGS__)
 
 /// ReplyToCommand() with printf formatting.
-#define REPLY_TO_COMMAND(ctx, fmt, ...) \
-    do { \
-        char _source2modReply[512]; \
+#define REPLY_TO_COMMAND(ctx, fmt, ...)                                           \
+    do {                                                                          \
+        char _source2modReply[512];                                               \
         snprintf(_source2modReply, sizeof(_source2modReply), fmt, ##__VA_ARGS__); \
-        g_pSource2ModCommands->ReplyToCommand(ctx, _source2modReply); \
+        g_pSource2ModCommands->ReplyToCommand(ctx, _source2modReply);             \
     } while (0)
 
 #endif //_INCLUDE_ISOURCE2MOD_COMMANDS_H

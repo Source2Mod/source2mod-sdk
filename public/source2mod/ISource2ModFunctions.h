@@ -449,9 +449,9 @@ Source2ModCallFunction(ISource2ModFunctions* functions, ISource2ModFunction*& ca
 }
 
 /// SOURCE2MOD_CALL_FUNCTION(void(CCSPlayerController*, int), "CCSPlayerController::SwitchTeam", eChain, this, nTeam)
-#define SOURCE2MOD_CALL_FUNCTION(SIG, NAME, CHAIN, ...)                                             \
-    ([&]() -> typename source2mod_functions_detail::Signature<SIG>::Return {                        \
-        static ISource2ModFunction* s_function = nullptr;                                          \
+#define SOURCE2MOD_CALL_FUNCTION(SIG, NAME, CHAIN, ...)                                                   \
+    ([&]() -> typename source2mod_functions_detail::Signature<SIG>::Return {                              \
+        static ISource2ModFunction* s_function = nullptr;                                                 \
         return Source2ModCallFunction<SIG>(g_pSource2ModFunctions, s_function, NAME, CHAIN, __VA_ARGS__); \
     }())
 

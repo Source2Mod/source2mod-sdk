@@ -40,6 +40,7 @@
 
 #include "source2mod/sdk/game/shared/takedamageresult.h"
 #include "source2mod/sdk/game/shared/takedamageinfo.h"
+#include "source2mod/ISource2ModApi.h"
 #include "source2mod/ISource2ModPlugin.h"
 
 #include <cstring>
@@ -54,7 +55,7 @@ namespace
     {
         const int32_t nSize = schema::GetClassSize(pszClassName);
         if (nSize > static_cast<int32_t>(nStorage))
-            Warning("%s is %d bytes in the running game, the SDK reserves %zu: update the SDK\n", pszClassName, nSize, nStorage);
+            SOURCE2MOD_SDK_WARNING("%s is %d bytes in the running game, the SDK reserves %zu: update the SDK\n", pszClassName, nSize, nStorage);
     }
 }
 

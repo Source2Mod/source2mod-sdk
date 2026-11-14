@@ -1176,18 +1176,18 @@ Macros
 *
 * Each hook that could not be resolved is logged and skipped.
   */
-#define KHOOK_CHECK() \
-    do { \
-        const char* source2modKHookNote = nullptr; \
+#define KHOOK_CHECK()                                                                                                                        \
+    do {                                                                                                                                     \
+        const char* source2modKHookNote = nullptr;                                                                                           \
         if (!::Source2ModKHookVersionMatches(g_Source2ModCoreKHookHeader, g_Source2ModCoreKHookCommit, error, maxlen, &source2modKHookNote)) \
-            return false; \
-        if (source2modKHookNote) \
-            g_pSource2ModAPI->Log("%s\n", source2modKHookNote); \
+            return false;                                                                                                                    \
+        if (source2modKHookNote)                                                                                                             \
+            g_pSource2ModAPI->Log("%s\n", source2modKHookNote);                                                                              \
     } while (0)
 
-#define KHOOK_INIT() \
-    do { \
-        KHOOK_CHECK(); \
+#define KHOOK_INIT()                  \
+    do {                              \
+        KHOOK_CHECK();                \
         ::ISource2ModHook::InitAll(); \
     } while (0)
 

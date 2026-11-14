@@ -39,6 +39,7 @@
 
 #include "source2mod/ISource2ModSchemaMethods.h"
 
+#include "source2mod/ISource2ModApi.h"
 #include "source2mod/ISource2ModPlugin.h"
 
 #include <tier0/dbg.h>
@@ -53,6 +54,6 @@ void* Source2ModSchemaMethod(const char* key, bool& resolved)
     resolved = true;
     void* function = g_pSource2ModSchemaMethods->Find(key);
     if (!function)
-        Warning("[Source2Mod] this core has no %s -- the plugin was built against a newer SDK; the call does nothing\n", key);
+        SOURCE2MOD_SDK_WARNING("this core has no %s -- the plugin was built against a newer SDK; the call does nothing\n", key);
     return function;
 }

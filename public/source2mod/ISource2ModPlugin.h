@@ -605,9 +605,9 @@ Globals
 * fills the pointers with SOURCE2MOD_FILLVARS(), so SDK code reads the same
 * globals (g_pSource2ModFunctions, g_pSource2ModGameConfig, ...) whichever binary it is linked into.
   */
-#define SOURCE2MOD_DEFINE_GLOBALVARS() \
-    ISource2ModAPI*             g_pSource2ModAPI              = nullptr; \
-    ISource2ModPlugin*          g_pPluginAPI                  = nullptr; \
+#define SOURCE2MOD_DEFINE_GLOBALVARS()                                  \
+    ISource2ModAPI*             g_pSource2ModAPI             = nullptr; \
+    ISource2ModPlugin*          g_pPluginAPI                 = nullptr; \
     const char*                 g_Source2ModCoreKHookCommit  = nullptr; \
     const char*                 g_Source2ModCoreKHookHeader  = nullptr; \
     ISource2ModCommands*        g_pSource2ModCommands        = nullptr; \
@@ -667,50 +667,50 @@ Globals
 
 * @brief Declares external globals.
   */
-#define SOURCE2MOD_GLOBALVARS() \
-    extern ISource2ModAPI*             g_pSource2ModAPI; \
-    extern ISource2ModPlugin*          g_pPluginAPI; \
-    extern const char*                 g_Source2ModCoreKHookCommit; \
-    extern const char*                 g_Source2ModCoreKHookHeader; \
-    extern ISource2ModCommands*        g_pSource2ModCommands; \
-    extern ISource2ModConfigs*         g_pSource2ModConfigs; \
-    extern ISource2ModCrash*           g_pSource2ModCrash; \
-    extern ISource2ModConVars*         g_pSource2ModConVars; \
-    extern ISource2ModCookies*         g_pSource2ModCookies; \
-    extern ISource2ModCustomHud*       g_pSource2ModCustomHud; \
-    extern ISource2ModEntities*        g_pSource2ModEntities; \
-    extern ISource2ModEvents*          g_pSource2ModEvents; \
-    extern ISource2ModFeatures*        g_pSource2ModFeatures; \
-    extern ISource2ModGameConfig*      g_pSource2ModGameConfig; \
-    extern ISource2ModHooks*           g_pSource2ModHooks; \
-    extern ISource2ModGameSystems*     g_pSource2ModGameSystems; \
-    extern ISource2ModGeoIP*           g_pSource2ModGeoIP; \
-    extern ISource2ModHTTP*            g_pSource2ModHTTP; \
-    extern ISource2ModJSON*            g_pSource2ModJSON; \
-    extern ISource2ModMaps*            g_pSource2ModMaps; \
-    extern ISource2ModModules*         g_pSource2ModModules; \
-    extern ISource2ModVoice*           g_pSource2ModVoice; \
-    extern ISource2ModMenus*           g_pSource2ModMenus; \
-    extern ISource2ModSQL*             g_pSource2ModSQL; \
+#define SOURCE2MOD_GLOBALVARS()                                      \
+    extern ISource2ModAPI*             g_pSource2ModAPI;             \
+    extern ISource2ModPlugin*          g_pPluginAPI;                 \
+    extern const char*                 g_Source2ModCoreKHookCommit;  \
+    extern const char*                 g_Source2ModCoreKHookHeader;  \
+    extern ISource2ModCommands*        g_pSource2ModCommands;        \
+    extern ISource2ModConfigs*         g_pSource2ModConfigs;         \
+    extern ISource2ModCrash*           g_pSource2ModCrash;           \
+    extern ISource2ModConVars*         g_pSource2ModConVars;         \
+    extern ISource2ModCookies*         g_pSource2ModCookies;         \
+    extern ISource2ModCustomHud*       g_pSource2ModCustomHud;       \
+    extern ISource2ModEntities*        g_pSource2ModEntities;        \
+    extern ISource2ModEvents*          g_pSource2ModEvents;          \
+    extern ISource2ModFeatures*        g_pSource2ModFeatures;        \
+    extern ISource2ModGameConfig*      g_pSource2ModGameConfig;      \
+    extern ISource2ModHooks*           g_pSource2ModHooks;           \
+    extern ISource2ModGameSystems*     g_pSource2ModGameSystems;     \
+    extern ISource2ModGeoIP*           g_pSource2ModGeoIP;           \
+    extern ISource2ModHTTP*            g_pSource2ModHTTP;            \
+    extern ISource2ModJSON*            g_pSource2ModJSON;            \
+    extern ISource2ModMaps*            g_pSource2ModMaps;            \
+    extern ISource2ModModules*         g_pSource2ModModules;         \
+    extern ISource2ModVoice*           g_pSource2ModVoice;           \
+    extern ISource2ModMenus*           g_pSource2ModMenus;           \
+    extern ISource2ModSQL*             g_pSource2ModSQL;             \
     extern ISource2ModNetworkMessages* g_pSource2ModNetworkMessages; \
-    extern ISource2ModPaths*           g_pSource2ModPaths; \
-    extern ISource2ModPermissions*     g_pSource2ModPermissions; \
-    extern ISource2ModScheduler*       g_pSource2ModScheduler; \
-    extern ISource2ModScripts*         g_pSource2ModScripts; \
-    extern ISource2ModSounds*          g_pSource2ModSounds; \
-    extern ISource2ModTrace*           g_pSource2ModTrace; \
-    extern ISource2ModClients*         g_pSource2ModClients; \
-    extern ISource2ModFiles*           g_pSource2ModFiles; \
-    extern ISource2ModTargeting*       g_pSource2ModTargeting; \
-    extern ISource2ModFunctions*       g_pSource2ModFunctions; \
-    extern ISource2ModTranslations*    g_pSource2ModTranslations; \
-    extern ISource2ModUtils*           g_pSource2ModUtils; \
-    extern ISource2ModWebSockets*      g_pSource2ModWebSockets; \
-    extern ISource2ModTransmit*        g_pSource2ModTransmit; \
-    extern ISource2ModSpawnGroups*     g_pSource2ModSpawnGroups; \
-    extern ISource2ModSnapshots*       g_pSource2ModSnapshots; \
-    extern ISource2ModNatives*         g_pSource2ModNatives; \
-    extern ISource2ModSchemaMethods*   g_pSource2ModSchemaMethods; \
+    extern ISource2ModPaths*           g_pSource2ModPaths;           \
+    extern ISource2ModPermissions*     g_pSource2ModPermissions;     \
+    extern ISource2ModScheduler*       g_pSource2ModScheduler;       \
+    extern ISource2ModScripts*         g_pSource2ModScripts;         \
+    extern ISource2ModSounds*          g_pSource2ModSounds;          \
+    extern ISource2ModTrace*           g_pSource2ModTrace;           \
+    extern ISource2ModClients*         g_pSource2ModClients;         \
+    extern ISource2ModFiles*           g_pSource2ModFiles;           \
+    extern ISource2ModTargeting*       g_pSource2ModTargeting;       \
+    extern ISource2ModFunctions*       g_pSource2ModFunctions;       \
+    extern ISource2ModTranslations*    g_pSource2ModTranslations;    \
+    extern ISource2ModUtils*           g_pSource2ModUtils;           \
+    extern ISource2ModWebSockets*      g_pSource2ModWebSockets;      \
+    extern ISource2ModTransmit*        g_pSource2ModTransmit;        \
+    extern ISource2ModSpawnGroups*     g_pSource2ModSpawnGroups;     \
+    extern ISource2ModSnapshots*       g_pSource2ModSnapshots;       \
+    extern ISource2ModNatives*         g_pSource2ModNatives;         \
+    extern ISource2ModSchemaMethods*   g_pSource2ModSchemaMethods;   \
     namespace KHook { extern KHook::IKHook* __exported__khook; }
 
 /**
@@ -720,7 +720,7 @@ Globals
 * Part of SOURCE2MOD_SAVEVARS() for a plugin; the core calls it once its
 * interfaces exist (see SOURCE2MOD_DEFINE_GLOBALVARS()).
   */
-#define SOURCE2MOD_FILLVARS(api) \
+#define SOURCE2MOD_FILLVARS(api)                                                                                                                  \
     g_pSource2ModCommands        = (ISource2ModCommands*)       (api)->Source2ModFactory(SOURCE2MOD_COMMANDS_INTERFACE,        nullptr, nullptr); \
     g_pSource2ModConfigs         = (ISource2ModConfigs*)        (api)->Source2ModFactory(SOURCE2MOD_CONFIGS_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModCrash           = (ISource2ModCrash*)          (api)->Source2ModFactory(SOURCE2MOD_CRASH_INTERFACE,           nullptr, nullptr); \
@@ -742,8 +742,8 @@ Globals
     g_pSource2ModPermissions     = (ISource2ModPermissions*)    (api)->Source2ModFactory(SOURCE2MOD_PERMISSIONS_INTERFACE,     nullptr, nullptr); \
     g_pSource2ModJSON            = (ISource2ModJSON*)           (api)->Source2ModFactory(SOURCE2MOD_JSON_INTERFACE,            nullptr, nullptr); \
     g_pSource2ModMaps            = (ISource2ModMaps*)           (api)->Source2ModFactory(SOURCE2MOD_MAPS_INTERFACE,            nullptr, nullptr); \
-    g_pSource2ModModules            = (ISource2ModModules*)           (api)->Source2ModFactory(SOURCE2MOD_MODULES_INTERFACE,            nullptr, nullptr); \
-    g_pSource2ModVoice            = (ISource2ModVoice*)           (api)->Source2ModFactory(SOURCE2MOD_VOICE_INTERFACE,            nullptr, nullptr); \
+    g_pSource2ModModules         = (ISource2ModModules*)        (api)->Source2ModFactory(SOURCE2MOD_MODULES_INTERFACE,         nullptr, nullptr); \
+    g_pSource2ModVoice           = (ISource2ModVoice*)          (api)->Source2ModFactory(SOURCE2MOD_VOICE_INTERFACE,           nullptr, nullptr); \
     g_pSource2ModScheduler       = (ISource2ModScheduler*)      (api)->Source2ModFactory(SOURCE2MOD_SCHEDULER_INTERFACE,       nullptr, nullptr); \
     g_pSource2ModScripts         = (ISource2ModScripts*)        (api)->Source2ModFactory(SOURCE2MOD_SCRIPTS_INTERFACE,         nullptr, nullptr); \
     g_pSource2ModSounds          = (ISource2ModSounds*)         (api)->Source2ModFactory(SOURCE2MOD_SOUNDS_INTERFACE,          nullptr, nullptr); \
@@ -775,31 +775,31 @@ Globals
 *
 * Part of SOURCE2MOD_SAVEVARS(); the core sets its own.
   */
-#define SOURCE2MOD_FILLGAMEVARS(api) \
-    g_pSource2Server             = (api)->GetSource2Server(); \
-    g_pSource2ServerConfig       = (api)->GetSource2ServerConfig(); \
-    g_pSource2GameClients        = (api)->GetSource2GameClients(); \
-    g_pSource2GameEntities       = (api)->GetSource2GameEntities(); \
-    g_pEngineServer              = (api)->GetEngineServer(); \
-    g_pCVar                      = (api)->GetCVar(); \
+#define SOURCE2MOD_FILLGAMEVARS(api)                                         \
+    g_pSource2Server             = (api)->GetSource2Server();                \
+    g_pSource2ServerConfig       = (api)->GetSource2ServerConfig();          \
+    g_pSource2GameClients        = (api)->GetSource2GameClients();           \
+    g_pSource2GameEntities       = (api)->GetSource2GameEntities();          \
+    g_pEngineServer              = (api)->GetEngineServer();                 \
+    g_pCVar                      = (api)->GetCVar();                         \
     g_pSchemaSystem              = (ISchemaSystem*)(api)->GetSchemaSystem(); \
-    g_pGameResourceServiceServer = (api)->GetGameResourceService(); \
-    g_pNetworkServerService      = (api)->GetNetworkServerService(); \
-    g_pNetworkSystem             = (api)->GetNetworkSystem(); \
-    g_pNetworkMessages           = (api)->GetNetworkMessages(); \
-    g_pNetworkStringTableServer  = (api)->GetNetworkStringTableServer(); \
-    g_pEngineServiceMgr          = (api)->GetEngineServiceMgr(); \
-    g_pHostStateMgr              = (api)->GetHostStateMgr(); \
-    g_pLocalize                  = (api)->GetLocalize(); \
-    g_pFullFileSystem            = (api)->GetFileSystem(); \
-    g_pResourceSystem            = (api)->GetResourceSystem(); \
-    g_pResourceManifestRegistry  = (api)->GetResourceManifestRegistry(); \
-    g_pResourceHandleUtils       = (api)->GetResourceHandleUtils(); \
-    g_pFlattenedSerializers      = (api)->GetFlattenedSerializers(); \
-    g_pSerializedEntities        = (api)->GetSerializedEntities(); \
-    g_pGameTypes                 = (api)->GetGameTypes(); \
-    g_pScriptManager             = (api)->GetScriptManager(); \
-    g_pAsyncFileSystem           = (api)->GetAsyncFileSystem(); \
+    g_pGameResourceServiceServer = (api)->GetGameResourceService();          \
+    g_pNetworkServerService      = (api)->GetNetworkServerService();         \
+    g_pNetworkSystem             = (api)->GetNetworkSystem();                \
+    g_pNetworkMessages           = (api)->GetNetworkMessages();              \
+    g_pNetworkStringTableServer  = (api)->GetNetworkStringTableServer();     \
+    g_pEngineServiceMgr          = (api)->GetEngineServiceMgr();             \
+    g_pHostStateMgr              = (api)->GetHostStateMgr();                 \
+    g_pLocalize                  = (api)->GetLocalize();                     \
+    g_pFullFileSystem            = (api)->GetFileSystem();                   \
+    g_pResourceSystem            = (api)->GetResourceSystem();               \
+    g_pResourceManifestRegistry  = (api)->GetResourceManifestRegistry();     \
+    g_pResourceHandleUtils       = (api)->GetResourceHandleUtils();          \
+    g_pFlattenedSerializers      = (api)->GetFlattenedSerializers();         \
+    g_pSerializedEntities        = (api)->GetSerializedEntities();           \
+    g_pGameTypes                 = (api)->GetGameTypes();                    \
+    g_pScriptManager             = (api)->GetScriptManager();                \
+    g_pAsyncFileSystem           = (api)->GetAsyncFileSystem();              \
     g_pProcessUtils              = (api)->GetProcessUtils();
 
 /**
@@ -834,14 +834,14 @@ Globals
 // source2mod's own interfaces) does not care which KHook the core runs.
 // KHOOK_INIT() makes it, the first time KHook is used, from the two values
 // fetched here (see SOURCE2MOD_KHOOK_HEADER_INTERFACE).
-#define SOURCE2MOD_SAVEVARS() \
-    g_pSource2ModAPI = api; \
-    SOURCE2MOD_FILLGAMEVARS(api) \
-    g_pPluginAPI  = static_cast<ISource2ModPlugin*>(this); \
-    KHook::__exported__khook = static_cast<KHook::IKHook*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_INTERFACE, nullptr, nullptr)); \
+#define SOURCE2MOD_SAVEVARS()                                                                                                             \
+    g_pSource2ModAPI = api;                                                                                                               \
+    SOURCE2MOD_FILLGAMEVARS(api)                                                                                                          \
+    g_pPluginAPI = static_cast<ISource2ModPlugin*>(this);                                                                                 \
+    KHook::__exported__khook = static_cast<KHook::IKHook*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_INTERFACE, nullptr, nullptr));         \
     g_Source2ModCoreKHookCommit = static_cast<const char*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_VERSION_INTERFACE, nullptr, nullptr)); \
-    g_Source2ModCoreKHookHeader = static_cast<const char*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_HEADER_INTERFACE, nullptr, nullptr)); \
-    SOURCE2MOD_FILLVARS(api) \
+    g_Source2ModCoreKHookHeader = static_cast<const char*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_HEADER_INTERFACE, nullptr, nullptr));  \
+    SOURCE2MOD_FILLVARS(api)                                                                                                              \
     SOURCE2MOD_CONVAR_REGISTER()
 
 /* =========================
@@ -850,6 +850,26 @@ Logging helpers
 
 /// Shortcut for logging
 #define SOURCE2MOD_LOG        g_pSource2ModAPI->Log
+
+/// For SDK code that may run before Load() has set g_pSource2ModAPI (static
+/// initialisers, the first schema lookups): the log, tagged with the plugin's
+/// name, once the API is there; the server console until then. Formatted with
+/// vsnprintf, so the usual printf specifiers (%zu, ...) work. A template only
+/// so that ISource2ModAPI needs to be complete where it is used, not here.
+template <typename Api>
+inline void Source2ModSdkWarning(Api* api, const char* fmt, ...)
+{
+    char buffer[1024];
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(buffer, sizeof(buffer), fmt, ap);
+    va_end(ap);
+    if (api)
+        api->Log("%s", buffer);
+    else
+        Warning("%s", buffer);
+}
+#define SOURCE2MOD_SDK_WARNING(...) Source2ModSdkWarning(g_pSource2ModAPI, __VA_ARGS__)
 
 /// Console print
 #define SOURCE2MOD_CONPRINT   g_pSource2ModAPI->ConPrint
@@ -869,15 +889,15 @@ Interface helpers
  * @param v_type		Interface type (do not include the pointer/asterisk).
  * @param v_name		Interface name.
  */
-#define GET_VALVE_IFACE_CURRENT(v_factory, v_var, v_type, v_name) \
+#define GET_VALVE_IFACE_CURRENT(v_factory, v_var, v_type, v_name)                              \
 	v_var = (v_type *)g_pSource2ModAPI->QueryInterface(g_pSource2ModAPI->v_factory(), v_name); \
-	if (!v_var) \
-	{ \
-		if (error && maxlen) \
-		{ \
-			g_pSource2ModAPI->Format(error, maxlen, "Could not find interface: %s", v_name); \
-		} \
-		return false; \
+	if (!v_var)                                                                                \
+	{                                                                                          \
+		if (error && maxlen)                                                                   \
+		{                                                                                      \
+			g_pSource2ModAPI->Format(error, maxlen, "Could not find interface: %s", v_name);   \
+		}                                                                                      \
+		return false;                                                                          \
 	}
 
 /**
@@ -888,15 +908,15 @@ Interface helpers
  * @param v_type		Interface type (do not include the pointer/asterisk).
  * @param v_name		Interface name.
  */
-#define GET_VALVE_IFACE_ANY(v_factory, v_var, v_type, v_name) \
+#define GET_VALVE_IFACE_ANY(v_factory, v_var, v_type, v_name)                                     \
 	v_var = (v_type *)g_pSource2ModAPI->QueryInterface(g_pSource2ModAPI->v_factory(), v_name, 0); \
-	if (!v_var) \
-	{ \
-		if (error && maxlen) \
-		{ \
-			g_pSource2ModAPI->Format(error, maxlen, "Could not find interface: %s", v_name); \
-		} \
-		return false; \
+	if (!v_var)                                                                                   \
+	{                                                                                             \
+		if (error && maxlen)                                                                      \
+		{                                                                                         \
+			g_pSource2ModAPI->Format(error, maxlen, "Could not find interface: %s", v_name);      \
+		}                                                                                         \
+		return false;                                                                             \
 	}
 
 /**
@@ -912,11 +932,11 @@ Interface helpers
  * @param v_name		Interface name.
  * @param v_ret		int receiving SOURCE2MOD_IFACE_OK or SOURCE2MOD_IFACE_FAILED.
  */
-#define GET_SOURCE2MOD_IFACE(v_var, v_type, v_name, v_ret) \
+#define GET_SOURCE2MOD_IFACE(v_var, v_type, v_name, v_ret)                            \
 	v_var = (v_type *)g_pSource2ModAPI->Source2ModFactory(v_name, &(v_ret), nullptr); \
-	if (!v_var) \
-	{ \
-		(v_ret) = SOURCE2MOD_IFACE_FAILED; \
+	if (!v_var)                                                                       \
+	{                                                                                 \
+		(v_ret) = SOURCE2MOD_IFACE_FAILED;                                            \
 	}
 
 /**
@@ -932,11 +952,11 @@ Interface helpers
  * @param v_name		Interface name.
  * @param v_ret		int receiving SOURCE2MOD_IFACE_OK or SOURCE2MOD_IFACE_FAILED.
  */
-#define GET_METAMOD_IFACE(v_var, v_type, v_name, v_ret) \
+#define GET_METAMOD_IFACE(v_var, v_type, v_name, v_ret)                         \
 	v_var = (v_type *)g_pSource2ModAPI->MetaFactory(v_name, &(v_ret), nullptr); \
-	if (!v_var) \
-	{ \
-		(v_ret) = SOURCE2MOD_IFACE_FAILED; \
+	if (!v_var)                                                                 \
+	{                                                                           \
+		(v_ret) = SOURCE2MOD_IFACE_FAILED;                                      \
 	}
 
 // Last, on purpose: the hook macros need the globals SOURCE2MOD_GLOBALVARS() above

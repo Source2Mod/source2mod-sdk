@@ -152,7 +152,7 @@ Contexts
  * The two members after it belong to the core; the movement contexts shared
  * by void and bool functions answer false for the void ones.
  */
-#define SOURCE2MOD_HOOK_CALL_ORIGINAL(RET)                              \
+#define SOURCE2MOD_HOOK_CALL_ORIGINAL(RET)                                \
     using Return = RET;                                                   \
     RET CallOriginal() const { return callOriginal_(callOriginalData_); } \
     RET (*callOriginal_)(const void*) = nullptr;                          \

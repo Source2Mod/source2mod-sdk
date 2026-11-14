@@ -56,7 +56,7 @@ namespace
     {
         const int32_t nSize = schema::GetClassSize(pszClassName);
         if (nSize > static_cast<int32_t>(nStorage))
-            Warning("%s is %d bytes in the running game, the SDK reserves %zu: update the SDK\n", pszClassName, nSize, nStorage);
+            SOURCE2MOD_SDK_WARNING("%s is %d bytes in the running game, the SDK reserves %zu: update the SDK\n", pszClassName, nSize, nStorage);
     }
 
     bool HasClassOps(const char* pszClassName)
