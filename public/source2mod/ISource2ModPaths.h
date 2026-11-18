@@ -67,6 +67,7 @@ Core Source2Mod Paths
 *   configs/              core.json, and one directory per plugin
 *     <plugin>/       this plugin's own configs
 *   gamedata/             every .json here is read into the game config
+*   logs/                 log files, one directory per plugin that writes some
 *   plugins/              the .smx files themselves
 *   shared/               data more than one plugin reads
 * @endcode
@@ -74,7 +75,7 @@ Core Source2Mod Paths
 * The returned strings are owned by Source2Mod and stay valid for as long as
 * it is loaded; copy them if you need to keep one past that.
   */
-#define SOURCE2MOD_PATHS_INTERFACE "ISource2ModPaths002"
+#define SOURCE2MOD_PATHS_INTERFACE "ISource2ModPaths003"
 
 class ISource2ModPaths
 {
@@ -104,6 +105,14 @@ public:
     * @brief addons/source2mod/gamedata.
       */
     virtual const char* GamedataDirectory() = 0;
+
+    /**
+
+    * @brief addons/source2mod/logs, for the log files plugins write
+    * (ISource2ModUtils::LogToFile into logs/<plugin>/<date>.log, say).
+    * Created with the rest of the layout.
+      */
+    virtual const char* LogsDirectory() = 0;
 
     /**
 
@@ -137,6 +146,7 @@ public:
 #define SOURCE2MOD_ROOT_DIR()          g_pSource2ModPaths->RootDirectory()
 #define SOURCE2MOD_CONFIGS_DIR()       g_pSource2ModPaths->ConfigsDirectory()
 #define SOURCE2MOD_GAMEDATA_DIR()      g_pSource2ModPaths->GamedataDirectory()
+#define SOURCE2MOD_LOGS_DIR()          g_pSource2ModPaths->LogsDirectory()
 #define SOURCE2MOD_PLUGINS_DIR()       g_pSource2ModPaths->PluginsDirectory()
 #define SOURCE2MOD_SHARED_DIR()        g_pSource2ModPaths->SharedDirectory()
 

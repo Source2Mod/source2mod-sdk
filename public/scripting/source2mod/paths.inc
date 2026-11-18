@@ -25,6 +25,9 @@ methodmap Source2ModPaths
 	/** addons/source2mod/gamedata */
 	public static native void GamedataDirectory(char[] buffer, int maxlen);
 
+	/** addons/source2mod/logs: log files, logs/<plugin>/ for a plugin's own */
+	public static native void LogsDirectory(char[] buffer, int maxlen);
+
 	/** addons/source2mod/plugins */
 	public static native void PluginsDirectory(char[] buffer, int maxlen);
 
