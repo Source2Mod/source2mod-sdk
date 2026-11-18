@@ -47,6 +47,7 @@
 #include "source2mod/sdk/schemasystem_helper.h"
 
 #include <ehandle.h>
+#include <entity2/ientity2_entityio.h>
 #include <entityhandle.h>
 #include <igameevents.h>
 #include <utlbinaryblock.h>

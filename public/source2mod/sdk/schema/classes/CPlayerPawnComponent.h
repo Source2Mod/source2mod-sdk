@@ -48,6 +48,7 @@
 #include <ehandle.h>
 #include <entityhandle.h>
 #include <igameevents.h>
+#include <networksystem/networkvar.h>
 #include <utlbinaryblock.h>
 #include <utlstring.h>
 #include <utlstringtoken.h>

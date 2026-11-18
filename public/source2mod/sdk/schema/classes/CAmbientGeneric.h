@@ -50,6 +50,7 @@
 #include <ehandle.h>
 #include <entityhandle.h>
 #include <igameevents.h>
+#include <soundflags.h>
 #include <utlbinaryblock.h>
 #include <utlstring.h>
 #include <utlstringtoken.h>

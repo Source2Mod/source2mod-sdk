@@ -46,6 +46,7 @@
 #include "source2mod/sdk/schemasystem_helper.h"
 #include "VPhysicsCollisionAttribute_t.h"
 
+#include <const.h>
 #include <ehandle.h>
 #include <entityhandle.h>
 #include <igameevents.h>

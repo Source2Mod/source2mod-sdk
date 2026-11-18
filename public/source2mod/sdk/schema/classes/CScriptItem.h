@@ -46,6 +46,7 @@
 #include "source2mod/sdk/game/server/entityio.h"
 #include "source2mod/sdk/schemasystem_helper.h"
 
+#include <const.h>
 #include <ehandle.h>
 #include <entityhandle.h>
 #include <igameevents.h>

@@ -325,6 +325,85 @@ SKIPPED_ENUM_HEADERS: dict[str, str] = {
     "TakeDamageFlags_t": "shareddefs.h",
 }
 
+# Schema types s2sdk already defines -- with a body, not just a declaration or a
+# forward declaration -- found by scanning its headers (scan_s2sdk_definitions).
+# They are not generated: a translation unit that reached both the generated one
+# and s2sdk's (ResourceId_t: resourcefile/resourcetype.h) failed with a
+# redefinition. Whatever uses them includes the s2sdk header instead.
+# name -> the header, relative to one of S2SDK_INCLUDE_ROOTS.
+S2SDK_CLASSES: dict[str, str] = {}
+S2SDK_ENUMS: dict[str, str] = {}
+
+# s2sdk's include paths (s2sdk-manifests makefiles/cmake/shared.cmake); a header
+# is named relative to the first root it is under.
+S2SDK_INCLUDE_ROOTS: list[str] = [
+    "public",
+    "game/shared",
+    "common",
+    "public/mathlib",
+    "public/tier0",
+    "public/tier1",
+    "public/entity2",
+]
+
+_CPP_COMMENT = re.compile(r"//[^\n]*|/\*.*?\*/", re.S)
+# class/struct/enum NAME [final] [: bases/underlying] {  -- a definition. A bare
+# "class NAME;" or a declaration without a body never matches.
+_CPP_DEFINITION = re.compile(
+    r"(?<![\w:])(class|struct|enum(?:\s+class|\s+struct)?)\s+"
+    r"(?:alignas\s*\([^)]*\)\s*)?(?:[A-Z_][A-Z0-9_]*\s+)*(\w+)\s*(?:final\s*)?(?::\s*[^{;()]*)?\{"
+)
+_CPP_TEMPLATE_TAIL = re.compile(r"template\s*<[^;{}]*>\s*$")
+
+
+def scan_s2sdk_definitions(sdk_dir: str, enums: set[str], classes: set[str]) -> tuple[dict[str, str], dict[str, str]]:
+    """The schema classes and enums s2sdk defines, and the header each is in.
+
+    A class or struct only counts for a schema class, an enum only for a schema
+    enum (s2sdk's struct Hull_t is not the schema's enum Hull_t). A template's
+    body never counts. With several definitions the shortest header path wins.
+    """
+    found_classes: dict[str, str] = {}
+    found_enums: dict[str, str] = {}
+    seen: set[str] = set()
+    for root in S2SDK_INCLUDE_ROOTS:
+        base = os.path.join(sdk_dir, root)
+        if not os.path.isdir(base):
+            continue
+        for dir_path, _, files in os.walk(base):
+            for fname in files:
+                if not fname.endswith(".h"):
+                    continue
+                path = os.path.normpath(os.path.join(dir_path, fname))
+                if path in seen:
+                    continue  # already found under an earlier, shorter root
+                seen.add(path)
+                try:
+                    with open(path, encoding="utf-8", errors="replace") as fh:
+                        text = _CPP_COMMENT.sub("", fh.read())
+                except OSError:
+                    continue
+                rel = os.path.relpath(path, base).replace("\\", "/")
+                for m in _CPP_DEFINITION.finditer(text):
+                    if _CPP_TEMPLATE_TAIL.search(text[max(0, m.start() - 160):m.start()]):
+                        continue
+                    kind, name = m.group(1).split()[0], m.group(2)
+                    target = found_enums if kind == "enum" else found_classes
+                    wanted = enums if kind == "enum" else classes
+                    if name in wanted and (name not in target or len(rel) < len(target[name])):
+                        target[name] = rel
+    return found_classes, found_enums
+
+
+def external_header(name: str) -> Optional[str]:
+    """The header that declares a type this generator does not emit, if any."""
+    if name in S2SDK_CLASSES:
+        return S2SDK_CLASSES[name]
+    if name in S2SDK_ENUMS:
+        return S2SDK_ENUMS[name]
+    return SKIPPED_ENUM_HEADERS.get(name)
+
+
 NETWORK_CLASSES: list[str] = [
     "CAK47", "CBarnLight", "CBaseAnimGraph", "CBaseButton", "CBaseClientUIEntity",
     "CBaseCombatCharacter", "CBaseCSGrenade", "CBaseCSGrenadeProjectile", "CBaseDoor",
@@ -1019,8 +1098,8 @@ def collect_referenced_types(
         forwards: set[str],
         is_pointer_context: bool,
 ) -> None:
-    if t.category == SchemaTypeCategory.DeclaredEnum and t.name in HARD_SKIP_ENUMS:
-        header = SKIPPED_ENUM_HEADERS.get(t.name)
+    if t.category == SchemaTypeCategory.DeclaredEnum and (t.name in HARD_SKIP_ENUMS or t.name in S2SDK_ENUMS):
+        header = external_header(t.name)
         if header:
             # "#" marks a raw header rather than a schema type name.
             includes.add("#" + header)
@@ -1028,7 +1107,11 @@ def collect_referenced_types(
 
     is_handle_template = t.atomic == SchemaAtomicCategory.T
 
-    if t.is_declared and t.name not in HARD_SKIP_CLASSES:
+    if t.is_declared and t.name in S2SDK_CLASSES:
+        # s2sdk's own definition: its header, never a forward declaration (it
+        # may be a struct, and a "class X;" for it only draws warnings)
+        includes.add("#" + S2SDK_CLASSES[t.name])
+    elif t.is_declared and t.name not in HARD_SKIP_CLASSES:
         if is_pointer_context or is_handle_template:
             forwards.add(t.name)
         else:
@@ -1048,13 +1131,18 @@ def collect_types_from_methods(
     for method in methods:
         for cls_name in all_classes:
             if cls_name in method:
-                if cls_name not in includes:
+                if cls_name in S2SDK_CLASSES:
+                    includes.add("#" + S2SDK_CLASSES[cls_name])
+                elif cls_name not in includes:
                     forwards.add(cls_name)
         for enum_name in all_enums:
             if enum_name in method:
-                # Same treatment as collect_referenced_types: a hard-skipped enum
-                # needs the header that really declares it, not "../enums/X.h".
-                header = SKIPPED_ENUM_HEADERS.get(enum_name) if enum_name in HARD_SKIP_ENUMS else None
+                # Same treatment as collect_referenced_types: an enum this does not
+                # generate needs the header that really declares it, not "../enums/X.h".
+                skipped = enum_name in HARD_SKIP_ENUMS or enum_name in S2SDK_ENUMS
+                header = external_header(enum_name) if skipped else None
+                if skipped and not header:
+                    continue
                 includes.add("#" + header if header else enum_name)
 
 def inherits_from_base_entity(
@@ -1078,7 +1166,9 @@ def write_class(
     includes: set[str] = set()
     forwards: set[str] = set()
 
-    if schema_class.parent and schema_class.parent not in HARD_SKIP_CLASSES:
+    if schema_class.parent in S2SDK_CLASSES:
+        includes.add("#" + S2SDK_CLASSES[schema_class.parent])
+    elif schema_class.parent and schema_class.parent not in HARD_SKIP_CLASSES:
         includes.add(schema_class.parent)
 
     for f in schema_class.fields:
@@ -1139,9 +1229,10 @@ def write_class(
 
     for inc in includes:
         if inc.startswith("#"):
-            # Raw SDK header declaring a hard-skipped enum (SKIPPED_ENUM_HEADERS).
+            # Raw s2sdk header of a type this does not generate (SKIPPED_ENUM_HEADERS,
+            # S2SDK_CLASSES / S2SDK_ENUMS).
             external_includes.add(inc[1:])
-        elif inc in all_enums and inc not in HARD_SKIP_ENUMS:
+        elif inc in all_enums and inc not in HARD_SKIP_ENUMS and inc not in S2SDK_ENUMS:
             own_includes.add(f"../enums/{sanitise_type_name(inc)}.h")
         elif inc in all_classes:
             own_includes.add(f"{sanitise_type_name(inc)}.h")
@@ -1243,6 +1334,16 @@ def main() -> None:
         k: v for k, v in sorted(classes.items()) if k not in IGNORE_CLASSES
     }
 
+    # The types s2sdk defines itself are left to s2sdk
+    sdk_dir = os.environ.get("S2SDK") or os.path.join(script_dir, "../../vendor/s2sdk")
+    if not os.path.isdir(os.path.join(sdk_dir, "public")):
+        sys.exit(f"s2sdk not found at {sdk_dir} (set S2SDK): needed to leave its own types out")
+    found_classes, found_enums = scan_s2sdk_definitions(sdk_dir, set(all_enums), set(all_classes))
+    S2SDK_CLASSES.update(found_classes)
+    S2SDK_ENUMS.update(found_enums)
+    for name, header in sorted({**found_classes, **found_enums}.items()):
+        print(f"  from s2sdk: {name:<40} {header}")
+
     visited = build_graph_and_bfs(all_classes)
     visited |= EXTRA_WHITELIST
 
@@ -1260,7 +1361,7 @@ def main() -> None:
     os.makedirs(classes_dir, exist_ok=True)
 
     for enum_name, schema_enum in all_enums.items():
-        if enum_name in HARD_SKIP_ENUMS:
+        if enum_name in HARD_SKIP_ENUMS or enum_name in S2SDK_ENUMS:
             continue
         content = write_enum(enum_name, schema_enum)
         out_file = os.path.join(enums_dir, f"{sanitise_type_name(enum_name)}.h")
@@ -1268,7 +1369,7 @@ def main() -> None:
             fh.write(content)
 
     for class_name, schema_class in all_classes.items():
-        if class_name in HARD_SKIP_CLASSES:
+        if class_name in HARD_SKIP_CLASSES or class_name in S2SDK_CLASSES:
             continue
         if class_name in HANDWRITTEN_CLASSES:
             continue

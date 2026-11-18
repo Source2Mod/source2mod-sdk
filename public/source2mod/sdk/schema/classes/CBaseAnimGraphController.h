@@ -48,7 +48,6 @@
 #include "CExternalAnimGraphList.h"
 #include "CSkeletonAnimationController.h"
 #include "ExternalAnimGraphHandle_t.h"
-#include "ResourceId_t.h"
 #include "source2mod/ISource2ModPlugin.h"
 #include "source2mod/sdk/game/server/entityio.h"
 #include "source2mod/sdk/schemasystem_helper.h"
@@ -56,6 +55,7 @@
 #include <ehandle.h>
 #include <entityhandle.h>
 #include <igameevents.h>
+#include <resourcefile/resourcetype.h>
 #include <utlbinaryblock.h>
 #include <utlstring.h>
 #include <utlstringtoken.h>

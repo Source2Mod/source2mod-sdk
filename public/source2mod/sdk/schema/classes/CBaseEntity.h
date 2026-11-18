@@ -43,7 +43,6 @@
 #include "../enums/BloodType.h"
 #include "../enums/EntityPlatformTypes_t.h"
 #include "../enums/ParticleAttachment_t.h"
-#include "CNetworkTransmitComponent.h"
 #include "CNetworkVelocityVector.h"
 #include "ResponseContext_t.h"
 #include "source2mod/ISource2ModPlugin.h"
@@ -51,10 +50,14 @@
 #include "source2mod/sdk/schemasystem_helper.h"
 #include "thinkfunc_t.h"
 
+#include <const.h>
 #include <ehandle.h>
+#include <entity2/entityinstance.h>
 #include <entity2/entitykeyvalues.h>
+#include <entity2/ientity2_entityio.h>
 #include <entityhandle.h>
 #include <igameevents.h>
+#include <networktransmitcomponent.h>
 #include <shareddefs.h>
 #include <utlbinaryblock.h>
 #include <utlstring.h>
@@ -71,8 +74,6 @@ class CBodyComponent;
 class CCSPlayerController;
 class CCSPlayerPawn;
 class CCollisionProperty;
-class CEntityInstance;
-class CEntityKeyValues;
 class CEntitySubclassVDataBase;
 class CPulseGraphInstance_ServerEntity;
 class IRecipientFilter;

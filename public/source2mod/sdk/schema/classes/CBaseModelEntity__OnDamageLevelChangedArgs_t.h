@@ -46,6 +46,7 @@
 
 #include <ehandle.h>
 #include <entityhandle.h>
+#include <gametrace.h>
 #include <igameevents.h>
 #include <utlbinaryblock.h>
 #include <utlstring.h>
