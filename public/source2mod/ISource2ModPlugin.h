@@ -931,13 +931,10 @@ Interface helpers
  * @param v_type		Interface type (do not include the pointer/asterisk).
  * @param v_name		Interface name.
  * @param v_ret		int receiving SOURCE2MOD_IFACE_OK or SOURCE2MOD_IFACE_FAILED.
+ * @param v_id		PluginId* receiving the id of the plugin that serves it (to match
+ *					in OnPluginUnload), or nullptr.
  */
-#define GET_SOURCE2MOD_IFACE(v_var, v_type, v_name, v_ret)                            \
-	v_var = (v_type *)g_pSource2ModAPI->Source2ModFactory(v_name, &(v_ret), nullptr); \
-	if (!v_var)                                                                       \
-	{                                                                                 \
-		(v_ret) = SOURCE2MOD_IFACE_FAILED;                                            \
-	}
+#define GET_SOURCE2MOD_IFACE(v_var, v_type, v_name, v_ret, v_id)                     	v_var = (v_type *)g_pSource2ModAPI->Source2ModFactory(v_name, &(v_ret), (v_id)); 	if (!v_var)                                                                      	{                                                                                		(v_ret) = SOURCE2MOD_IFACE_FAILED;                                           	}
 
 /**
  * @brief Macro for automatically getting a Metamod:Source plugin exposed interface.
@@ -951,13 +948,10 @@ Interface helpers
  * @param v_type		Interface type (do not include the pointer/asterisk).
  * @param v_name		Interface name.
  * @param v_ret		int receiving SOURCE2MOD_IFACE_OK or SOURCE2MOD_IFACE_FAILED.
+ * @param v_id		PluginId* receiving Metamod's id of the plugin that serves it (to
+ *					match in OnMetamodPluginUnload), or nullptr.
  */
-#define GET_METAMOD_IFACE(v_var, v_type, v_name, v_ret)                         \
-	v_var = (v_type *)g_pSource2ModAPI->MetaFactory(v_name, &(v_ret), nullptr); \
-	if (!v_var)                                                                 \
-	{                                                                           \
-		(v_ret) = SOURCE2MOD_IFACE_FAILED;                                      \
-	}
+#define GET_METAMOD_IFACE(v_var, v_type, v_name, v_ret, v_id)                  	v_var = (v_type *)g_pSource2ModAPI->MetaFactory(v_name, &(v_ret), (v_id)); 	if (!v_var)                                                                	{                                                                          		(v_ret) = SOURCE2MOD_IFACE_FAILED;                                     	}
 
 // Last, on purpose: the hook macros need the globals SOURCE2MOD_GLOBALVARS() above
 // declares, and are meant to be there wherever this header is.
