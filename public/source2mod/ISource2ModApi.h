@@ -375,6 +375,18 @@ public:
     ========================= */
 
     virtual ISource2ModSpawnGroups* SpawnGroups() = 0;
+
+    /* =========================
+    Plugin API 13
+    ========================= */
+
+    /**
+     * @brief Unloads the calling plugin, as SourcePawn's SetFailState: the
+     *        reason is logged and the plugin goes between frames, never from
+     *        inside the call. While the server shuts down every plugin is being
+     *        unloaded already, so then only the reason is logged.
+     */
+    virtual void SetFailState(const char* pszReason) = 0;
 };
 
 #endif //_INCLUDE_ISOURCE2MOD_API_H

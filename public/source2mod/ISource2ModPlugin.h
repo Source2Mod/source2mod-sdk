@@ -355,7 +355,9 @@ inline bool Source2ModKHookVersionMatches(const char* coreHeader, const char* co
 // against 10 keeps working; one built against 11 needs a core that has them.
 // 12: ISource2ModSpawnGroups (SpawnGroups() at the end of ISource2ModAPI). Plugins
 // built against 10 or 11 keep working.
-#define SOURCE2MOD_PLAPI_VERSION 12
+// 13: ISource2ModAPI::SetFailState() at its end, a plugin unloading itself.
+// Plugins built against 10 to 12 keep working.
+#define SOURCE2MOD_PLAPI_VERSION 13
 /// The oldest plugin API the core still loads.
 #define SOURCE2MOD_PLAPI_MIN 10
 
