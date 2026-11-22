@@ -19,6 +19,7 @@
 #include "source2mod/sdk/schema/classes/CEntitySubclassVDataBase.h"
 #include "source2mod/sdk/schema/classes/CGameSceneNode.h"
 #include "source2mod/sdk/schema/classes/CBaseModelEntity.h"
+#include "source2mod/sdk/schema/classes/CModelState.h"
 #include "source2mod/sdk/schema/classes/CSkeletonInstance.h"
 #include "source2mod/sdk/schema/classes/CBasePlayerController.h"
 #include "source2mod/sdk/schema/classes/CCSPlayerPawnBase.h"
@@ -213,632 +214,642 @@ namespace
         return self->Teleport(pPosition, pAngles, pVelocity, eChain);
     }
 
-    Vector Thunk32(CBaseModelEntity* self)
+    int Thunk32(CBaseModelEntity* self, const char* pszGroupName)
+    {
+        return self->GetBodygroupByName(pszGroupName);
+    }
+
+    Vector Thunk33(CBaseModelEntity* self)
     {
         return self->GetEyePosition();
     }
 
-    CUtlSymbolLarge Thunk33(CBaseModelEntity* self)
+    void* Thunk34(CBaseModelEntity* self)
+    {
+        return self->GetModel();
+    }
+
+    CUtlSymbolLarge Thunk35(CBaseModelEntity* self)
     {
         return self->GetModelName();
     }
 
-    void Thunk34(CBaseModelEntity* self, const char* pszName, int nValue)
+    void Thunk36(CBaseModelEntity* self, const char* pszName, int nValue)
     {
         return self->SetBodyGroup(pszName, nValue);
     }
 
-    void Thunk35(CBaseModelEntity* self, const char* pszModel, HookChain eChain)
+    void Thunk37(CBaseModelEntity* self, const char* pszModel, HookChain eChain)
     {
         return self->SetModel(pszModel, eChain);
     }
 
-    void Thunk36(CBasePlayerController* self, ENetworkDisconnectionReason eReason, const char* pszInternalReason)
+    void Thunk38(CBasePlayerController* self, ENetworkDisconnectionReason eReason, const char* pszInternalReason)
     {
         return self->Disconnect(eReason, pszInternalReason);
     }
 
-    void Thunk37(CBasePlayerController* self, const char* pszCommand)
+    void Thunk39(CBasePlayerController* self, const char* pszCommand)
     {
         return self->ExecuteClientCommand(pszCommand);
     }
 
-    void Thunk38(CBasePlayerController* self, const char* pszCommand)
+    void Thunk40(CBasePlayerController* self, const char* pszCommand)
     {
         return self->ExecuteClientCommandFromServer(pszCommand);
     }
 
-    void Thunk39(CBasePlayerController* self, IGameEvent* pEvent)
+    void Thunk41(CBasePlayerController* self, IGameEvent* pEvent)
     {
         return self->FireEventToClient(pEvent);
     }
 
-    CUtlString Thunk40(CBasePlayerController* self)
+    CUtlString Thunk42(CBasePlayerController* self)
     {
         return self->GetIpAddress();
     }
 
-    CBaseEntity* Thunk41(CBasePlayerController* self)
+    CBaseEntity* Thunk43(CBasePlayerController* self)
     {
         return self->GetObserverTarget();
     }
 
-    CCSPlayerPawn* Thunk42(CBasePlayerController* self)
+    CCSPlayerPawn* Thunk44(CBasePlayerController* self)
     {
         return self->GetPawn();
     }
 
-    CSPlayerState Thunk43(CBasePlayerController* self)
+    CSPlayerState Thunk45(CBasePlayerController* self)
     {
         return self->GetPawnState();
     }
 
-    CEntityIndex Thunk44(CBasePlayerController* self)
+    CEntityIndex Thunk46(CBasePlayerController* self)
     {
         return self->GetPlayerIndex();
     }
 
-    const char* Thunk45(CBasePlayerController* self)
+    const char* Thunk47(CBasePlayerController* self)
     {
         return self->GetPlayerName();
     }
 
-    CPlayerSlot Thunk46(CBasePlayerController* self)
+    CPlayerSlot Thunk48(CBasePlayerController* self)
     {
         return self->GetPlayerSlot();
     }
 
-    CSteamID Thunk47(CBasePlayerController* self)
+    CSteamID Thunk49(CBasePlayerController* self)
     {
         return self->GetPlayerSteamID();
     }
 
-    CPlayerUserId Thunk48(CBasePlayerController* self)
+    CPlayerUserId Thunk50(CBasePlayerController* self)
     {
         return self->GetPlayerUserID();
     }
 
-    CServerSideClient* Thunk49(CBasePlayerController* self)
+    CServerSideClient* Thunk51(CBasePlayerController* self)
     {
         return self->GetServerSideClient();
     }
 
-    int Thunk50(CBasePlayerController* self)
+    int Thunk52(CBasePlayerController* self)
     {
         return self->GetSlot();
     }
 
-    uint64 Thunk51(CBasePlayerController* self)
+    uint64 Thunk53(CBasePlayerController* self)
     {
         return self->GetSteamID();
     }
 
-    int Thunk52(CBasePlayerController* self)
+    int Thunk54(CBasePlayerController* self)
     {
         return self->GetUserID();
     }
 
-    bool Thunk53(CBasePlayerController* self)
+    bool Thunk55(CBasePlayerController* self)
     {
         return self->IsBot();
     }
 
-    bool Thunk54(CBasePlayerController* self)
+    bool Thunk56(CBasePlayerController* self)
     {
         return self->IsConnected();
     }
 
-    void Thunk55(CBasePlayerController* self, const char* pszMessage)
+    void Thunk57(CBasePlayerController* self, const char* pszMessage)
     {
         return self->PrintToCenter(pszMessage);
     }
 
-    void Thunk56(CBasePlayerController* self, const char* pszMessage)
+    void Thunk58(CBasePlayerController* self, const char* pszMessage)
     {
         return self->PrintToCenterAlert(pszMessage);
     }
 
-    void Thunk57(CBasePlayerController* self, const char* pszMessage)
+    void Thunk59(CBasePlayerController* self, const char* pszMessage)
     {
         return self->PrintToChat(pszMessage);
     }
 
-    void Thunk58(CBasePlayerController* self, const char* pszMessage)
+    void Thunk60(CBasePlayerController* self, const char* pszMessage)
     {
         return self->PrintToConsole(pszMessage);
     }
 
-    void Thunk59(CBasePlayerController* self, const char* pszConVar, const char* pszValue)
+    void Thunk61(CBasePlayerController* self, const char* pszConVar, const char* pszValue)
     {
         return self->ReplicateConVar(pszConVar, pszValue);
     }
 
-    void Thunk60(CBasePlayerController* self, CBasePlayerPawn* pPawn, HookChain eChain)
+    void Thunk62(CBasePlayerController* self, CBasePlayerPawn* pPawn, HookChain eChain)
     {
         return self->SetPawn(pPawn, eChain);
     }
 
-    void Thunk61(CBasePlayerController* self, const char* pszName)
+    void Thunk63(CBasePlayerController* self, const char* pszName)
     {
         return self->SetPlayerName(pszName);
     }
 
-    void Thunk62(CBasePlayerPawn* self, bool bExplode, bool bForce, HookChain eChain)
+    void Thunk64(CBasePlayerPawn* self, bool bExplode, bool bForce, HookChain eChain)
     {
         return self->CommitSuicide(bExplode, bForce, eChain);
     }
 
-    CCSPlayerController* Thunk63(CBasePlayerPawn* self)
+    CCSPlayerController* Thunk65(CBasePlayerPawn* self)
     {
         return self->GetController();
     }
 
-    CCSPlayerController* Thunk64(CBasePlayerPawn* self)
+    CCSPlayerController* Thunk66(CBasePlayerPawn* self)
     {
         return self->GetDefaultController();
     }
 
-    void Thunk65(CBasePlayerPawn* self, const QAngle& angEyeAngles, HookChain eChain)
+    void Thunk67(CBasePlayerPawn* self, const QAngle& angEyeAngles, HookChain eChain)
     {
         return self->SnapViewAngles(angEyeAngles, eChain);
     }
 
-    const char* Thunk66(CBasePlayerWeapon* self)
+    const char* Thunk68(CBasePlayerWeapon* self)
     {
         return self->GetWeaponClassname();
     }
 
-    CCSWeaponBaseVData* Thunk67(CBasePlayerWeapon* self)
+    CCSWeaponBaseVData* Thunk69(CBasePlayerWeapon* self)
     {
         return self->GetWeaponVData();
     }
 
-    CCSCustomHudLayout* Thunk68(const char* pszLayout, const char* pszTargetName)
+    CCSCustomHudLayout* Thunk70(const char* pszLayout, const char* pszTargetName)
     {
         return CCSCustomHudLayout::Create(pszLayout, pszTargetName);
     }
 
-    CCSCustomHudLayoutState& Thunk69(CCSCustomHudLayout* self, CCSPlayerController* pController)
+    CCSCustomHudLayoutState& Thunk71(CCSCustomHudLayout* self, CCSPlayerController* pController)
     {
         return self->GetLayoutState(pController);
     }
 
-    void Thunk70(CCSCustomHudLayout* self, std::function<void(CCSPlayerController*, CCSCustomHudLayout*, const char*)> callback)
+    void Thunk72(CCSCustomHudLayout* self, std::function<void(CCSPlayerController*, CCSCustomHudLayout*, const char*)> callback)
     {
         return self->HookClick(std::move(callback));
     }
 
-    bool Thunk71(CCSCustomHudLayout* self, CCSPlayerController* pController)
+    bool Thunk73(CCSCustomHudLayout* self, CCSPlayerController* pController)
     {
         return self->IsInputCaptureEnabled(pController);
     }
 
-    void Thunk72(CCSCustomHudLayout* self, const char* pszPanelId, const char* pszVariableName, const char* pszValue, CCSPlayerController* pController)
+    void Thunk74(CCSCustomHudLayout* self, const char* pszPanelId, const char* pszVariableName, const char* pszValue, CCSPlayerController* pController)
     {
         return self->SetDialogVariableString(pszPanelId, pszVariableName, pszValue, pController);
     }
 
-    void Thunk73(CCSCustomHudLayout* self, const char* pszPanelId, const char* pszClassName, bool bHasClass, CCSPlayerController* pController)
+    void Thunk75(CCSCustomHudLayout* self, const char* pszPanelId, const char* pszClassName, bool bHasClass, CCSPlayerController* pController)
     {
         return self->SetHasClass(pszPanelId, pszClassName, bHasClass, pController);
     }
 
-    void Thunk74(CCSCustomHudLayout* self, bool bEnable, CCSPlayerController* pController)
+    void Thunk76(CCSCustomHudLayout* self, bool bEnable, CCSPlayerController* pController)
     {
         return self->SetInputCaptureEnabled(bEnable, pController);
     }
 
-    void Thunk75(CCSCustomHudLayout* self)
+    void Thunk77(CCSCustomHudLayout* self)
     {
         return self->UnhookClicks();
     }
 
-    CBaseEntity* Thunk76(CCSGameRules* self, CBasePlayerController* pPlayer)
+    CBaseEntity* Thunk78(CCSGameRules* self, CBasePlayerController* pPlayer)
     {
         return self->FindPickerEntity(pPlayer);
     }
 
-    CCSPlayerController* Thunk77(CCSGameRules* self, CCSPlayerController* pPlayer)
+    CCSPlayerController* Thunk79(CCSGameRules* self, CCSPlayerController* pPlayer)
     {
         return self->GetClientAimTarget(pPlayer);
     }
 
-    void Thunk78(CCSGameRules* self, bool bAbortedMatch, HookChain eChain)
+    void Thunk80(CCSGameRules* self, bool bAbortedMatch, HookChain eChain)
     {
         return self->GoToIntermission(bAbortedMatch, eChain);
     }
 
-    void Thunk79(CCSGameRules* self, float flDelay, int32_t eRoundEndReason, uint32 nTeamId, HookChain eChain)
+    void Thunk81(CCSGameRules* self, float flDelay, int32_t eRoundEndReason, uint32 nTeamId, HookChain eChain)
     {
         return self->TerminateRound(flDelay, eRoundEndReason, nTeamId, eChain);
     }
 
-    float Thunk80(const CCSNavArea* self)
+    float Thunk82(const CCSNavArea* self)
     {
         return self->Area2D();
     }
 
-    const Vector& Thunk81(const CCSNavArea* self)
+    const Vector& Thunk83(const CCSNavArea* self)
     {
         return self->Center();
     }
 
-    bool Thunk82(const CCSNavArea* self, const Vector& vecMins, const Vector& vecMaxs, float flZTolerance)
+    bool Thunk84(const CCSNavArea* self, const Vector& vecMins, const Vector& vecMaxs, float flZTolerance)
     {
         return self->ContainsBox(vecMins, vecMaxs, flZTolerance);
     }
 
-    bool Thunk83(const CCSNavArea* self, const Vector& vecPosition, float flZTolerance)
+    bool Thunk85(const CCSNavArea* self, const Vector& vecPosition, float flZTolerance)
     {
         return self->ContainsPoint(vecPosition, flZTolerance);
     }
 
-    std::vector<CCSNavArea*> Thunk84()
+    std::vector<CCSNavArea*> Thunk86()
     {
         return CCSNavArea::GetAllNavAreas();
     }
 
-    CCSNavArea* Thunk85(const Vector& vecPosition, float flMaximumDistance)
+    CCSNavArea* Thunk87(const Vector& vecPosition, float flMaximumDistance)
     {
         return CCSNavArea::GetClosestNavArea(vecPosition, flMaximumDistance);
     }
 
-    CCSNavArea* Thunk86(const Vector& vecPosition, float* pflDistanceOut, float flMaximumDistance)
+    CCSNavArea* Thunk88(const Vector& vecPosition, float* pflDistanceOut, float flMaximumDistance)
     {
         return CCSNavArea::GetClosestNavArea(vecPosition, pflDistanceOut, flMaximumDistance);
     }
 
-    Vector Thunk87(const CCSNavArea* self, const Vector& vecPosition)
+    Vector Thunk89(const CCSNavArea* self, const Vector& vecPosition)
     {
         return self->GetClosestPoint(vecPosition);
     }
 
-    float Thunk88(const CCSNavArea* self, const Vector& vecPosition)
+    float Thunk90(const CCSNavArea* self, const Vector& vecPosition)
     {
         return self->GetDistanceSquaredToPoint(vecPosition);
     }
 
-    float Thunk89(const CCSNavArea* self, const Vector& vecPosition)
+    float Thunk91(const CCSNavArea* self, const Vector& vecPosition)
     {
         return self->GetDistanceToPoint(vecPosition);
     }
 
-    float Thunk90(const CCSNavArea* self, float x, float y)
+    float Thunk92(const CCSNavArea* self, float x, float y)
     {
         return self->GetHeightAtPosition(x, y);
     }
 
-    float Thunk91(const CCSNavArea* self)
+    float Thunk93(const CCSNavArea* self)
     {
         return self->Height();
     }
 
-    uint32_t Thunk92(const CCSNavArea* self)
+    uint32_t Thunk94(const CCSNavArea* self)
     {
         return self->Id();
     }
 
-    bool Thunk93(const CCSNavArea* self, const Vector& vecMins, const Vector& vecMaxs, float flZTolerance)
+    bool Thunk95(const CCSNavArea* self, const Vector& vecMins, const Vector& vecMaxs, float flZTolerance)
     {
         return self->IntersectsBox(vecMins, vecMaxs, flZTolerance);
     }
 
-    bool Thunk94()
+    bool Thunk96()
     {
         return CCSNavArea::IsValidNavMesh();
     }
 
-    Vector Thunk95(const CCSNavArea* self)
+    Vector Thunk97(const CCSNavArea* self)
     {
         return self->Max();
     }
 
-    Vector Thunk96(const CCSNavArea* self)
+    Vector Thunk98(const CCSNavArea* self)
     {
         return self->Min();
     }
 
-    const Vector& Thunk97(const CCSNavArea* self)
+    const Vector& Thunk99(const CCSNavArea* self)
     {
         return self->Normal();
     }
 
-    float Thunk98(const CCSNavArea* self)
+    float Thunk100(const CCSNavArea* self)
     {
         return self->Width();
     }
 
-    void Thunk99(CCSPlayerController* self, int nDelta)
+    void Thunk101(CCSPlayerController* self, int nDelta)
     {
         return self->AddArmor(nDelta);
     }
 
-    void Thunk100(CCSPlayerController* self, int nDelta)
+    void Thunk102(CCSPlayerController* self, int nDelta)
     {
         return self->AddHealth(nDelta);
     }
 
-    void Thunk101(CCSPlayerController* self, int nTeam, HookChain eChain)
+    void Thunk103(CCSPlayerController* self, int nTeam, HookChain eChain)
     {
         return self->ChangeTeam(nTeam, eChain);
     }
 
-    CCSPlayerController * Thunk102(CCSPlayerPawn* pPawn)
+    CCSPlayerController * Thunk104(CCSPlayerPawn* pPawn)
     {
         return CCSPlayerController::FromPawn(pPawn);
     }
 
-    CCSPlayerController * Thunk103(CPlayerSlot slot)
+    CCSPlayerController * Thunk105(CPlayerSlot slot)
     {
         return CCSPlayerController::FromSlot(slot);
     }
 
-    CCSPlayerController * Thunk104(int iSlot)
+    CCSPlayerController * Thunk106(int iSlot)
     {
         return CCSPlayerController::FromSlot(iSlot);
     }
 
-    CCSPlayerController * Thunk105(CSteamID steamId)
+    CCSPlayerController * Thunk107(CSteamID steamId)
     {
         return CCSPlayerController::FromSteamId(steamId);
     }
 
-    CCSPlayerController * Thunk106(uint64 uSteamId)
+    CCSPlayerController * Thunk108(uint64 uSteamId)
     {
         return CCSPlayerController::FromSteamId(uSteamId);
     }
 
-    CCSPlayerController * Thunk107(CPlayerUserId userId)
+    CCSPlayerController * Thunk109(CPlayerUserId userId)
     {
         return CCSPlayerController::FromUserId(userId);
     }
 
-    CCSPlayerController * Thunk108(int iUserId)
+    CCSPlayerController * Thunk110(int iUserId)
     {
         return CCSPlayerController::FromUserId(iUserId);
     }
 
-    int Thunk109(CCSPlayerController* self)
+    int Thunk111(CCSPlayerController* self)
     {
         return self->GetHealth();
     }
 
-    int Thunk110(CCSPlayerController* self)
+    int Thunk112(CCSPlayerController* self)
     {
         return self->GetMaxHealth();
     }
 
-    CCSObserverPawn* Thunk111(CCSPlayerController* self)
+    CCSObserverPawn* Thunk113(CCSPlayerController* self)
     {
         return self->GetObserverPawn();
     }
 
-    CCSPlayerPawn* Thunk112(CCSPlayerController* self)
+    CCSPlayerPawn* Thunk114(CCSPlayerController* self)
     {
         return self->GetPlayerPawn();
     }
 
-    CSPlayerState Thunk113(CCSPlayerController* self)
+    CSPlayerState Thunk115(CCSPlayerController* self)
     {
         return self->GetPlayerPawnState();
     }
 
-    void Thunk114(CCSPlayerController* self, const char* pszMessage, int iDuration, bool bMenu)
+    void Thunk116(CCSPlayerController* self, const char* pszMessage, int iDuration, bool bMenu)
     {
         return self->PrintToCenterHtml(pszMessage, iDuration, bMenu);
     }
 
-    void Thunk115(CCSPlayerController* self, HookChain eChain)
+    void Thunk117(CCSPlayerController* self, HookChain eChain)
     {
         return self->Respawn(eChain);
     }
 
-    void Thunk116(CCSPlayerController* self, int nArmor, bool bHelmet)
+    void Thunk118(CCSPlayerController* self, int nArmor, bool bHelmet)
     {
         return self->SetArmor(nArmor, bHelmet);
     }
 
-    void Thunk117(CCSPlayerController* self, int nHealth)
+    void Thunk119(CCSPlayerController* self, int nHealth)
     {
         return self->SetHealth(nHealth);
     }
 
-    void Thunk118(CCSPlayerController* self, int nMaxHealth)
+    void Thunk120(CCSPlayerController* self, int nMaxHealth)
     {
         return self->SetMaxHealth(nMaxHealth);
     }
 
-    void Thunk119(CCSPlayerController* self, int nTeam, HookChain eChain)
+    void Thunk121(CCSPlayerController* self, int nTeam, HookChain eChain)
     {
         return self->SwitchTeam(nTeam, eChain);
     }
 
-    void Thunk120(CCSPlayerController* self, CCSPlayerController* pAttacker, int iDamage, DamageTypes_t bitsDamageType, HookChain eChain)
+    void Thunk122(CCSPlayerController* self, CCSPlayerController* pAttacker, int iDamage, DamageTypes_t bitsDamageType, HookChain eChain)
     {
         return self->TakeDamage(pAttacker, iDamage, bitsDamageType, eChain);
     }
 
-    CCSPlayer_MovementServices* Thunk121(CCSPlayerLegacyJump* self)
+    CCSPlayer_MovementServices* Thunk123(CCSPlayerLegacyJump* self)
     {
         return self->GetMovementServices();
     }
 
-    QAngle Thunk122(CCSPlayerPawn* self)
+    QAngle Thunk124(CCSPlayerPawn* self)
     {
         return self->GetEyeAngles();
     }
 
-    void Thunk123(CCSPlayerPawn* self, HookChain eChain)
+    void Thunk125(CCSPlayerPawn* self, HookChain eChain)
     {
         return self->PostThink(eChain);
     }
 
-    bool Thunk124(CCSPlayerPawnBase* self)
+    bool Thunk126(CCSPlayerPawnBase* self)
     {
         return self->CanMove();
     }
 
-    CCSPlayerController* Thunk125(CCSPlayerPawnBase* self)
+    CCSPlayerController* Thunk127(CCSPlayerPawnBase* self)
     {
         return self->GetOriginalController();
     }
 
-    CCSWeaponBaseVData* Thunk126(const char* pszKey, int nWeaponType)
+    CCSWeaponBaseVData* Thunk128(const char* pszKey, int nWeaponType)
     {
         return CCSWeaponBaseVData::FromKey(pszKey, nWeaponType);
     }
 
-    CDecoyProjectile* Thunk127(const Vector& vecPosition, const QAngle& angAngle, const Vector& vecVelocity, CBaseEntity* pOwner, uint32_t nItemDefIndex, HookChain eChain)
+    CDecoyProjectile* Thunk129(const Vector& vecPosition, const QAngle& angAngle, const Vector& vecVelocity, CBaseEntity* pOwner, uint32_t nItemDefIndex, HookChain eChain)
     {
         return CDecoyProjectile::EmitGrenade(vecPosition, angAngle, vecVelocity, pOwner, nItemDefIndex, eChain);
     }
 
-    CFlashbangProjectile* Thunk128(const Vector& vecPosition, const QAngle& angAngle, const Vector& vecVelocity, CBaseEntity* pOwner, uint32_t nItemDefIndex, HookChain eChain)
+    CFlashbangProjectile* Thunk130(const Vector& vecPosition, const QAngle& angAngle, const Vector& vecVelocity, CBaseEntity* pOwner, uint32_t nItemDefIndex, HookChain eChain)
     {
         return CFlashbangProjectile::EmitGrenade(vecPosition, angAngle, vecVelocity, pOwner, nItemDefIndex, eChain);
     }
 
-    CSkeletonInstance* Thunk129(CGameSceneNode* self)
+    CSkeletonInstance* Thunk131(CGameSceneNode* self)
     {
         return self->GetSkeletonInstance();
     }
 
-    CHEGrenadeProjectile* Thunk130(const Vector& vecPosition, const QAngle& angAngle, const Vector& vecVelocity, CBaseEntity* pOwner, uint32_t nItemDefIndex, HookChain eChain)
+    CHEGrenadeProjectile* Thunk132(const Vector& vecPosition, const QAngle& angAngle, const Vector& vecVelocity, CBaseEntity* pOwner, uint32_t nItemDefIndex, HookChain eChain)
     {
         return CHEGrenadeProjectile::EmitGrenade(vecPosition, angAngle, vecVelocity, pOwner, nItemDefIndex, eChain);
     }
 
-    CMolotovProjectile* Thunk131(const Vector& vecPosition, const QAngle& angAngle, const Vector& vecVelocity, CBaseEntity* pOwner, uint32_t nItemDefIndex, HookChain eChain)
+    CMolotovProjectile* Thunk133(const Vector& vecPosition, const QAngle& angAngle, const Vector& vecVelocity, CBaseEntity* pOwner, uint32_t nItemDefIndex, HookChain eChain)
     {
         return CMolotovProjectile::EmitGrenade(vecPosition, angAngle, vecVelocity, pOwner, nItemDefIndex, eChain);
     }
 
-    CCSPlayerController* Thunk132(CPlayerControllerComponent* self)
+    CCSPlayerController* Thunk134(CPlayerControllerComponent* self)
     {
         return self->GetPlayerController();
     }
 
-    CCSPlayerPawn* Thunk133(CPlayerPawnComponent* self)
+    CCSPlayerPawn* Thunk135(CPlayerPawnComponent* self)
     {
         return self->GetPlayerPawn();
     }
 
-    void Thunk134(CPlayer_ItemServices* self, CBasePlayerWeapon* pActiveWeapon, HookChain eChain)
+    void Thunk136(CPlayer_ItemServices* self, CBasePlayerWeapon* pActiveWeapon, HookChain eChain)
     {
         return self->DropActivePlayerWeapon(pActiveWeapon, eChain);
     }
 
-    CBasePlayerWeapon* Thunk135(CPlayer_ItemServices* self, const char* pszItem, HookChain eChain)
+    CBasePlayerWeapon* Thunk137(CPlayer_ItemServices* self, const char* pszItem, HookChain eChain)
     {
         return self->GiveNamedItem(pszItem, eChain);
     }
 
-    void Thunk136(CPlayer_ItemServices* self, bool bRemoveSuit, HookChain eChain)
+    void Thunk138(CPlayer_ItemServices* self, bool bRemoveSuit, HookChain eChain)
     {
         return self->RemoveWeapons(bRemoveSuit, eChain);
     }
 
-    int Thunk137(CPlayer_WeaponServices* self, CBasePlayerWeapon* pWeapon, HookChain eChain)
+    int Thunk139(CPlayer_WeaponServices* self, CBasePlayerWeapon* pWeapon, HookChain eChain)
     {
         return self->BumpWeapon(pWeapon, eChain);
     }
 
-    bool Thunk138(CPlayer_WeaponServices* self, CBasePlayerWeapon* pWeapon)
+    bool Thunk140(CPlayer_WeaponServices* self, CBasePlayerWeapon* pWeapon)
     {
         return self->CanUse(pWeapon);
     }
 
-    void Thunk139(CPlayer_WeaponServices* self, CBasePlayerWeapon* pWeapon, HookChain eChain)
+    void Thunk141(CPlayer_WeaponServices* self, CBasePlayerWeapon* pWeapon, HookChain eChain)
     {
         return self->Destroy(pWeapon, eChain);
     }
 
-    void Thunk140(CPlayer_WeaponServices* self, CBasePlayerWeapon * pWeapon, Vector * pVecTarget, Vector * pVelocity, HookChain eChain)
+    void Thunk142(CPlayer_WeaponServices* self, CBasePlayerWeapon * pWeapon, Vector * pVecTarget, Vector * pVelocity, HookChain eChain)
     {
         return self->DropWeapon(pWeapon, pVecTarget, pVelocity, eChain);
     }
 
-    void Thunk141(CPlayer_WeaponServices* self, CBasePlayerWeapon* pWeapon, int unk1, HookChain eChain)
+    void Thunk143(CPlayer_WeaponServices* self, CBasePlayerWeapon* pWeapon, int unk1, HookChain eChain)
     {
         return self->SelectItem(pWeapon, unk1, eChain);
     }
 
-    void Thunk142(CPointWorldText* self, const char* pszMessage)
+    void Thunk144(CPointWorldText* self, const char* pszMessage)
     {
         return self->SetMessage(pszMessage);
     }
 
-    CSmokeGrenadeProjectile* Thunk143(const Vector& vecPosition, const QAngle& angAngle, const Vector& vecVelocity, int nTeam, CBaseEntity* pOwner, uint32_t nItemDefIndex, HookChain eChain)
+    CSmokeGrenadeProjectile* Thunk145(const Vector& vecPosition, const QAngle& angAngle, const Vector& vecVelocity, int nTeam, CBaseEntity* pOwner, uint32_t nItemDefIndex, HookChain eChain)
     {
         return CSmokeGrenadeProjectile::EmitGrenade(vecPosition, angAngle, vecVelocity, nTeam, pOwner, nItemDefIndex, eChain);
     }
 
-    HitGroup_t Thunk144(const CTakeDamageInfo* self)
+    HitGroup_t Thunk146(const CTakeDamageInfo* self)
     {
         return self->GetHitGroup();
     }
 
-    void Thunk145(uintptr_t pNetworkVarChainer, uint nLocalOffset)
+    void Thunk147(uintptr_t pNetworkVarChainer, uint nLocalOffset)
     {
         return ChainNetworkStateChanged(pNetworkVarChainer, nLocalOffset);
     }
 
-    void Thunk146(uintptr_t pEntity, uint nOffset)
+    void Thunk148(uintptr_t pEntity, uint nOffset)
     {
         return EntityNetworkStateChanged(pEntity, nOffset);
     }
 
-    void Thunk147(uintptr_t pNetworkVar, uint32_t nOffset, uint32 p2)
+    void Thunk149(uintptr_t pNetworkVar, uint32_t nOffset, uint32 p2)
     {
         return NetworkVarStateChanged(pNetworkVar, nOffset, p2);
     }
 
-    int16_t Thunk148(const char* className)
+    int16_t Thunk150(const char* className)
     {
         return schema::FindChainOffset(className);
     }
 
-    int16_t Thunk149(const char* className, uint32_t classNameHash)
+    int16_t Thunk151(const char* className, uint32_t classNameHash)
     {
         return schema::FindChainOffset(className, classNameHash);
     }
 
-    schema::ClassNsc Thunk150(const char* className, uint32_t classNameHash)
+    schema::ClassNsc Thunk152(const char* className, uint32_t classNameHash)
     {
         return schema::GetClassNsc(className, classNameHash);
     }
 
-    SchemaGenClassOpsFn_t Thunk151(const char* className)
+    SchemaGenClassOpsFn_t Thunk153(const char* className)
     {
         return schema::GetClassOps(className);
     }
 
-    int32_t Thunk152(const char* className)
+    int32_t Thunk154(const char* className)
     {
         return schema::GetClassSize(className);
     }
 
-    SchemaKey Thunk153(const char* className, uint32_t classKey, const char* memberName, uint32_t memberKey)
+    SchemaKey Thunk155(const char* className, uint32_t classKey, const char* memberName, uint32_t memberKey)
     {
         return schema::GetOffset(className, classKey, memberName, memberKey);
     }
 
-    int32_t Thunk154(const char* pszClassName, const char* pszPropName)
+    int32_t Thunk156(const char* pszClassName, const char* pszPropName)
     {
         return schema::GetServerOffset(pszClassName, pszPropName);
     }
 
-    void* Thunk155(size_t size)
+    void* Thunk157(size_t size)
     {
         return schema::MissingFieldStorage(size);
     }
 
-    bool Thunk156(uintptr_t object, uint32_t offset)
+    bool Thunk158(uintptr_t object, uint32_t offset)
     {
         return schema::NetworkVarStateChanged(object, offset);
     }
 
-    void Thunk157(CEntityInstance* entity, const char* className, const char* propName)
+    void Thunk159(CEntityInstance* entity, const char* className, const char* propName)
     {
         return schema::SetStateChanged(entity, className, propName);
     }
@@ -879,132 +890,134 @@ extern const Source2ModSchemaMethodEntry g_Source2ModSchemaMethodTable[] = {
     { "CBaseEntity::SetCollisionGroup(uint8)", reinterpret_cast<void*>(&Thunk29) },
     { "CBaseEntity::SetMoveType(MoveType_t)", reinterpret_cast<void*>(&Thunk30) },
     { "CBaseEntity::Teleport(const Vector*,const QAngle*,const Vector*,HookChain)", reinterpret_cast<void*>(&Thunk31) },
-    { "CBaseModelEntity::GetEyePosition()", reinterpret_cast<void*>(&Thunk32) },
-    { "CBaseModelEntity::GetModelName()", reinterpret_cast<void*>(&Thunk33) },
-    { "CBaseModelEntity::SetBodyGroup(const char*,int)", reinterpret_cast<void*>(&Thunk34) },
-    { "CBaseModelEntity::SetModel(const char*,HookChain)", reinterpret_cast<void*>(&Thunk35) },
-    { "CBasePlayerController::Disconnect(ENetworkDisconnectionReason,const char*)", reinterpret_cast<void*>(&Thunk36) },
-    { "CBasePlayerController::ExecuteClientCommand(const char*)", reinterpret_cast<void*>(&Thunk37) },
-    { "CBasePlayerController::ExecuteClientCommandFromServer(const char*)", reinterpret_cast<void*>(&Thunk38) },
-    { "CBasePlayerController::FireEventToClient(IGameEvent*)", reinterpret_cast<void*>(&Thunk39) },
-    { "CBasePlayerController::GetIpAddress()", reinterpret_cast<void*>(&Thunk40) },
-    { "CBasePlayerController::GetObserverTarget()", reinterpret_cast<void*>(&Thunk41) },
-    { "CBasePlayerController::GetPawn()", reinterpret_cast<void*>(&Thunk42) },
-    { "CBasePlayerController::GetPawnState()", reinterpret_cast<void*>(&Thunk43) },
-    { "CBasePlayerController::GetPlayerIndex()", reinterpret_cast<void*>(&Thunk44) },
-    { "CBasePlayerController::GetPlayerName()", reinterpret_cast<void*>(&Thunk45) },
-    { "CBasePlayerController::GetPlayerSlot()", reinterpret_cast<void*>(&Thunk46) },
-    { "CBasePlayerController::GetPlayerSteamID()", reinterpret_cast<void*>(&Thunk47) },
-    { "CBasePlayerController::GetPlayerUserID()", reinterpret_cast<void*>(&Thunk48) },
-    { "CBasePlayerController::GetServerSideClient()", reinterpret_cast<void*>(&Thunk49) },
-    { "CBasePlayerController::GetSlot()", reinterpret_cast<void*>(&Thunk50) },
-    { "CBasePlayerController::GetSteamID()", reinterpret_cast<void*>(&Thunk51) },
-    { "CBasePlayerController::GetUserID()", reinterpret_cast<void*>(&Thunk52) },
-    { "CBasePlayerController::IsBot()", reinterpret_cast<void*>(&Thunk53) },
-    { "CBasePlayerController::IsConnected()", reinterpret_cast<void*>(&Thunk54) },
-    { "CBasePlayerController::PrintToCenter(const char*)", reinterpret_cast<void*>(&Thunk55) },
-    { "CBasePlayerController::PrintToCenterAlert(const char*)", reinterpret_cast<void*>(&Thunk56) },
-    { "CBasePlayerController::PrintToChat(const char*)", reinterpret_cast<void*>(&Thunk57) },
-    { "CBasePlayerController::PrintToConsole(const char*)", reinterpret_cast<void*>(&Thunk58) },
-    { "CBasePlayerController::ReplicateConVar(const char*,const char*)", reinterpret_cast<void*>(&Thunk59) },
-    { "CBasePlayerController::SetPawn(CBasePlayerPawn*,HookChain)", reinterpret_cast<void*>(&Thunk60) },
-    { "CBasePlayerController::SetPlayerName(const char*)", reinterpret_cast<void*>(&Thunk61) },
-    { "CBasePlayerPawn::CommitSuicide(bool,bool,HookChain)", reinterpret_cast<void*>(&Thunk62) },
-    { "CBasePlayerPawn::GetController()", reinterpret_cast<void*>(&Thunk63) },
-    { "CBasePlayerPawn::GetDefaultController()", reinterpret_cast<void*>(&Thunk64) },
-    { "CBasePlayerPawn::SnapViewAngles(const QAngle&,HookChain)", reinterpret_cast<void*>(&Thunk65) },
-    { "CBasePlayerWeapon::GetWeaponClassname()", reinterpret_cast<void*>(&Thunk66) },
-    { "CBasePlayerWeapon::GetWeaponVData()", reinterpret_cast<void*>(&Thunk67) },
-    { "CCSCustomHudLayout::Create(const char*,const char*)", reinterpret_cast<void*>(&Thunk68) },
-    { "CCSCustomHudLayout::GetLayoutState(CCSPlayerController*)", reinterpret_cast<void*>(&Thunk69) },
-    { "CCSCustomHudLayout::HookClick(std::function<void(CCSPlayerController*,CCSCustomHudLayout*,const char*)>)", reinterpret_cast<void*>(&Thunk70) },
-    { "CCSCustomHudLayout::IsInputCaptureEnabled(CCSPlayerController*)", reinterpret_cast<void*>(&Thunk71) },
-    { "CCSCustomHudLayout::SetDialogVariableString(const char*,const char*,const char*,CCSPlayerController*)", reinterpret_cast<void*>(&Thunk72) },
-    { "CCSCustomHudLayout::SetHasClass(const char*,const char*,bool,CCSPlayerController*)", reinterpret_cast<void*>(&Thunk73) },
-    { "CCSCustomHudLayout::SetInputCaptureEnabled(bool,CCSPlayerController*)", reinterpret_cast<void*>(&Thunk74) },
-    { "CCSCustomHudLayout::UnhookClicks()", reinterpret_cast<void*>(&Thunk75) },
-    { "CCSGameRules::FindPickerEntity(CBasePlayerController*)", reinterpret_cast<void*>(&Thunk76) },
-    { "CCSGameRules::GetClientAimTarget(CCSPlayerController*)", reinterpret_cast<void*>(&Thunk77) },
-    { "CCSGameRules::GoToIntermission(bool,HookChain)", reinterpret_cast<void*>(&Thunk78) },
-    { "CCSGameRules::TerminateRound(float,int32_t,uint32,HookChain)", reinterpret_cast<void*>(&Thunk79) },
-    { "CCSNavArea::Area2D() const", reinterpret_cast<void*>(&Thunk80) },
-    { "CCSNavArea::Center() const", reinterpret_cast<void*>(&Thunk81) },
-    { "CCSNavArea::ContainsBox(const Vector&,const Vector&,float) const", reinterpret_cast<void*>(&Thunk82) },
-    { "CCSNavArea::ContainsPoint(const Vector&,float) const", reinterpret_cast<void*>(&Thunk83) },
-    { "CCSNavArea::GetAllNavAreas()", reinterpret_cast<void*>(&Thunk84) },
-    { "CCSNavArea::GetClosestNavArea(const Vector&,float)", reinterpret_cast<void*>(&Thunk85) },
-    { "CCSNavArea::GetClosestNavArea(const Vector&,float*,float)", reinterpret_cast<void*>(&Thunk86) },
-    { "CCSNavArea::GetClosestPoint(const Vector&) const", reinterpret_cast<void*>(&Thunk87) },
-    { "CCSNavArea::GetDistanceSquaredToPoint(const Vector&) const", reinterpret_cast<void*>(&Thunk88) },
-    { "CCSNavArea::GetDistanceToPoint(const Vector&) const", reinterpret_cast<void*>(&Thunk89) },
-    { "CCSNavArea::GetHeightAtPosition(float,float) const", reinterpret_cast<void*>(&Thunk90) },
-    { "CCSNavArea::Height() const", reinterpret_cast<void*>(&Thunk91) },
-    { "CCSNavArea::Id() const", reinterpret_cast<void*>(&Thunk92) },
-    { "CCSNavArea::IntersectsBox(const Vector&,const Vector&,float) const", reinterpret_cast<void*>(&Thunk93) },
-    { "CCSNavArea::IsValidNavMesh()", reinterpret_cast<void*>(&Thunk94) },
-    { "CCSNavArea::Max() const", reinterpret_cast<void*>(&Thunk95) },
-    { "CCSNavArea::Min() const", reinterpret_cast<void*>(&Thunk96) },
-    { "CCSNavArea::Normal() const", reinterpret_cast<void*>(&Thunk97) },
-    { "CCSNavArea::Width() const", reinterpret_cast<void*>(&Thunk98) },
-    { "CCSPlayerController::AddArmor(int)", reinterpret_cast<void*>(&Thunk99) },
-    { "CCSPlayerController::AddHealth(int)", reinterpret_cast<void*>(&Thunk100) },
-    { "CCSPlayerController::ChangeTeam(int,HookChain)", reinterpret_cast<void*>(&Thunk101) },
-    { "CCSPlayerController::FromPawn(CCSPlayerPawn*)", reinterpret_cast<void*>(&Thunk102) },
-    { "CCSPlayerController::FromSlot(CPlayerSlot)", reinterpret_cast<void*>(&Thunk103) },
-    { "CCSPlayerController::FromSlot(int)", reinterpret_cast<void*>(&Thunk104) },
-    { "CCSPlayerController::FromSteamId(CSteamID)", reinterpret_cast<void*>(&Thunk105) },
-    { "CCSPlayerController::FromSteamId(uint64)", reinterpret_cast<void*>(&Thunk106) },
-    { "CCSPlayerController::FromUserId(CPlayerUserId)", reinterpret_cast<void*>(&Thunk107) },
-    { "CCSPlayerController::FromUserId(int)", reinterpret_cast<void*>(&Thunk108) },
-    { "CCSPlayerController::GetHealth()", reinterpret_cast<void*>(&Thunk109) },
-    { "CCSPlayerController::GetMaxHealth()", reinterpret_cast<void*>(&Thunk110) },
-    { "CCSPlayerController::GetObserverPawn()", reinterpret_cast<void*>(&Thunk111) },
-    { "CCSPlayerController::GetPlayerPawn()", reinterpret_cast<void*>(&Thunk112) },
-    { "CCSPlayerController::GetPlayerPawnState()", reinterpret_cast<void*>(&Thunk113) },
-    { "CCSPlayerController::PrintToCenterHtml(const char*,int,bool)", reinterpret_cast<void*>(&Thunk114) },
-    { "CCSPlayerController::Respawn(HookChain)", reinterpret_cast<void*>(&Thunk115) },
-    { "CCSPlayerController::SetArmor(int,bool)", reinterpret_cast<void*>(&Thunk116) },
-    { "CCSPlayerController::SetHealth(int)", reinterpret_cast<void*>(&Thunk117) },
-    { "CCSPlayerController::SetMaxHealth(int)", reinterpret_cast<void*>(&Thunk118) },
-    { "CCSPlayerController::SwitchTeam(int,HookChain)", reinterpret_cast<void*>(&Thunk119) },
-    { "CCSPlayerController::TakeDamage(CCSPlayerController*,int,DamageTypes_t,HookChain)", reinterpret_cast<void*>(&Thunk120) },
-    { "CCSPlayerLegacyJump::GetMovementServices()", reinterpret_cast<void*>(&Thunk121) },
-    { "CCSPlayerPawn::GetEyeAngles()", reinterpret_cast<void*>(&Thunk122) },
-    { "CCSPlayerPawn::PostThink(HookChain)", reinterpret_cast<void*>(&Thunk123) },
-    { "CCSPlayerPawnBase::CanMove()", reinterpret_cast<void*>(&Thunk124) },
-    { "CCSPlayerPawnBase::GetOriginalController()", reinterpret_cast<void*>(&Thunk125) },
-    { "CCSWeaponBaseVData::FromKey(const char*,int)", reinterpret_cast<void*>(&Thunk126) },
-    { "CDecoyProjectile::EmitGrenade(const Vector&,const QAngle&,const Vector&,CBaseEntity*,uint32_t,HookChain)", reinterpret_cast<void*>(&Thunk127) },
-    { "CFlashbangProjectile::EmitGrenade(const Vector&,const QAngle&,const Vector&,CBaseEntity*,uint32_t,HookChain)", reinterpret_cast<void*>(&Thunk128) },
-    { "CGameSceneNode::GetSkeletonInstance()", reinterpret_cast<void*>(&Thunk129) },
-    { "CHEGrenadeProjectile::EmitGrenade(const Vector&,const QAngle&,const Vector&,CBaseEntity*,uint32_t,HookChain)", reinterpret_cast<void*>(&Thunk130) },
-    { "CMolotovProjectile::EmitGrenade(const Vector&,const QAngle&,const Vector&,CBaseEntity*,uint32_t,HookChain)", reinterpret_cast<void*>(&Thunk131) },
-    { "CPlayerControllerComponent::GetPlayerController()", reinterpret_cast<void*>(&Thunk132) },
-    { "CPlayerPawnComponent::GetPlayerPawn()", reinterpret_cast<void*>(&Thunk133) },
-    { "CPlayer_ItemServices::DropActivePlayerWeapon(CBasePlayerWeapon*,HookChain)", reinterpret_cast<void*>(&Thunk134) },
-    { "CPlayer_ItemServices::GiveNamedItem(const char*,HookChain)", reinterpret_cast<void*>(&Thunk135) },
-    { "CPlayer_ItemServices::RemoveWeapons(bool,HookChain)", reinterpret_cast<void*>(&Thunk136) },
-    { "CPlayer_WeaponServices::BumpWeapon(CBasePlayerWeapon*,HookChain)", reinterpret_cast<void*>(&Thunk137) },
-    { "CPlayer_WeaponServices::CanUse(CBasePlayerWeapon*)", reinterpret_cast<void*>(&Thunk138) },
-    { "CPlayer_WeaponServices::Destroy(CBasePlayerWeapon*,HookChain)", reinterpret_cast<void*>(&Thunk139) },
-    { "CPlayer_WeaponServices::DropWeapon(CBasePlayerWeapon*,Vector*,Vector*,HookChain)", reinterpret_cast<void*>(&Thunk140) },
-    { "CPlayer_WeaponServices::SelectItem(CBasePlayerWeapon*,int,HookChain)", reinterpret_cast<void*>(&Thunk141) },
-    { "CPointWorldText::SetMessage(const char*)", reinterpret_cast<void*>(&Thunk142) },
-    { "CSmokeGrenadeProjectile::EmitGrenade(const Vector&,const QAngle&,const Vector&,int,CBaseEntity*,uint32_t,HookChain)", reinterpret_cast<void*>(&Thunk143) },
-    { "CTakeDamageInfo::GetHitGroup() const", reinterpret_cast<void*>(&Thunk144) },
-    { "ChainNetworkStateChanged(uintptr_t,uint)", reinterpret_cast<void*>(&Thunk145) },
-    { "EntityNetworkStateChanged(uintptr_t,uint)", reinterpret_cast<void*>(&Thunk146) },
-    { "NetworkVarStateChanged(uintptr_t,uint32_t,uint32)", reinterpret_cast<void*>(&Thunk147) },
-    { "schema::FindChainOffset(const char*)", reinterpret_cast<void*>(&Thunk148) },
-    { "schema::FindChainOffset(const char*,uint32_t)", reinterpret_cast<void*>(&Thunk149) },
-    { "schema::GetClassNsc(const char*,uint32_t)", reinterpret_cast<void*>(&Thunk150) },
-    { "schema::GetClassOps(const char*)", reinterpret_cast<void*>(&Thunk151) },
-    { "schema::GetClassSize(const char*)", reinterpret_cast<void*>(&Thunk152) },
-    { "schema::GetOffset(const char*,uint32_t,const char*,uint32_t)", reinterpret_cast<void*>(&Thunk153) },
-    { "schema::GetServerOffset(const char*,const char*)", reinterpret_cast<void*>(&Thunk154) },
-    { "schema::MissingFieldStorage(size_t)", reinterpret_cast<void*>(&Thunk155) },
-    { "schema::NetworkVarStateChanged(uintptr_t,uint32_t)", reinterpret_cast<void*>(&Thunk156) },
-    { "schema::SetStateChanged(CEntityInstance*,const char*,const char*)", reinterpret_cast<void*>(&Thunk157) },
+    { "CBaseModelEntity::GetBodygroupByName(const char*)", reinterpret_cast<void*>(&Thunk32) },
+    { "CBaseModelEntity::GetEyePosition()", reinterpret_cast<void*>(&Thunk33) },
+    { "CBaseModelEntity::GetModel()", reinterpret_cast<void*>(&Thunk34) },
+    { "CBaseModelEntity::GetModelName()", reinterpret_cast<void*>(&Thunk35) },
+    { "CBaseModelEntity::SetBodyGroup(const char*,int)", reinterpret_cast<void*>(&Thunk36) },
+    { "CBaseModelEntity::SetModel(const char*,HookChain)", reinterpret_cast<void*>(&Thunk37) },
+    { "CBasePlayerController::Disconnect(ENetworkDisconnectionReason,const char*)", reinterpret_cast<void*>(&Thunk38) },
+    { "CBasePlayerController::ExecuteClientCommand(const char*)", reinterpret_cast<void*>(&Thunk39) },
+    { "CBasePlayerController::ExecuteClientCommandFromServer(const char*)", reinterpret_cast<void*>(&Thunk40) },
+    { "CBasePlayerController::FireEventToClient(IGameEvent*)", reinterpret_cast<void*>(&Thunk41) },
+    { "CBasePlayerController::GetIpAddress()", reinterpret_cast<void*>(&Thunk42) },
+    { "CBasePlayerController::GetObserverTarget()", reinterpret_cast<void*>(&Thunk43) },
+    { "CBasePlayerController::GetPawn()", reinterpret_cast<void*>(&Thunk44) },
+    { "CBasePlayerController::GetPawnState()", reinterpret_cast<void*>(&Thunk45) },
+    { "CBasePlayerController::GetPlayerIndex()", reinterpret_cast<void*>(&Thunk46) },
+    { "CBasePlayerController::GetPlayerName()", reinterpret_cast<void*>(&Thunk47) },
+    { "CBasePlayerController::GetPlayerSlot()", reinterpret_cast<void*>(&Thunk48) },
+    { "CBasePlayerController::GetPlayerSteamID()", reinterpret_cast<void*>(&Thunk49) },
+    { "CBasePlayerController::GetPlayerUserID()", reinterpret_cast<void*>(&Thunk50) },
+    { "CBasePlayerController::GetServerSideClient()", reinterpret_cast<void*>(&Thunk51) },
+    { "CBasePlayerController::GetSlot()", reinterpret_cast<void*>(&Thunk52) },
+    { "CBasePlayerController::GetSteamID()", reinterpret_cast<void*>(&Thunk53) },
+    { "CBasePlayerController::GetUserID()", reinterpret_cast<void*>(&Thunk54) },
+    { "CBasePlayerController::IsBot()", reinterpret_cast<void*>(&Thunk55) },
+    { "CBasePlayerController::IsConnected()", reinterpret_cast<void*>(&Thunk56) },
+    { "CBasePlayerController::PrintToCenter(const char*)", reinterpret_cast<void*>(&Thunk57) },
+    { "CBasePlayerController::PrintToCenterAlert(const char*)", reinterpret_cast<void*>(&Thunk58) },
+    { "CBasePlayerController::PrintToChat(const char*)", reinterpret_cast<void*>(&Thunk59) },
+    { "CBasePlayerController::PrintToConsole(const char*)", reinterpret_cast<void*>(&Thunk60) },
+    { "CBasePlayerController::ReplicateConVar(const char*,const char*)", reinterpret_cast<void*>(&Thunk61) },
+    { "CBasePlayerController::SetPawn(CBasePlayerPawn*,HookChain)", reinterpret_cast<void*>(&Thunk62) },
+    { "CBasePlayerController::SetPlayerName(const char*)", reinterpret_cast<void*>(&Thunk63) },
+    { "CBasePlayerPawn::CommitSuicide(bool,bool,HookChain)", reinterpret_cast<void*>(&Thunk64) },
+    { "CBasePlayerPawn::GetController()", reinterpret_cast<void*>(&Thunk65) },
+    { "CBasePlayerPawn::GetDefaultController()", reinterpret_cast<void*>(&Thunk66) },
+    { "CBasePlayerPawn::SnapViewAngles(const QAngle&,HookChain)", reinterpret_cast<void*>(&Thunk67) },
+    { "CBasePlayerWeapon::GetWeaponClassname()", reinterpret_cast<void*>(&Thunk68) },
+    { "CBasePlayerWeapon::GetWeaponVData()", reinterpret_cast<void*>(&Thunk69) },
+    { "CCSCustomHudLayout::Create(const char*,const char*)", reinterpret_cast<void*>(&Thunk70) },
+    { "CCSCustomHudLayout::GetLayoutState(CCSPlayerController*)", reinterpret_cast<void*>(&Thunk71) },
+    { "CCSCustomHudLayout::HookClick(std::function<void(CCSPlayerController*,CCSCustomHudLayout*,const char*)>)", reinterpret_cast<void*>(&Thunk72) },
+    { "CCSCustomHudLayout::IsInputCaptureEnabled(CCSPlayerController*)", reinterpret_cast<void*>(&Thunk73) },
+    { "CCSCustomHudLayout::SetDialogVariableString(const char*,const char*,const char*,CCSPlayerController*)", reinterpret_cast<void*>(&Thunk74) },
+    { "CCSCustomHudLayout::SetHasClass(const char*,const char*,bool,CCSPlayerController*)", reinterpret_cast<void*>(&Thunk75) },
+    { "CCSCustomHudLayout::SetInputCaptureEnabled(bool,CCSPlayerController*)", reinterpret_cast<void*>(&Thunk76) },
+    { "CCSCustomHudLayout::UnhookClicks()", reinterpret_cast<void*>(&Thunk77) },
+    { "CCSGameRules::FindPickerEntity(CBasePlayerController*)", reinterpret_cast<void*>(&Thunk78) },
+    { "CCSGameRules::GetClientAimTarget(CCSPlayerController*)", reinterpret_cast<void*>(&Thunk79) },
+    { "CCSGameRules::GoToIntermission(bool,HookChain)", reinterpret_cast<void*>(&Thunk80) },
+    { "CCSGameRules::TerminateRound(float,int32_t,uint32,HookChain)", reinterpret_cast<void*>(&Thunk81) },
+    { "CCSNavArea::Area2D() const", reinterpret_cast<void*>(&Thunk82) },
+    { "CCSNavArea::Center() const", reinterpret_cast<void*>(&Thunk83) },
+    { "CCSNavArea::ContainsBox(const Vector&,const Vector&,float) const", reinterpret_cast<void*>(&Thunk84) },
+    { "CCSNavArea::ContainsPoint(const Vector&,float) const", reinterpret_cast<void*>(&Thunk85) },
+    { "CCSNavArea::GetAllNavAreas()", reinterpret_cast<void*>(&Thunk86) },
+    { "CCSNavArea::GetClosestNavArea(const Vector&,float)", reinterpret_cast<void*>(&Thunk87) },
+    { "CCSNavArea::GetClosestNavArea(const Vector&,float*,float)", reinterpret_cast<void*>(&Thunk88) },
+    { "CCSNavArea::GetClosestPoint(const Vector&) const", reinterpret_cast<void*>(&Thunk89) },
+    { "CCSNavArea::GetDistanceSquaredToPoint(const Vector&) const", reinterpret_cast<void*>(&Thunk90) },
+    { "CCSNavArea::GetDistanceToPoint(const Vector&) const", reinterpret_cast<void*>(&Thunk91) },
+    { "CCSNavArea::GetHeightAtPosition(float,float) const", reinterpret_cast<void*>(&Thunk92) },
+    { "CCSNavArea::Height() const", reinterpret_cast<void*>(&Thunk93) },
+    { "CCSNavArea::Id() const", reinterpret_cast<void*>(&Thunk94) },
+    { "CCSNavArea::IntersectsBox(const Vector&,const Vector&,float) const", reinterpret_cast<void*>(&Thunk95) },
+    { "CCSNavArea::IsValidNavMesh()", reinterpret_cast<void*>(&Thunk96) },
+    { "CCSNavArea::Max() const", reinterpret_cast<void*>(&Thunk97) },
+    { "CCSNavArea::Min() const", reinterpret_cast<void*>(&Thunk98) },
+    { "CCSNavArea::Normal() const", reinterpret_cast<void*>(&Thunk99) },
+    { "CCSNavArea::Width() const", reinterpret_cast<void*>(&Thunk100) },
+    { "CCSPlayerController::AddArmor(int)", reinterpret_cast<void*>(&Thunk101) },
+    { "CCSPlayerController::AddHealth(int)", reinterpret_cast<void*>(&Thunk102) },
+    { "CCSPlayerController::ChangeTeam(int,HookChain)", reinterpret_cast<void*>(&Thunk103) },
+    { "CCSPlayerController::FromPawn(CCSPlayerPawn*)", reinterpret_cast<void*>(&Thunk104) },
+    { "CCSPlayerController::FromSlot(CPlayerSlot)", reinterpret_cast<void*>(&Thunk105) },
+    { "CCSPlayerController::FromSlot(int)", reinterpret_cast<void*>(&Thunk106) },
+    { "CCSPlayerController::FromSteamId(CSteamID)", reinterpret_cast<void*>(&Thunk107) },
+    { "CCSPlayerController::FromSteamId(uint64)", reinterpret_cast<void*>(&Thunk108) },
+    { "CCSPlayerController::FromUserId(CPlayerUserId)", reinterpret_cast<void*>(&Thunk109) },
+    { "CCSPlayerController::FromUserId(int)", reinterpret_cast<void*>(&Thunk110) },
+    { "CCSPlayerController::GetHealth()", reinterpret_cast<void*>(&Thunk111) },
+    { "CCSPlayerController::GetMaxHealth()", reinterpret_cast<void*>(&Thunk112) },
+    { "CCSPlayerController::GetObserverPawn()", reinterpret_cast<void*>(&Thunk113) },
+    { "CCSPlayerController::GetPlayerPawn()", reinterpret_cast<void*>(&Thunk114) },
+    { "CCSPlayerController::GetPlayerPawnState()", reinterpret_cast<void*>(&Thunk115) },
+    { "CCSPlayerController::PrintToCenterHtml(const char*,int,bool)", reinterpret_cast<void*>(&Thunk116) },
+    { "CCSPlayerController::Respawn(HookChain)", reinterpret_cast<void*>(&Thunk117) },
+    { "CCSPlayerController::SetArmor(int,bool)", reinterpret_cast<void*>(&Thunk118) },
+    { "CCSPlayerController::SetHealth(int)", reinterpret_cast<void*>(&Thunk119) },
+    { "CCSPlayerController::SetMaxHealth(int)", reinterpret_cast<void*>(&Thunk120) },
+    { "CCSPlayerController::SwitchTeam(int,HookChain)", reinterpret_cast<void*>(&Thunk121) },
+    { "CCSPlayerController::TakeDamage(CCSPlayerController*,int,DamageTypes_t,HookChain)", reinterpret_cast<void*>(&Thunk122) },
+    { "CCSPlayerLegacyJump::GetMovementServices()", reinterpret_cast<void*>(&Thunk123) },
+    { "CCSPlayerPawn::GetEyeAngles()", reinterpret_cast<void*>(&Thunk124) },
+    { "CCSPlayerPawn::PostThink(HookChain)", reinterpret_cast<void*>(&Thunk125) },
+    { "CCSPlayerPawnBase::CanMove()", reinterpret_cast<void*>(&Thunk126) },
+    { "CCSPlayerPawnBase::GetOriginalController()", reinterpret_cast<void*>(&Thunk127) },
+    { "CCSWeaponBaseVData::FromKey(const char*,int)", reinterpret_cast<void*>(&Thunk128) },
+    { "CDecoyProjectile::EmitGrenade(const Vector&,const QAngle&,const Vector&,CBaseEntity*,uint32_t,HookChain)", reinterpret_cast<void*>(&Thunk129) },
+    { "CFlashbangProjectile::EmitGrenade(const Vector&,const QAngle&,const Vector&,CBaseEntity*,uint32_t,HookChain)", reinterpret_cast<void*>(&Thunk130) },
+    { "CGameSceneNode::GetSkeletonInstance()", reinterpret_cast<void*>(&Thunk131) },
+    { "CHEGrenadeProjectile::EmitGrenade(const Vector&,const QAngle&,const Vector&,CBaseEntity*,uint32_t,HookChain)", reinterpret_cast<void*>(&Thunk132) },
+    { "CMolotovProjectile::EmitGrenade(const Vector&,const QAngle&,const Vector&,CBaseEntity*,uint32_t,HookChain)", reinterpret_cast<void*>(&Thunk133) },
+    { "CPlayerControllerComponent::GetPlayerController()", reinterpret_cast<void*>(&Thunk134) },
+    { "CPlayerPawnComponent::GetPlayerPawn()", reinterpret_cast<void*>(&Thunk135) },
+    { "CPlayer_ItemServices::DropActivePlayerWeapon(CBasePlayerWeapon*,HookChain)", reinterpret_cast<void*>(&Thunk136) },
+    { "CPlayer_ItemServices::GiveNamedItem(const char*,HookChain)", reinterpret_cast<void*>(&Thunk137) },
+    { "CPlayer_ItemServices::RemoveWeapons(bool,HookChain)", reinterpret_cast<void*>(&Thunk138) },
+    { "CPlayer_WeaponServices::BumpWeapon(CBasePlayerWeapon*,HookChain)", reinterpret_cast<void*>(&Thunk139) },
+    { "CPlayer_WeaponServices::CanUse(CBasePlayerWeapon*)", reinterpret_cast<void*>(&Thunk140) },
+    { "CPlayer_WeaponServices::Destroy(CBasePlayerWeapon*,HookChain)", reinterpret_cast<void*>(&Thunk141) },
+    { "CPlayer_WeaponServices::DropWeapon(CBasePlayerWeapon*,Vector*,Vector*,HookChain)", reinterpret_cast<void*>(&Thunk142) },
+    { "CPlayer_WeaponServices::SelectItem(CBasePlayerWeapon*,int,HookChain)", reinterpret_cast<void*>(&Thunk143) },
+    { "CPointWorldText::SetMessage(const char*)", reinterpret_cast<void*>(&Thunk144) },
+    { "CSmokeGrenadeProjectile::EmitGrenade(const Vector&,const QAngle&,const Vector&,int,CBaseEntity*,uint32_t,HookChain)", reinterpret_cast<void*>(&Thunk145) },
+    { "CTakeDamageInfo::GetHitGroup() const", reinterpret_cast<void*>(&Thunk146) },
+    { "ChainNetworkStateChanged(uintptr_t,uint)", reinterpret_cast<void*>(&Thunk147) },
+    { "EntityNetworkStateChanged(uintptr_t,uint)", reinterpret_cast<void*>(&Thunk148) },
+    { "NetworkVarStateChanged(uintptr_t,uint32_t,uint32)", reinterpret_cast<void*>(&Thunk149) },
+    { "schema::FindChainOffset(const char*)", reinterpret_cast<void*>(&Thunk150) },
+    { "schema::FindChainOffset(const char*,uint32_t)", reinterpret_cast<void*>(&Thunk151) },
+    { "schema::GetClassNsc(const char*,uint32_t)", reinterpret_cast<void*>(&Thunk152) },
+    { "schema::GetClassOps(const char*)", reinterpret_cast<void*>(&Thunk153) },
+    { "schema::GetClassSize(const char*)", reinterpret_cast<void*>(&Thunk154) },
+    { "schema::GetOffset(const char*,uint32_t,const char*,uint32_t)", reinterpret_cast<void*>(&Thunk155) },
+    { "schema::GetServerOffset(const char*,const char*)", reinterpret_cast<void*>(&Thunk156) },
+    { "schema::MissingFieldStorage(size_t)", reinterpret_cast<void*>(&Thunk157) },
+    { "schema::NetworkVarStateChanged(uintptr_t,uint32_t)", reinterpret_cast<void*>(&Thunk158) },
+    { "schema::SetStateChanged(CEntityInstance*,const char*,const char*)", reinterpret_cast<void*>(&Thunk159) },
 };
 
 extern const size_t g_Source2ModSchemaMethodCount = sizeof(g_Source2ModSchemaMethodTable) / sizeof(g_Source2ModSchemaMethodTable[0]);

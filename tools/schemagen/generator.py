@@ -613,8 +613,12 @@ MANUAL_METHODS: dict[str, list[str]] = {
         "Vector GetEyePosition();",
         "/// <summary>Set entity model.</summary>",
         "void SetModel(const char* pszModel, HookChain eChain = HookChain::Run);",
+        "/// <summary>The model the entity has now (its CModel), nullptr without a skeleton or a model.</summary>",
+        "void* GetModel();",
         "/// <summary>Switch a bodygroup on the model.</summary>",
         "void SetBodyGroup(const char* pszName, int nValue);",
+        "/// <summary>The bodygroup's current value (m_nBodyGroupChoices), -1 when the model has no such group.</summary>",
+        "int GetBodygroupByName(const char* pszGroupName);",
     ],
     "CBasePlayerController": [
         "/// <summary>Set pawn for controller.</summary>",

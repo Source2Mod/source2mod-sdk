@@ -39,6 +39,8 @@
 #include "source2mod/ISource2ModApi.h"
 #include "source2mod/ISource2ModPlugin.h"
 #include "source2mod/sdk/schema/classes/CBodyComponent.h"
+#include "source2mod/sdk/schema/classes/CGameSceneNode.h"
+#include "source2mod/sdk/schema/classes/CModelState.h"
 #include "source2mod/sdk/schema/classes/CSkeletonInstance.h"
 SOURCE2MOD_GLOBALVARS();
 
@@ -76,4 +78,38 @@ void CBaseModelEntity::SetBodyGroup(const char* pszName, int nValue)
     V_snprintf(szValue, sizeof(szValue), "%s,%d", pszName, nValue);
 
     AcceptInput("SetBodyGroup", this, this, szValue);
+}
+
+// As the game's CBaseEntity::GetModel: the skeleton's model state
+static CModelState* ModelStateOf(CBaseModelEntity* pEntity)
+{
+    CBodyComponent* bodyComponent = pEntity->m_CBodyComponent();
+    CGameSceneNode* sceneNode = bodyComponent ? bodyComponent->m_pSceneNode() : nullptr;
+    CSkeletonInstance* skeleton = sceneNode ? sceneNode->GetSkeletonInstance() : nullptr;
+    return skeleton ? &skeleton->m_modelState() : nullptr;
+}
+
+void* CBaseModelEntity::GetModel()
+{
+    CModelState* modelState = ModelStateOf(this);
+    if (!modelState)
+        return nullptr;
+
+    // m_hModel's CStrongHandle points at the resource binding, whose first member is the CModel
+    void** binding = reinterpret_cast<void**>(modelState->m_hModel().Get());
+    return binding ? *binding : nullptr;
+}
+
+int CBaseModelEntity::GetBodygroupByName(const char* pszGroupName)
+{
+    void* model = GetModel();
+    if (!model || !pszGroupName)
+        return -1;
+
+    // The group's index in the model; the value is the entity's choice for it. SetBodyGroup only
+    // queues a request that the game applies later in the tick, so this reads the value before it.
+    const int iGroup = SOURCE2MOD_CALL_FUNCTION(int(void*, const char*), "CModel::FindBodygroupByName", HookChain::Run, model, pszGroupName);
+
+    CUtlVector<int32_t>& choices = ModelStateOf(this)->m_nBodyGroupChoices();
+    return (iGroup >= 0 && iGroup < choices.Count()) ? choices[iGroup] : -1;
 }

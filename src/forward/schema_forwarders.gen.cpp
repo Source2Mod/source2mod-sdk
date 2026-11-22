@@ -19,6 +19,7 @@
 #include "source2mod/sdk/schema/classes/CEntitySubclassVDataBase.h"
 #include "source2mod/sdk/schema/classes/CGameSceneNode.h"
 #include "source2mod/sdk/schema/classes/CBaseModelEntity.h"
+#include "source2mod/sdk/schema/classes/CModelState.h"
 #include "source2mod/sdk/schema/classes/CSkeletonInstance.h"
 #include "source2mod/sdk/schema/classes/CBasePlayerController.h"
 #include "source2mod/sdk/schema/classes/CCSPlayerPawnBase.h"
@@ -435,6 +436,18 @@ void CBaseEntity::Teleport(const Vector* pPosition, const QAngle* pAngles, const
     return s_fn(this, pPosition, pAngles, pVelocity, eChain);
 }
 
+int CBaseModelEntity::GetBodygroupByName(const char* pszGroupName)
+{
+    using Fn = int (*)(CBaseModelEntity*, const char*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBaseModelEntity::GetBodygroupByName(const char*)", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<int>();
+    return s_fn(this, pszGroupName);
+}
+
 Vector CBaseModelEntity::GetEyePosition()
 {
     using Fn = Vector (*)(CBaseModelEntity*);
@@ -444,6 +457,18 @@ Vector CBaseModelEntity::GetEyePosition()
         s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBaseModelEntity::GetEyePosition()", s_resolved));
     if (!s_fn)
         return Source2ModSchemaMissing<Vector>();
+    return s_fn(this);
+}
+
+void* CBaseModelEntity::GetModel()
+{
+    using Fn = void* (*)(CBaseModelEntity*);
+    static Fn s_fn = nullptr;
+    static bool s_resolved = false;
+    if (!s_resolved)
+        s_fn = reinterpret_cast<Fn>(Source2ModSchemaMethod("CBaseModelEntity::GetModel()", s_resolved));
+    if (!s_fn)
+        return Source2ModSchemaMissing<void*>();
     return s_fn(this);
 }
 
