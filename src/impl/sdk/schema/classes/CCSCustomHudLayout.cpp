@@ -44,7 +44,9 @@
 
 #include <entitykeyvalues.h>
 
+#include <cstring>
 #include <string>
+#include <unordered_set>
 SOURCE2MOD_GLOBALVARS();
 
 namespace
@@ -57,25 +59,53 @@ namespace
     // Values go through the game's setters on the state: only they mark the changed
     // element of a nested vector, which a state change from out here cannot do, and
     // the client applies a value by that element. The string tables stay ours: the
-    // game's setters above these cap them at 1024 entries, /skins has far more classes.
+    // game's setters above these cap them at 1024 entries and drop the change silently.
+
+    /// The tables are networked with the entity and a client needs every name the states point at, so
+    /// a name can never be dropped during a map: the tables only grow. Past what the serializer can pack
+    /// (one plugin's class per picture reached m_vecClassNames[7080]) the engine stops the server with
+    /// "PackEntity: g_pFlattenedSerializers->Encode false". A plugin bug must not do that: a full table
+    /// takes no new names, the change is dropped and logged once per layout and table.
+    constexpr int MAX_TABLE_STRINGS = 4096;
+    constexpr int MAX_TABLE_CHARS = 32 * 1024;
 
     /// Index of a string in one of the layout's string tables, appending it if
     /// it is not there yet. The per-player states store these indices, not the
     /// strings themselves, so a new string has to reach the clients with them:
     /// without the table's own state change a client gets a state pointing past
-    /// the end of its copy of the table.
+    /// the end of its copy of the table. -1 when the table is full.
     template <typename Field>
-    int InternString(Field& field, const char* pszValue)
+    int InternString(CCSCustomHudLayout* pLayout, Field& field, const char* pszTable, const char* pszValue)
     {
         CUtlVector<CUtlString>& vecTable = field();
         int index = vecTable.Find(pszValue);
+        if (index != -1)
+            return index;
 
-        if (index == -1)
+        int nChars = static_cast<int>(strlen(pszValue)) + 1;
+        for (int i = 0; i < vecTable.Count(); ++i)
+            nChars += vecTable[i].Length() + 1;
+
+        if (vecTable.Count() >= MAX_TABLE_STRINGS || nChars > MAX_TABLE_CHARS)
         {
-            index = vecTable.AddToTail(pszValue);
-            field.NetworkStateChanged();
+            static std::unordered_set<std::string> s_reported;
+            const std::string sKey = std::to_string(pLayout->GetHandle().ToInt()) + '|' + pszTable;
+            if (s_reported.size() > 256)
+                s_reported.clear();
+            if (s_reported.insert(sKey).second)
+            {
+                g_pSource2ModAPI->Log("custom_hud_layout '%s' (%s): %s is full (%d names, %d chars), \"%s\" and every further new name "
+                                      "are dropped until the map changes. A plugin is making names up per value (one class per "
+                                      "picture, per player, ...): use a fixed set.\n",
+                                      pLayout->m_strLayout().String(), pLayout->GetName(), pszTable, vecTable.Count(),
+                                      nChars - static_cast<int>(strlen(pszValue)) - 1,
+                                      pszValue);
+            }
+            return -1;
         }
 
+        index = vecTable.AddToTail(pszValue);
+        field.NetworkStateChanged();
         return index;
     }
 }
@@ -136,8 +166,10 @@ void CCSCustomHudLayout::SetHasClass(const char* pszPanelId, const char* pszClas
     if (!pszPanelId || !pszClassName)
         return;
 
-    const int panelIndex = InternString(m_vecPanelIds, pszPanelId);
-    const int classIndex = InternString(m_vecClassNames, pszClassName);
+    const int panelIndex = InternString(this, m_vecPanelIds, "m_vecPanelIds", pszPanelId);
+    const int classIndex = panelIndex == -1 ? -1 : InternString(this, m_vecClassNames, "m_vecClassNames", pszClassName);
+    if (classIndex == -1)
+        return;
 
     auto& layoutState = GetLayoutState(pController);
 
@@ -169,8 +201,10 @@ void CCSCustomHudLayout::SetDialogVariableString(const char* pszPanelId, const c
     if (!pszPanelId || !pszVariableName || !pszValue)
         return;
 
-    const int panelIndex = InternString(m_vecPanelIds, pszPanelId);
-    const int variableIndex = InternString(m_vecDialogVariableNames, pszVariableName);
+    const int panelIndex = InternString(this, m_vecPanelIds, "m_vecPanelIds", pszPanelId);
+    const int variableIndex = panelIndex == -1 ? -1 : InternString(this, m_vecDialogVariableNames, "m_vecDialogVariableNames", pszVariableName);
+    if (variableIndex == -1)
+        return;
 
     auto& layoutState = GetLayoutState(pController);
 
