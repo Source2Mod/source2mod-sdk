@@ -78,12 +78,9 @@ public:
     static CCSCustomHudLayout* Create(const char* pszLayout, const char* pszTargetName = nullptr);
     /// <summary>Gets the layout state of one player, or the global state when no controller is given.</summary>
     CCSCustomHudLayoutState& GetLayoutState(CCSPlayerController* pController = nullptr);
-    /// <summary>Adds or removes a CSS class on a panel of the layout. Panel ids, class names and dialog variable names
-    /// are networked tables that only grow during a map: use a fixed set of names, never one per value (a picture,
-    /// a player). A table past 4096 names or 32 KiB takes no new name, the change is dropped and logged once.</summary>
+    /// <summary>Adds or removes a CSS class on a panel of the layout.</summary>
     void SetHasClass(const char* pszPanelId, const char* pszClassName, bool bHasClass, CCSPlayerController* pController = nullptr);
-    /// <summary>Sets a dialog variable string on a panel of the layout. The value is free; the panel id and the
-    /// variable name share SetHasClass()'s table limits.</summary>
+    /// <summary>Sets a dialog variable string on a panel of the layout.</summary>
     void SetDialogVariableString(const char* pszPanelId, const char* pszVariableName, const char* pszValue, CCSPlayerController* pController = nullptr);
     /// <summary>Enables or disables mouse input capture, without which the player cannot click the layout.</summary>
     void SetInputCaptureEnabled(bool bEnable, CCSPlayerController* pController = nullptr);
