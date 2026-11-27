@@ -616,6 +616,15 @@ struct EmptyContext
     SOURCE2MOD_HOOK_NO_RETURN
 };
 
+/// ISource2Server::ServerHibernationUpdate: the server starts (true) or stops
+/// (false) hibernating, with no players on it (sv_hibernate_when_empty).
+struct ServerHibernationContext
+{
+    bool hibernating;
+
+    SOURCE2MOD_HOOK_NO_RETURN
+};
+
 /// IGameEventManager2::LoadEventsFromFile -- a resource file of game events.
 struct LoadEventsFromFileContext
 {

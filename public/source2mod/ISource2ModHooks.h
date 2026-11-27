@@ -62,7 +62,8 @@
  *     player inventory's virtual, HookTarget::All() works);
  *   - engine callbacks: GameFrame, StartupServer, ClientConnect, ClientConnected,
  *     ClientPutInServer, ClientDisconnect, ClientVoice, ClientSettingsChanged,
- *     the Steam API, LoadEventsFromFile, ClientFullyConnect;
+ *     the Steam API, LoadEventsFromFile, ClientFullyConnect,
+ *     ServerHibernationUpdate;
  *   - any function: HookPoint::Function(fn), fn an ISource2ModFunction --
  *     a gamedata entry (Find), a signature, a symbol, a vtable slot, an engine
  *     interface's virtual, a core address (ISource2ModFunctions::From*).
@@ -233,6 +234,7 @@ enum class HookPointId : int32_t
     GameServerSteamAPIDeactivated,
     LoadEventsFromFile,
     ClientFullyConnect,
+    ServerHibernationUpdate,
 
     // HookPoint::Function.
     Function = 300,
@@ -436,6 +438,8 @@ namespace HookPoint
     inline constexpr HookPointOf<LoadEventsFromFileContext> LoadEventsFromFile{ HookPointId::LoadEventsFromFile };
     /// ISource2GameClients::ClientFullyConnect: the client finished loading (signon full).
     inline constexpr HookPointOf<ClientSlotContext> ClientFullyConnect{ HookPointId::ClientFullyConnect };
+    /// ISource2Server::ServerHibernationUpdate: the empty server starts or stops hibernating.
+    inline constexpr HookPointOf<ServerHibernationContext> ServerHibernationUpdate{ HookPointId::ServerHibernationUpdate };
 
 
     /// Any function from ISource2ModFunctions.

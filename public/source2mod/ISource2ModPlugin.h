@@ -357,7 +357,9 @@ inline bool Source2ModKHookVersionMatches(const char* coreHeader, const char* co
 // built against 10 or 11 keep working.
 // 13: ISource2ModAPI::SetFailState() at its end, a plugin unloading itself.
 // Plugins built against 10 to 12 keep working.
-#define SOURCE2MOD_PLAPI_VERSION 13
+// 14: ISource2ModAPI::GetPluginId() at its end; SOURCE2MOD_SAVEVARS() stores it
+// in g_iPluginId. Plugins built against 10 to 13 keep working.
+#define SOURCE2MOD_PLAPI_VERSION 14
 /// The oldest plugin API the core still loads.
 #define SOURCE2MOD_PLAPI_MIN 10
 
@@ -394,7 +396,9 @@ public:
     /**
     * @brief Called when plugin is loaded.
     *
-    * @param id Plugin identifier
+    * The plugin's id is g_iPluginId once SOURCE2MOD_SAVEVARS() ran
+    * (ISource2ModAPI::GetPluginId()).
+    *
     * @param api Source2Mod API instance
     * @param error Buffer for error message
     * @param maxlen Error buffer size
@@ -610,6 +614,7 @@ Globals
 #define SOURCE2MOD_DEFINE_GLOBALVARS()                                  \
     ISource2ModAPI*             g_pSource2ModAPI             = nullptr; \
     ISource2ModPlugin*          g_pPluginAPI                 = nullptr; \
+    PluginId                    g_iPluginId                  = 0;       \
     const char*                 g_Source2ModCoreKHookCommit  = nullptr; \
     const char*                 g_Source2ModCoreKHookHeader  = nullptr; \
     ISource2ModCommands*        g_pSource2ModCommands        = nullptr; \
@@ -672,6 +677,7 @@ Globals
 #define SOURCE2MOD_GLOBALVARS()                                      \
     extern ISource2ModAPI*             g_pSource2ModAPI;             \
     extern ISource2ModPlugin*          g_pPluginAPI;                 \
+    extern PluginId                    g_iPluginId;                  \
     extern const char*                 g_Source2ModCoreKHookCommit;  \
     extern const char*                 g_Source2ModCoreKHookHeader;  \
     extern ISource2ModCommands*        g_pSource2ModCommands;        \
@@ -809,7 +815,7 @@ Globals
 * @brief Initializes global variables inside Load().
 *
 * @note Must be called in plugin Load(), with its parameters under their
-*       declared names (id, api, error, maxlen).
+*       declared names (api, error, maxlen).
   */
 /// The flags SOURCE2MOD_SAVEVARS() registers the plugin's ConVars and
 /// ConCommands with; define it before including the SDK for others.
@@ -840,6 +846,7 @@ Globals
     g_pSource2ModAPI = api;                                                                                                               \
     SOURCE2MOD_FILLGAMEVARS(api)                                                                                                          \
     g_pPluginAPI = static_cast<ISource2ModPlugin*>(this);                                                                                 \
+    g_iPluginId = api->GetPluginId();                                                                                                     \
     KHook::__exported__khook = static_cast<KHook::IKHook*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_INTERFACE, nullptr, nullptr));         \
     g_Source2ModCoreKHookCommit = static_cast<const char*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_VERSION_INTERFACE, nullptr, nullptr)); \
     g_Source2ModCoreKHookHeader = static_cast<const char*>(api->Source2ModFactory(SOURCE2MOD_KHOOK_HEADER_INTERFACE, nullptr, nullptr));  \

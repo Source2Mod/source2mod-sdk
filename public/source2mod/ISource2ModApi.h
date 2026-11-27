@@ -387,6 +387,20 @@ public:
      *        unloaded already, so then only the reason is logged.
      */
     virtual void SetFailState(const char* pszReason) = 0;
+
+    /* =========================
+    Plugin API 14
+    ========================= */
+
+    /**
+     * @brief The calling plugin's id: the one "s2m list" shows and
+     *        ISource2ModListener::OnPluginLoad / OnPluginUnload report. A
+     *        reload (hot reload, "s2m reload") gives the plugin a new one.
+     *        SOURCE2MOD_SAVEVARS() stores it in g_iPluginId.
+     *
+     * @return The id, 0 for the core itself
+     */
+    virtual PluginId GetPluginId() = 0;
 };
 
 #endif //_INCLUDE_ISOURCE2MOD_API_H
