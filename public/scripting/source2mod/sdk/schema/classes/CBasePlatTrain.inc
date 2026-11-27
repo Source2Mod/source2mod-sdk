@@ -10,6 +10,8 @@
 
 methodmap CBasePlatTrain < CBaseToggle
 {
+	public int m_NoiseMoving(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBasePlatTrain", "m_NoiseMoving", buffer, maxlen); }
+	public int m_NoiseArrived(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBasePlatTrain", "m_NoiseArrived", buffer, maxlen); }
 	property float m_volume {
 		public get() { return Source2ModSchema.GetFloat(this, "CBasePlatTrain", "m_volume"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBasePlatTrain", "m_volume", value); }

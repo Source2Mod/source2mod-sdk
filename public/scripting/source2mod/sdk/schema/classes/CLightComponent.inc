@@ -52,6 +52,7 @@ methodmap CLightComponent < SchemaObject
 		public get() { return Source2ModSchema.GetFloat(this, "CLightComponent", "m_flPhi"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CLightComponent", "m_flPhi", value); }
 	}
+	public int m_hLightCookie(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CLightComponent", "m_hLightCookie", buffer, maxlen); }
 	property int m_nCascades {
 		public get() { return Source2ModSchema.GetInt(this, "CLightComponent", "m_nCascades"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CLightComponent", "m_nCascades", value); }

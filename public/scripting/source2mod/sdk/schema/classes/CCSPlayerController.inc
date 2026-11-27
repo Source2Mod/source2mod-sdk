@@ -342,6 +342,10 @@ methodmap CCSPlayerController < CBasePlayerController
 		public get() { return Source2ModSchema.GetBool(this, "CCSPlayerController", "m_bGaveTeamDamageWarningThisRound"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSPlayerController", "m_bGaveTeamDamageWarningThisRound", value); }
 	}
+	property float m_dblLastReceivedPacketPlatFloatTime {
+		public get() { return Source2ModSchema.GetFloat(this, "CCSPlayerController", "m_dblLastReceivedPacketPlatFloatTime"); }
+		public set(float value) { Source2ModSchema.SetFloat(this, "CCSPlayerController", "m_dblLastReceivedPacketPlatFloatTime", value); }
+	}
 	property float m_LastTeamDamageWarningTime {
 		public get() { return Source2ModSchema.GetFloat(this, "CCSPlayerController", "m_LastTeamDamageWarningTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CCSPlayerController", "m_LastTeamDamageWarningTime", value); }

@@ -32,6 +32,7 @@ methodmap CParticleSystem < CBaseModelEntity
 		public get() { return Source2ModSchema.GetBool(this, "CParticleSystem", "m_bAnimateDuringGameplayPause"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CParticleSystem", "m_bAnimateDuringGameplayPause", value); }
 	}
+	public int m_iEffectIndex(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CParticleSystem", "m_iEffectIndex", buffer, maxlen); }
 	property float m_flStartTime {
 		public get() { return Source2ModSchema.GetFloat(this, "CParticleSystem", "m_flStartTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CParticleSystem", "m_flStartTime", value); }

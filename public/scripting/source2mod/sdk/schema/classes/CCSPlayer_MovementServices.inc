@@ -67,6 +67,8 @@ methodmap CCSPlayer_MovementServices < CPlayer_MovementServices_Humanoid
 		public get() { return Source2ModSchema.GetFloat(this, "CCSPlayer_MovementServices", "m_flBombPlantViewOffset"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CCSPlayer_MovementServices", "m_flBombPlantViewOffset", value); }
 	}
+	public void m_vecLastPositionAtFullCrouchSpeed(float value[2]) { Source2ModSchema.GetFloats(this, "CCSPlayer_MovementServices", "m_vecLastPositionAtFullCrouchSpeed", value, 2); }
+	public void Set_m_vecLastPositionAtFullCrouchSpeed(const float value[2]) { Source2ModSchema.SetFloats(this, "CCSPlayer_MovementServices", "m_vecLastPositionAtFullCrouchSpeed", value, 2); }
 	property bool m_duckUntilOnGround {
 		public get() { return Source2ModSchema.GetBool(this, "CCSPlayer_MovementServices", "m_duckUntilOnGround"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSPlayer_MovementServices", "m_duckUntilOnGround", value); }
@@ -187,6 +189,8 @@ methodmap CCSPlayer_MovementServices < CPlayer_MovementServices_Humanoid
 		public get() { return Source2ModSchema.GetFloat(this, "CCSPlayer_MovementServices", "m_flTicksSinceLastSurfingDetected"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CCSPlayer_MovementServices", "m_flTicksSinceLastSurfingDetected", value); }
 	}
+	public void m_vecWalkWishVel(float value[2]) { Source2ModSchema.GetFloats(this, "CCSPlayer_MovementServices", "m_vecWalkWishVel", value, 2); }
+	public void Set_m_vecWalkWishVel(const float value[2]) { Source2ModSchema.SetFloats(this, "CCSPlayer_MovementServices", "m_vecWalkWishVel", value, 2); }
 	property bool m_bHasEverProcessedCommand {
 		public get() { return Source2ModSchema.GetBool(this, "CCSPlayer_MovementServices", "m_bHasEverProcessedCommand"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CCSPlayer_MovementServices", "m_bHasEverProcessedCommand", value); }

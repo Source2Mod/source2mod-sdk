@@ -14,6 +14,7 @@ methodmap CEnvSoundscape < CBaseEntity
 		public get() { return Source2ModSchema.GetFloat(this, "CEnvSoundscape", "m_flRadius"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CEnvSoundscape", "m_flRadius", value); }
 	}
+	public int m_soundEventName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CEnvSoundscape", "m_soundEventName", buffer, maxlen); }
 	property bool m_bOverrideWithEvent {
 		public get() { return Source2ModSchema.GetBool(this, "CEnvSoundscape", "m_bOverrideWithEvent"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CEnvSoundscape", "m_bOverrideWithEvent", value); }

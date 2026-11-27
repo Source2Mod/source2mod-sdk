@@ -18,6 +18,10 @@ methodmap CMapVetoPickController < CBaseEntity
 		public get() { return Source2ModSchema.GetBool(this, "CMapVetoPickController", "m_bNeedToPlayFiveSecondsRemaining"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CMapVetoPickController", "m_bNeedToPlayFiveSecondsRemaining", value); }
 	}
+	property float m_dblPreMatchDraftSequenceTime {
+		public get() { return Source2ModSchema.GetFloat(this, "CMapVetoPickController", "m_dblPreMatchDraftSequenceTime"); }
+		public set(float value) { Source2ModSchema.SetFloat(this, "CMapVetoPickController", "m_dblPreMatchDraftSequenceTime", value); }
+	}
 	property bool m_bPreMatchDraftStateChanged {
 		public get() { return Source2ModSchema.GetBool(this, "CMapVetoPickController", "m_bPreMatchDraftStateChanged"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CMapVetoPickController", "m_bPreMatchDraftStateChanged", value); }

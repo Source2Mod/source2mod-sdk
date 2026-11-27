@@ -30,6 +30,7 @@ methodmap CAmbientGeneric < CPointEntity
 		public get() { return Source2ModSchema.GetBool(this, "CAmbientGeneric", "m_fLooping"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CAmbientGeneric", "m_fLooping", value); }
 	}
+	public int m_iszSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CAmbientGeneric", "m_iszSound", buffer, maxlen); }
 	public int m_sSourceEntName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CAmbientGeneric", "m_sSourceEntName", buffer, maxlen); }
 	property CBaseEntity m_hSoundSource {
 		public get() { return view_as<CBaseEntity>(Source2ModSchema.GetHandle(this, "CAmbientGeneric", "m_hSoundSource")); }

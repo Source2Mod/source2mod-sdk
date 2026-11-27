@@ -38,14 +38,17 @@ methodmap CItemGeneric < CItem
 		public get() { return Source2ModSchema.GetBool(this, "CItemGeneric", "m_bPlayerInTriggerRadius"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CItemGeneric", "m_bPlayerInTriggerRadius", value); }
 	}
+	public int m_hSpawnParticleEffect(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CItemGeneric", "m_hSpawnParticleEffect", buffer, maxlen); }
 	public int m_pAmbientSoundEffect(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CItemGeneric", "m_pAmbientSoundEffect", buffer, maxlen); }
 	property bool m_bAutoStartAmbientSound {
 		public get() { return Source2ModSchema.GetBool(this, "CItemGeneric", "m_bAutoStartAmbientSound"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CItemGeneric", "m_bAutoStartAmbientSound", value); }
 	}
 	public int m_pSpawnScriptFunction(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CItemGeneric", "m_pSpawnScriptFunction", buffer, maxlen); }
+	public int m_hPickupParticleEffect(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CItemGeneric", "m_hPickupParticleEffect", buffer, maxlen); }
 	public int m_pPickupSoundEffect(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CItemGeneric", "m_pPickupSoundEffect", buffer, maxlen); }
 	public int m_pPickupScriptFunction(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CItemGeneric", "m_pPickupScriptFunction", buffer, maxlen); }
+	public int m_hTimeoutParticleEffect(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CItemGeneric", "m_hTimeoutParticleEffect", buffer, maxlen); }
 	public int m_pTimeoutSoundEffect(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CItemGeneric", "m_pTimeoutSoundEffect", buffer, maxlen); }
 	public int m_pTimeoutScriptFunction(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CItemGeneric", "m_pTimeoutScriptFunction", buffer, maxlen); }
 	public int m_pPickupFilterName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CItemGeneric", "m_pPickupFilterName", buffer, maxlen); }

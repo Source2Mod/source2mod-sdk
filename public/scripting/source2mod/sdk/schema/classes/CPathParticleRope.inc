@@ -38,6 +38,7 @@ methodmap CPathParticleRope < CBaseEntity
 		public get() { return Source2ModSchema.GetInt(this, "CPathParticleRope", "m_nEffectState"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CPathParticleRope", "m_nEffectState", value); }
 	}
+	public int m_iEffectIndex(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CPathParticleRope", "m_iEffectIndex", buffer, maxlen); }
 	public int m_PathNodes_PositionCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathParticleRope", "m_PathNodes_Position"); }
 	public int m_PathNodes_TangentInCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathParticleRope", "m_PathNodes_TangentIn"); }
 	public int m_PathNodes_TangentOutCount() { return Source2ModSchema.GetUtlVectorCount(this, "CPathParticleRope", "m_PathNodes_TangentOut"); }

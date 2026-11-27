@@ -10,6 +10,7 @@
 
 methodmap CPostProcessingVolume < CBaseTrigger
 {
+	public int m_hPostSettings(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CPostProcessingVolume", "m_hPostSettings", buffer, maxlen); }
 	property float m_flFadeDuration {
 		public get() { return Source2ModSchema.GetFloat(this, "CPostProcessingVolume", "m_flFadeDuration"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CPostProcessingVolume", "m_flFadeDuration", value); }

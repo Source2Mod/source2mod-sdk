@@ -36,6 +36,7 @@ methodmap CRopeKeyframe < CBaseModelEntity
 		public set(bool value) { Source2ModSchema.SetBool(this, "CRopeKeyframe", "m_bConstrainBetweenEndpoints", value); }
 	}
 	public int m_strRopeMaterialModel(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CRopeKeyframe", "m_strRopeMaterialModel", buffer, maxlen); }
+	public int m_iRopeMaterialModelIndex(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CRopeKeyframe", "m_iRopeMaterialModelIndex", buffer, maxlen); }
 	property int m_Subdiv {
 		public get() { return Source2ModSchema.GetInt(this, "CRopeKeyframe", "m_Subdiv"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CRopeKeyframe", "m_Subdiv", value); }

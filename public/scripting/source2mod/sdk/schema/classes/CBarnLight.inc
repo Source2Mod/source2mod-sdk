@@ -68,6 +68,7 @@ methodmap CBarnLight < CBaseModelEntity
 	public int m_QueuedLightStyleStringsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBarnLight", "m_QueuedLightStyleStrings"); }
 	public int m_LightStyleEventsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBarnLight", "m_LightStyleEvents"); }
 	public int m_LightStyleTargetsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBarnLight", "m_LightStyleTargets"); }
+	public int m_hLightCookie(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CBarnLight", "m_hLightCookie", buffer, maxlen); }
 	property float m_flShape {
 		public get() { return Source2ModSchema.GetFloat(this, "CBarnLight", "m_flShape"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBarnLight", "m_flShape", value); }

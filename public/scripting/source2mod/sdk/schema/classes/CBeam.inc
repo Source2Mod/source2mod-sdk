@@ -30,6 +30,8 @@ methodmap CBeam < CBaseModelEntity
 		public get() { return Source2ModSchema.GetInt(this, "CBeam", "m_nNumBeamEnts"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBeam", "m_nNumBeamEnts", value); }
 	}
+	public int m_hBaseMaterial(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CBeam", "m_hBaseMaterial", buffer, maxlen); }
+	public int m_nHaloIndex(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CBeam", "m_nHaloIndex", buffer, maxlen); }
 	property int m_nBeamType {
 		public get() { return Source2ModSchema.GetInt(this, "CBeam", "m_nBeamType"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBeam", "m_nBeamType", value); }

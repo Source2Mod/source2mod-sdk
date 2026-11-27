@@ -10,6 +10,8 @@
 
 methodmap CFuncRotating < CBaseModelEntity
 {
+	public void m_localRotationVector(float value[3]) { Source2ModSchema.GetFloats(this, "CFuncRotating", "m_localRotationVector", value, 3); }
+	public void Set_m_localRotationVector(const float value[3]) { Source2ModSchema.SetFloats(this, "CFuncRotating", "m_localRotationVector", value, 3); }
 	property float m_flSpeed {
 		public get() { return Source2ModSchema.GetFloat(this, "CFuncRotating", "m_flSpeed"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CFuncRotating", "m_flSpeed", value); }
@@ -38,6 +40,7 @@ methodmap CFuncRotating < CBaseModelEntity
 		public get() { return Source2ModSchema.GetFloat(this, "CFuncRotating", "m_flBlockDamage"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CFuncRotating", "m_flBlockDamage", value); }
 	}
+	public int m_NoiseRunning(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncRotating", "m_NoiseRunning", buffer, maxlen); }
 	property bool m_bReversed {
 		public get() { return Source2ModSchema.GetBool(this, "CFuncRotating", "m_bReversed"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CFuncRotating", "m_bReversed", value); }

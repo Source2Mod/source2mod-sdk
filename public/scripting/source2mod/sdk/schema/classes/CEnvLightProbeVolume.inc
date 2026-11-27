@@ -10,6 +10,13 @@
 
 methodmap CEnvLightProbeVolume < CBaseEntity
 {
+	public int m_Entity_hLightProbeTexture_AmbientCube(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvLightProbeVolume", "m_Entity_hLightProbeTexture_AmbientCube", buffer, maxlen); }
+	public int m_Entity_hLightProbeTexture_SDF(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvLightProbeVolume", "m_Entity_hLightProbeTexture_SDF", buffer, maxlen); }
+	public int m_Entity_hLightProbeTexture_SH2_DC(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvLightProbeVolume", "m_Entity_hLightProbeTexture_SH2_DC", buffer, maxlen); }
+	public int m_Entity_hLightProbeTexture_SH2_L1(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvLightProbeVolume", "m_Entity_hLightProbeTexture_SH2_L1", buffer, maxlen); }
+	public int m_Entity_hLightProbeDirectLightIndicesTexture(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvLightProbeVolume", "m_Entity_hLightProbeDirectLightIndicesTexture", buffer, maxlen); }
+	public int m_Entity_hLightProbeDirectLightScalarsTexture(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvLightProbeVolume", "m_Entity_hLightProbeDirectLightScalarsTexture", buffer, maxlen); }
+	public int m_Entity_hLightProbeDirectLightShadowsTexture(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvLightProbeVolume", "m_Entity_hLightProbeDirectLightShadowsTexture", buffer, maxlen); }
 	public void m_Entity_vBoxMins(float vec[3]) { Source2ModSchema.GetVector(this, "CEnvLightProbeVolume", "m_Entity_vBoxMins", vec); }
 	public void Set_m_Entity_vBoxMins(const float vec[3]) { Source2ModSchema.SetVector(this, "CEnvLightProbeVolume", "m_Entity_vBoxMins", vec); }
 	public void m_Entity_vBoxMaxs(float vec[3]) { Source2ModSchema.GetVector(this, "CEnvLightProbeVolume", "m_Entity_vBoxMaxs", vec); }

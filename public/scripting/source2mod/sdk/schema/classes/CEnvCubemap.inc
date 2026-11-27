@@ -10,6 +10,7 @@
 
 methodmap CEnvCubemap < CBaseEntity
 {
+	public int m_Entity_hCubemapTexture(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvCubemap", "m_Entity_hCubemapTexture", buffer, maxlen); }
 	property bool m_Entity_bCustomCubemapTexture {
 		public get() { return Source2ModSchema.GetBool(this, "CEnvCubemap", "m_Entity_bCustomCubemapTexture"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CEnvCubemap", "m_Entity_bCustomCubemapTexture", value); }

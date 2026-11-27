@@ -23,4 +23,5 @@ methodmap CMessage < CPointEntity
 		public get() { return Source2ModSchema.GetFloat(this, "CMessage", "m_Radius"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CMessage", "m_Radius", value); }
 	}
+	public int m_sNoise(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CMessage", "m_sNoise", buffer, maxlen); }
 }

@@ -124,9 +124,25 @@ methodmap Source2ModSchema
 	public static native void GetColor(any instance, const char[] className, const char[] field, int color[4]);
 	public static native void SetColor(any instance, const char[] className, const char[] field, const int color[4]);
 
-	/** char arrays, CUtlSymbolLarge, CUtlString, CGlobalSymbol; char arrays and CGlobalSymbol (the engine's symbol for the text) can be set. */
+	/** char arrays, CUtlSymbolLarge, CUtlString, CGlobalSymbol, CGameSoundEventName; char arrays and CGlobalSymbol (the engine's symbol for the text) can be set. */
 	public static native int GetString(any instance, const char[] className, const char[] field, char[] buffer, int maxlen);
 	public static native void SetString(any instance, const char[] className, const char[] field, const char[] value);
+
+	/**
+	 * A field of floats in a row: Vector2D (2), RotationVector (3),
+	 * Quaternion and Vector4D (4: x, y, z, w).
+	 * @param count  Entries of values to fill or take
+	 * @return       GetFloats: how many floats the field holds
+	 */
+	public static native int GetFloats(any instance, const char[] className, const char[] field, float[] values, int count);
+	public static native void SetFloats(any instance, const char[] className, const char[] field, const float[] values, int count);
+
+	/**
+	 * The path of the resource a CStrongHandle field holds (a model, a
+	 * material, a texture, a particle system), "" when it holds none. Read only.
+	 * @return Bytes written
+	 */
+	public static native int GetResourceName(any instance, const char[] className, const char[] field, char[] buffer, int maxlen);
 
 	/**
 	 * Fixed array fields (SCHEMA_FIELD_POINTER in C++: ammo, match stats,
@@ -153,6 +169,27 @@ methodmap Source2ModSchema
 
 	/** The field's offset in its class, -1 when the running game has no such field. */
 	public static native int GetOffset(const char[] className, const char[] field);
+
+	/**
+	 * Reflection over the running game's server schema.
+	 *
+	 * GetClassFields: the names of a class's fields, its own first and then
+	 * (includeBases) its bases', in the schema's order; null when the game
+	 * has no such class. Close the list.
+	 */
+	public static native ArrayList GetClassFields(const char[] className, bool includeBases = false);
+
+	/** The field's schema type ("int32", "CHandle< CBaseEntity >", "Vector"). @return Bytes written, 0 for no such field */
+	public static native int GetFieldTypeName(const char[] className, const char[] field, char[] buffer, int maxlen);
+
+	/** The class it derives from. @return False at the root or for no such class */
+	public static native bool GetBaseClassName(const char[] className, char[] buffer, int maxlen);
+
+	/**
+	 * Every server class deriving from baseClass ("" = every class), sorted
+	 * by name; direct = only the classes whose base it is. Close the list.
+	 */
+	public static native ArrayList GetSubclassNames(const char[] baseClass = "", bool direct = false);
 
 	/**
 	 * Tells the clients a networked field changed (NetworkStateChanged) -- for

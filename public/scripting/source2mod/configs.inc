@@ -117,6 +117,13 @@ methodmap Source2ModConfig < Handle
 	public native bool SetInt(const char[] pointer, int value);
 	public native bool SetFloat(const char[] pointer, float value);
 	public native bool SetBool(const char[] pointer, bool value);
+	/**
+	 * A 64-bit integer or a double, as decimal text ("76561198000000000",
+	 * "0.1234567890123"), for values a cell or a float cannot hold.
+	 * @return  False also when the text is not one whole number.
+	 */
+	public native bool SetInt64(const char[] pointer, const char[] value);
+	public native bool SetDouble(const char[] pointer, const char[] value);
 	/** Any JSON value as text: an object, an array, null. */
 	public native bool SetJSON(const char[] pointer, const char[] json);
 	public native bool Remove(const char[] pointer);

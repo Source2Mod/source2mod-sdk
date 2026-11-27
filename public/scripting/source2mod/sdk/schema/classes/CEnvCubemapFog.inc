@@ -62,6 +62,7 @@ methodmap CEnvCubemapFog < CBaseEntity
 		public get() { return Source2ModSchema.GetInt(this, "CEnvCubemapFog", "m_nCubemapSourceType"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CEnvCubemapFog", "m_nCubemapSourceType", value); }
 	}
+	public int m_hSkyMaterial(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvCubemapFog", "m_hSkyMaterial", buffer, maxlen); }
 	public int m_iszSkyEntity(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CEnvCubemapFog", "m_iszSkyEntity", buffer, maxlen); }
 	property int m_nHeightFogType {
 		public get() { return Source2ModSchema.GetInt(this, "CEnvCubemapFog", "m_nHeightFogType"); }
@@ -81,6 +82,7 @@ methodmap CEnvCubemapFog < CBaseEntity
 	}
 	public int m_DistanceFogCurveString(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CEnvCubemapFog", "m_DistanceFogCurveString", buffer, maxlen); }
 	public int m_HeightFogCurveString(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CEnvCubemapFog", "m_HeightFogCurveString", buffer, maxlen); }
+	public int m_hFogCubemapTexture(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvCubemapFog", "m_hFogCubemapTexture", buffer, maxlen); }
 	property bool m_bHasHeightFogEnd {
 		public get() { return Source2ModSchema.GetBool(this, "CEnvCubemapFog", "m_bHasHeightFogEnd"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CEnvCubemapFog", "m_bHasHeightFogEnd", value); }

@@ -22,6 +22,8 @@ methodmap CTriggerFan < CBaseTrigger
 		public get() { return Source2ModSchema.GetBool(this, "CTriggerFan", "m_bPushAwayFromInfoTarget"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CTriggerFan", "m_bPushAwayFromInfoTarget", value); }
 	}
+	public void m_qNoiseDelta(float value[4]) { Source2ModSchema.GetFloats(this, "CTriggerFan", "m_qNoiseDelta", value, 4); }
+	public void Set_m_qNoiseDelta(const float value[4]) { Source2ModSchema.SetFloats(this, "CTriggerFan", "m_qNoiseDelta", value, 4); }
 	property CInfoFan m_hInfoFan {
 		public get() { return view_as<CInfoFan>(Source2ModSchema.GetHandle(this, "CTriggerFan", "m_hInfoFan")); }
 		public set(CInfoFan value) { Source2ModSchema.SetHandle(this, "CTriggerFan", "m_hInfoFan", value); }

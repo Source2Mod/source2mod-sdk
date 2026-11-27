@@ -10,6 +10,7 @@
 
 methodmap CEnvDecal < CBaseModelEntity
 {
+	public int m_hDecalMaterial(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvDecal", "m_hDecalMaterial", buffer, maxlen); }
 	property float m_flWidth {
 		public get() { return Source2ModSchema.GetFloat(this, "CEnvDecal", "m_flWidth"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CEnvDecal", "m_flWidth", value); }

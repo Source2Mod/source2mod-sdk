@@ -18,6 +18,7 @@ methodmap CBaseCSGrenadeProjectile < CBaseGrenade
 		public get() { return Source2ModSchema.GetInt(this, "CBaseCSGrenadeProjectile", "m_nBounces"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBaseCSGrenadeProjectile", "m_nBounces", value); }
 	}
+	public int m_nExplodeEffectIndex(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CBaseCSGrenadeProjectile", "m_nExplodeEffectIndex", buffer, maxlen); }
 	property int m_nExplodeEffectTickBegin {
 		public get() { return Source2ModSchema.GetInt(this, "CBaseCSGrenadeProjectile", "m_nExplodeEffectTickBegin"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBaseCSGrenadeProjectile", "m_nExplodeEffectTickBegin", value); }
@@ -46,6 +47,8 @@ methodmap CBaseCSGrenadeProjectile < CBaseGrenade
 		public get() { return Source2ModSchema.GetFloat(this, "CBaseCSGrenadeProjectile", "m_flLastBounceSoundTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBaseCSGrenadeProjectile", "m_flLastBounceSoundTime", value); }
 	}
+	public void m_vecGrenadeSpin(float value[3]) { Source2ModSchema.GetFloats(this, "CBaseCSGrenadeProjectile", "m_vecGrenadeSpin", value, 3); }
+	public void Set_m_vecGrenadeSpin(const float value[3]) { Source2ModSchema.SetFloats(this, "CBaseCSGrenadeProjectile", "m_vecGrenadeSpin", value, 3); }
 	public void m_vecLastHitSurfaceNormal(float vec[3]) { Source2ModSchema.GetVector(this, "CBaseCSGrenadeProjectile", "m_vecLastHitSurfaceNormal", vec); }
 	public void Set_m_vecLastHitSurfaceNormal(const float vec[3]) { Source2ModSchema.SetVector(this, "CBaseCSGrenadeProjectile", "m_vecLastHitSurfaceNormal", vec); }
 	property int m_nTicksAtZeroVelocity {

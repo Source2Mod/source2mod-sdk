@@ -11,9 +11,6 @@ methodmap CBaseEntity < CEntityInstance
 	property CBodyComponent m_CBodyComponent {
 		public get() { return view_as<CBodyComponent>(Source2ModSchema.GetObject(this, "CBaseEntity", "m_CBodyComponent")); }
 	}
-	property CNetworkTransmitComponent m_NetworkTransmitComponent {
-		public get() { return view_as<CNetworkTransmitComponent>(Source2ModSchema.GetObject(this, "CBaseEntity", "m_NetworkTransmitComponent")); }
-	}
 	public int m_aThinkFunctionsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CBaseEntity", "m_aThinkFunctions"); }
 	property int m_iCurrentThinkContext {
 		public get() { return Source2ModSchema.GetInt(this, "CBaseEntity", "m_iCurrentThinkContext"); }

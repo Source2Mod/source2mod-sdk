@@ -8,6 +8,7 @@
 
 methodmap CModelState < SchemaObject
 {
+	public int m_hModel(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CModelState", "m_hModel", buffer, maxlen); }
 	public int m_ModelName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CModelState", "m_ModelName", buffer, maxlen); }
 	property IPhysAggregateInstance m_pVPhysicsAggregate {
 		public get() { return view_as<IPhysAggregateInstance>(Source2ModSchema.GetObject(this, "CModelState", "m_pVPhysicsAggregate")); }

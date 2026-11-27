@@ -25,6 +25,7 @@ methodmap CPhysConstraint < CLogicalEntity
 	}
 	public int m_nameAttachment1(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CPhysConstraint", "m_nameAttachment1", buffer, maxlen); }
 	public int m_nameAttachment2(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CPhysConstraint", "m_nameAttachment2", buffer, maxlen); }
+	public int m_breakSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CPhysConstraint", "m_breakSound", buffer, maxlen); }
 	property float m_forceLimit {
 		public get() { return Source2ModSchema.GetFloat(this, "CPhysConstraint", "m_forceLimit"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CPhysConstraint", "m_forceLimit", value); }

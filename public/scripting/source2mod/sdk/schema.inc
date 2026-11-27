@@ -445,7 +445,6 @@
 #include <source2mod/sdk/schema/classes/CNavSpaceInfo>
 #include <source2mod/sdk/schema/classes/CNavWalkable>
 #include <source2mod/sdk/schema/classes/CNetworkOriginCellCoordQuantizedVector>
-#include <source2mod/sdk/schema/classes/CNetworkTransmitComponent>
 #include <source2mod/sdk/schema/classes/CNetworkVelocityVector>
 #include <source2mod/sdk/schema/classes/CNetworkViewOffsetVector>
 #include <source2mod/sdk/schema/classes/CNmContactAudioActionVData>
@@ -712,7 +711,6 @@
 #include <source2mod/sdk/schema/classes/PrecipitationFilter_t>
 #include <source2mod/sdk/schema/classes/Relationship_t>
 #include <source2mod/sdk/schema/classes/RelationshipOverride_t>
-#include <source2mod/sdk/schema/classes/ResourceId_t>
 #include <source2mod/sdk/schema/classes/ResponseContext_t>
 #include <source2mod/sdk/schema/classes/SceneEventId_t>
 #include <source2mod/sdk/schema/classes/SellbackPurchaseEntry_t>
@@ -777,7 +775,6 @@
 #include <source2mod/sdk/schema/enums/CSWeaponNameID>
 #include <source2mod/sdk/schema/enums/AmmoFlags_t>
 #include <source2mod/sdk/schema/enums/SpawnGroupFlags_t>
-#include <source2mod/sdk/schema/enums/InputBitMask_t>
 #include <source2mod/sdk/schema/enums/TOGGLE_STATE>
 #include <source2mod/sdk/schema/enums/ForcedCrouchState_t>
 #include <source2mod/sdk/schema/enums/SurroundingBoundsType_t>

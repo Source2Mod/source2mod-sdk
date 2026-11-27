@@ -71,6 +71,12 @@ typedef CenterHtmlMenuCanSelect = function bool (CCSPlayerController player);
 /** SetCooldownHandlers: the player picked an option. */
 typedef CenterHtmlMenuOnSelect = function void (CCSPlayerController player);
 
+/**
+ * OnSelect: an option of the menu was picked (not a submenu, not text).
+ * @return False to skip the option's own handler
+ */
+typedef CenterHtmlMenuSelected = function bool (CCSPlayerController player, CenterHtmlMenu menu, int option);
+
 methodmap CenterHtmlMenu < Handle
 {
 	public native CenterHtmlMenu(const char[] title);
@@ -125,6 +131,28 @@ methodmap CenterHtmlMenu < Handle
 	 * IsOptionDisabled reports the fixed flag (SetOptionDisabled).
 	 */
 	public native void SetOptionDisabledEvaluator(int option, CenterHtmlMenuCheck evaluator, any data = 0);
+
+	/** Replaces the option's handler; INVALID_FUNCTION removes it (picking it then does nothing). */
+	public native void SetOptionHandler(int option, CenterHtmlMenuHandler handler, any data = 0);
+
+	/** The option's text worked out per player from now on; INVALID_FUNCTION goes back to its fixed text. */
+	public native void SetOptionTextEvaluator(int option, CenterHtmlMenuText text, any data = 0);
+
+	/** Whether the option shows for each player; INVALID_FUNCTION removes it (always shown). */
+	public native void SetOptionVisibleEvaluator(int option, CenterHtmlMenuCheck visible, any data = 0);
+
+	/** The menu the option opens (AddSubmenu), null when it opens none. */
+	public native CenterHtmlMenu GetOptionSubmenu(int option);
+
+	/** Whether the option is a line of text (AddText). */
+	public native bool IsOptionText(int option);
+
+	/**
+	 * Called for every option picked in this menu, before the option's own
+	 * handler (IBaseMenu::OnOptionSelected); return false to skip that
+	 * handler. INVALID_FUNCTION removes it.
+	 */
+	public native void OnSelect(CenterHtmlMenuSelected callback);
 
 	/** MenuOption_* flags. */
 	public native void SetOptionFlags(int option, int flags);

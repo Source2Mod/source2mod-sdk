@@ -10,6 +10,8 @@
 
 methodmap CEnvSky < CBaseModelEntity
 {
+	public int m_hSkyMaterial(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvSky", "m_hSkyMaterial", buffer, maxlen); }
+	public int m_hSkyMaterialLightingOnly(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvSky", "m_hSkyMaterialLightingOnly", buffer, maxlen); }
 	property bool m_bStartDisabled {
 		public get() { return Source2ModSchema.GetBool(this, "CEnvSky", "m_bStartDisabled"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CEnvSky", "m_bStartDisabled", value); }

@@ -24,4 +24,5 @@ methodmap CEnvParticleGlow < CParticleSystem
 	}
 	public void m_ColorTint(int color[4]) { Source2ModSchema.GetColor(this, "CEnvParticleGlow", "m_ColorTint", color); }
 	public void Set_m_ColorTint(const int color[4]) { Source2ModSchema.SetColor(this, "CEnvParticleGlow", "m_ColorTint", color); }
+	public int m_hTextureOverride(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvParticleGlow", "m_hTextureOverride", buffer, maxlen); }
 }

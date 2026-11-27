@@ -70,6 +70,8 @@ methodmap CFuncRotator < CBaseModelEntity
 		public get() { return Source2ModSchema.GetFloat(this, "CFuncRotator", "m_flStartSpeed"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CFuncRotator", "m_flStartSpeed", value); }
 	}
+	public void m_qSpawnOrientation(float value[4]) { Source2ModSchema.GetFloats(this, "CFuncRotator", "m_qSpawnOrientation", value, 4); }
+	public void Set_m_qSpawnOrientation(const float value[4]) { Source2ModSchema.SetFloats(this, "CFuncRotator", "m_qSpawnOrientation", value, 4); }
 	property bool m_bReturningToInitialRotation {
 		public get() { return Source2ModSchema.GetBool(this, "CFuncRotator", "m_bReturningToInitialRotation"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CFuncRotator", "m_bReturningToInitialRotation", value); }
@@ -86,6 +88,9 @@ methodmap CFuncRotator < CBaseModelEntity
 		public get() { return Source2ModSchema.GetBool(this, "CFuncRotator", "m_bOscillationFromStart"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CFuncRotator", "m_bOscillationFromStart", value); }
 	}
+	public int m_iszStartSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncRotator", "m_iszStartSound", buffer, maxlen); }
+	public int m_iszLoopSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncRotator", "m_iszLoopSound", buffer, maxlen); }
+	public int m_iszStopSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncRotator", "m_iszStopSound", buffer, maxlen); }
 	property float m_flTargetAngle {
 		public get() { return Source2ModSchema.GetFloat(this, "CFuncRotator", "m_flTargetAngle"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CFuncRotator", "m_flTargetAngle", value); }

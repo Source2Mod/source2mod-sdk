@@ -10,6 +10,7 @@
 
 methodmap CSprite < CBaseModelEntity
 {
+	public int m_hSpriteMaterial(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CSprite", "m_hSpriteMaterial", buffer, maxlen); }
 	property CBaseEntity m_hAttachedToEntity {
 		public get() { return view_as<CBaseEntity>(Source2ModSchema.GetHandle(this, "CSprite", "m_hAttachedToEntity")); }
 		public set(CBaseEntity value) { Source2ModSchema.SetHandle(this, "CSprite", "m_hAttachedToEntity", value); }

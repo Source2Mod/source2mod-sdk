@@ -61,6 +61,15 @@ methodmap CBasePropDoor < CDynamicProp
 		public get() { return Source2ModSchema.GetFloat(this, "CBasePropDoor", "m_flSpeed"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBasePropDoor", "m_flSpeed", value); }
 	}
+	public int m_SoundMoving(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBasePropDoor", "m_SoundMoving", buffer, maxlen); }
+	public int m_SoundOpen(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBasePropDoor", "m_SoundOpen", buffer, maxlen); }
+	public int m_SoundClose(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBasePropDoor", "m_SoundClose", buffer, maxlen); }
+	public int m_SoundLock(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBasePropDoor", "m_SoundLock", buffer, maxlen); }
+	public int m_SoundUnlock(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBasePropDoor", "m_SoundUnlock", buffer, maxlen); }
+	public int m_SoundLatch(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBasePropDoor", "m_SoundLatch", buffer, maxlen); }
+	public int m_SoundPound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBasePropDoor", "m_SoundPound", buffer, maxlen); }
+	public int m_SoundJiggle(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBasePropDoor", "m_SoundJiggle", buffer, maxlen); }
+	public int m_SoundLockedAnim(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBasePropDoor", "m_SoundLockedAnim", buffer, maxlen); }
 	property int m_numCloseAttempts {
 		public get() { return Source2ModSchema.GetInt(this, "CBasePropDoor", "m_numCloseAttempts"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CBasePropDoor", "m_numCloseAttempts", value); }

@@ -20,6 +20,9 @@ methodmap CBaseButton < CBaseToggle
 		public get() { return Source2ModSchema.GetBool(this, "CBaseButton", "m_fRotating"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CBaseButton", "m_fRotating", value); }
 	}
+	public int m_sUseSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseButton", "m_sUseSound", buffer, maxlen); }
+	public int m_sLockedSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseButton", "m_sLockedSound", buffer, maxlen); }
+	public int m_sUnlockedSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseButton", "m_sUnlockedSound", buffer, maxlen); }
 	public int m_sOverrideAnticipationName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseButton", "m_sOverrideAnticipationName", buffer, maxlen); }
 	property bool m_bLocked {
 		public get() { return Source2ModSchema.GetBool(this, "CBaseButton", "m_bLocked"); }

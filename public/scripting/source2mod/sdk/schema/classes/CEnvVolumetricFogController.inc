@@ -116,6 +116,7 @@ methodmap CEnvVolumetricFogController < CBaseEntity
 		public get() { return Source2ModSchema.GetBool(this, "CEnvVolumetricFogController", "m_bIsMaster"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CEnvVolumetricFogController", "m_bIsMaster", value); }
 	}
+	public int m_hFogIndirectTexture(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvVolumetricFogController", "m_hFogIndirectTexture", buffer, maxlen); }
 	property int m_nForceRefreshCount {
 		public get() { return Source2ModSchema.GetInt(this, "CEnvVolumetricFogController", "m_nForceRefreshCount"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CEnvVolumetricFogController", "m_nForceRefreshCount", value); }

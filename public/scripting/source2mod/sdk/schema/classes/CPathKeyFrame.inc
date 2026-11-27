@@ -14,6 +14,8 @@ methodmap CPathKeyFrame < CLogicalEntity
 	public void Set_m_Origin(const float vec[3]) { Source2ModSchema.SetVector(this, "CPathKeyFrame", "m_Origin", vec); }
 	public void m_Angles(float vec[3]) { Source2ModSchema.GetVector(this, "CPathKeyFrame", "m_Angles", vec); }
 	public void Set_m_Angles(const float vec[3]) { Source2ModSchema.SetVector(this, "CPathKeyFrame", "m_Angles", vec); }
+	public void m_qAngle(float value[4]) { Source2ModSchema.GetFloats(this, "CPathKeyFrame", "m_qAngle", value, 4); }
+	public void Set_m_qAngle(const float value[4]) { Source2ModSchema.SetFloats(this, "CPathKeyFrame", "m_qAngle", value, 4); }
 	public int m_iNextKey(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CPathKeyFrame", "m_iNextKey", buffer, maxlen); }
 	property float m_flNextTime {
 		public get() { return Source2ModSchema.GetFloat(this, "CPathKeyFrame", "m_flNextTime"); }

@@ -45,6 +45,20 @@ methodmap NetworkStringTable
 
 	/** @return false for no such table */
 	public native bool SetUserData(int index, const char[] data, int length, bool force = true);
+
+	/**
+	 * Gives one client its own user data for a string of the table (a
+	 * per-player MOTD in "InfoPanel", say); the table and every other client
+	 * keep the server's. The next change of that string, or a full update,
+	 * puts the client back on the server's data.
+	 *
+	 * @param slot    Client to send it to
+	 * @param value   The string whose user data changes; it must be in the table
+	 * @param data    The bytes; length 0 clears the client's user data
+	 * @param length  Bytes of data (0-1024); count a C string's terminator if the game expects one
+	 * @return        False when there is no such table or string, or the slot has no client
+	 */
+	public native bool ReplicateUserData(int slot, const char[] value, const char[] data, int length);
 }
 
 #define INVALID_STRING_TABLE view_as<NetworkStringTable>(-1)

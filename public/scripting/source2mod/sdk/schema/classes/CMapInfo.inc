@@ -70,4 +70,8 @@ methodmap CMapInfo < CPointEntity
 		public get() { return Source2ModSchema.GetFloat(this, "CMapInfo", "m_flEnvWetnessDryingAmount"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CMapInfo", "m_flEnvWetnessDryingAmount", value); }
 	}
+	property bool m_bFrostEnabled {
+		public get() { return Source2ModSchema.GetBool(this, "CMapInfo", "m_bFrostEnabled"); }
+		public set(bool value) { Source2ModSchema.SetBool(this, "CMapInfo", "m_bFrostEnabled", value); }
+	}
 }

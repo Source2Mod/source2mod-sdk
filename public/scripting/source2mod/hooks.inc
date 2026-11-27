@@ -108,6 +108,7 @@ enum HookPoint
 	HookPoint_GameServerSteamAPIDeactivated,
 	HookPoint_LoadEventsFromFile,
 	HookPoint_ClientFullyConnect,      /**< the client finished loading (signon full) */
+	HookPoint_ServerHibernationUpdate, /**< the empty server starts or stops hibernating */
 
 	// Source2ModHooks.HookFunction.
 	HookPoint_Function = 300
@@ -218,6 +219,18 @@ methodmap ClientSlotContext
 /** GameServerSteamAPIActivated / Deactivated: nothing to pass. */
 methodmap EmptyContext
 {
+}
+
+/**
+ * ISource2Server::ServerHibernationUpdate: the server starts (true) or stops
+ * (false) hibernating with no players on it (sv_hibernate_when_empty).
+ */
+methodmap ServerHibernationContext
+{
+	property bool hibernating
+	{
+		public native get();
+	}
 }
 
 /** IGameEventManager2::LoadEventsFromFile -- a resource file of game events. */
@@ -342,6 +355,7 @@ typeset Source2ModHookHandler
 	function Source2ModAction (ClientSlotContext ctx, bool post);
 	function Source2ModAction (EmptyContext ctx, bool post);
 	function Source2ModAction (LoadEventsFromFileContext ctx, bool post);
+	function Source2ModAction (ServerHibernationContext ctx, bool post);
 };
 
 methodmap Source2ModHooks

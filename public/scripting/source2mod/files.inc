@@ -56,7 +56,10 @@ methodmap Source2ModFiles
 	public static native ArrayList ListDirectory(const char[] path);
 }
 
-/** An open file, read or written a line or a string at a time. delete = close. */
+/**
+ * An open file, read or written a line or a string at a time, or as binary
+ * items (open it with "b" in the mode for those). delete = close.
+ */
 methodmap Source2ModFile < Handle
 {
 	/**
@@ -84,6 +87,33 @@ methodmap Source2ModFile < Handle
 	public native bool Seek(int position, int whence = 0);
 	public native int Position();
 	public native bool Flush();
+
+	/**
+	 * Reads binary items, one per cell, little-endian. 1- and 2-byte items
+	 * come out unsigned (0-255, 0-65535).
+	 *
+	 * @param items  Array the items go into
+	 * @param count  Number of items to read
+	 * @param size   Bytes per item: 1, 2 or 4
+	 * @return       Items read (fewer at the end of the file), -1 on a bad handle
+	 * @error        A size other than 1, 2 or 4
+	 */
+	public native int Read(any[] items, int count, int size);
+
+	/**
+	 * Writes binary items, the low size bytes of each cell, little-endian.
+	 * @return False when not every item was written
+	 */
+	public native bool Write(const any[] items, int count, int size);
+
+	/** One item. @param signed  Sign-extend an 8- or 16-bit value. @return False at the end of the file */
+	public native bool ReadInt8(int &value, bool signed = false);
+	public native bool ReadInt16(int &value, bool signed = false);
+	public native bool ReadInt32(int &value);
+
+	public native bool WriteInt8(int value);
+	public native bool WriteInt16(int value);
+	public native bool WriteInt32(int value);
 }
 
 /** Value types of a KeyValues key (ESource2ModKvType). */

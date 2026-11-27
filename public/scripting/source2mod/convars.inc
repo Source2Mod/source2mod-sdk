@@ -359,6 +359,15 @@ methodmap Source2ModConVars
 	public static native ArrayList ListNames(const char[] prefix = "", bool hidden = false);
 
 	/**
+	 * Puts every ConVar whose name starts with prefix back to its default
+	 * value, FCVAR_COMMANDLINE_ENFORCED ones included. Change hooks run as
+	 * for any other change.
+	 *
+	 * @error An empty prefix (it would reset every ConVar on the server).
+	 */
+	public static native void ResetByPrefix(const char[] prefix);
+
+	/**
 	 * Writes cfg/<folder>/<name>.cfg with the plugin's ConVars when it is
 	 * missing (autoCreate) and runs it on every map start; OnConfigsExecuted
 	 * follows. name "" is the plugin's file name.

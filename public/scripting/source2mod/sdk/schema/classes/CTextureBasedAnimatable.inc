@@ -18,6 +18,8 @@ methodmap CTextureBasedAnimatable < CBaseModelEntity
 		public get() { return Source2ModSchema.GetFloat(this, "CTextureBasedAnimatable", "m_flFPS"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CTextureBasedAnimatable", "m_flFPS", value); }
 	}
+	public int m_hPositionKeys(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CTextureBasedAnimatable", "m_hPositionKeys", buffer, maxlen); }
+	public int m_hRotationKeys(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CTextureBasedAnimatable", "m_hRotationKeys", buffer, maxlen); }
 	public void m_vAnimationBoundsMin(float vec[3]) { Source2ModSchema.GetVector(this, "CTextureBasedAnimatable", "m_vAnimationBoundsMin", vec); }
 	public void Set_m_vAnimationBoundsMin(const float vec[3]) { Source2ModSchema.SetVector(this, "CTextureBasedAnimatable", "m_vAnimationBoundsMin", vec); }
 	public void m_vAnimationBoundsMax(float vec[3]) { Source2ModSchema.GetVector(this, "CTextureBasedAnimatable", "m_vAnimationBoundsMax", vec); }

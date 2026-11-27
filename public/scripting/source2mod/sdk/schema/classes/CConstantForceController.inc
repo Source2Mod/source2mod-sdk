@@ -10,6 +10,10 @@ methodmap CConstantForceController < SchemaObject
 {
 	public void m_linear(float vec[3]) { Source2ModSchema.GetVector(this, "CConstantForceController", "m_linear", vec); }
 	public void Set_m_linear(const float vec[3]) { Source2ModSchema.SetVector(this, "CConstantForceController", "m_linear", vec); }
+	public void m_angular(float value[3]) { Source2ModSchema.GetFloats(this, "CConstantForceController", "m_angular", value, 3); }
+	public void Set_m_angular(const float value[3]) { Source2ModSchema.SetFloats(this, "CConstantForceController", "m_angular", value, 3); }
 	public void m_linearSave(float vec[3]) { Source2ModSchema.GetVector(this, "CConstantForceController", "m_linearSave", vec); }
 	public void Set_m_linearSave(const float vec[3]) { Source2ModSchema.SetVector(this, "CConstantForceController", "m_linearSave", vec); }
+	public void m_angularSave(float value[3]) { Source2ModSchema.GetFloats(this, "CConstantForceController", "m_angularSave", value, 3); }
+	public void Set_m_angularSave(const float value[3]) { Source2ModSchema.SetFloats(this, "CConstantForceController", "m_angularSave", value, 3); }
 }

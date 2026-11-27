@@ -14,4 +14,5 @@ methodmap CSkyCameraVolumeTarget < CBaseEntity
 		public get() { return Source2ModSchema.GetInt(this, "CSkyCameraVolumeTarget", "m_nSkyboxScale"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CSkyCameraVolumeTarget", "m_nSkyboxScale", value); }
 	}
+	public int m_hSkyMaterial(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CSkyCameraVolumeTarget", "m_hSkyMaterial", buffer, maxlen); }
 }

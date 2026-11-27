@@ -11,4 +11,6 @@ methodmap EntityRenderAttribute_t < SchemaObject
 	public int m_ID(int index) { return Source2ModSchema.GetArrayInt(this, "EntityRenderAttribute_t", "m_ID", index); }
 	public void Set_m_ID(int index, int value) { Source2ModSchema.SetArrayInt(this, "EntityRenderAttribute_t", "m_ID", index, value); }
 	public int m_ID_Count() { return Source2ModSchema.GetArraySize("EntityRenderAttribute_t", "m_ID"); }
+	public void m_Values(float value[4]) { Source2ModSchema.GetFloats(this, "EntityRenderAttribute_t", "m_Values", value, 4); }
+	public void Set_m_Values(const float value[4]) { Source2ModSchema.SetFloats(this, "EntityRenderAttribute_t", "m_Values", value, 4); }
 }

@@ -10,6 +10,7 @@
 
 methodmap CGradientFog < CBaseEntity
 {
+	public int m_hGradientFogTexture(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CGradientFog", "m_hGradientFogTexture", buffer, maxlen); }
 	property float m_flFogStartDistance {
 		public get() { return Source2ModSchema.GetFloat(this, "CGradientFog", "m_flFogStartDistance"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CGradientFog", "m_flFogStartDistance", value); }

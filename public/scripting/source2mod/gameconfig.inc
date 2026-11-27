@@ -290,6 +290,18 @@ methodmap Source2ModFunction < Handle
 		public native get();
 	}
 
+	/**
+	 * Whether a call of this shape matches the function: its return type and
+	 * its parameter types, in order (`this` included for a member). A
+	 * function from the gamedata reports a mismatch on the console, once per
+	 * function and shape; one the script built is compared quietly.
+	 *
+	 * @param returnType  Return type the caller expects
+	 * @param params      Parameter types the caller passes
+	 * @param count       Number of entries in params
+	 */
+	public native bool CheckCall(Source2ModType returnType, const Source2ModType[] params, int count);
+
 	/** The gamedata name; "" for one the script built. @return Bytes written */
 	public native int GetName(char[] buffer, int maxlen);
 

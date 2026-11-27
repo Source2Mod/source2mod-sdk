@@ -11,6 +11,8 @@
 methodmap CFuncShatterglass < CBaseModelEntity
 {
 	public int m_vecShatterGlassShardsCount() { return Source2ModSchema.GetUtlVectorCount(this, "CFuncShatterglass", "m_vecShatterGlassShards"); }
+	public void m_PanelSize(float value[2]) { Source2ModSchema.GetFloats(this, "CFuncShatterglass", "m_PanelSize", value, 2); }
+	public void Set_m_PanelSize(const float value[2]) { Source2ModSchema.SetFloats(this, "CFuncShatterglass", "m_PanelSize", value, 2); }
 	property float m_flLastShatterSoundEmitTime {
 		public get() { return Source2ModSchema.GetFloat(this, "CFuncShatterglass", "m_flLastShatterSoundEmitTime"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CFuncShatterglass", "m_flLastShatterSoundEmitTime", value); }
@@ -70,4 +72,5 @@ methodmap CFuncShatterglass < CBaseModelEntity
 		public get() { return Source2ModSchema.GetInt(this, "CFuncShatterglass", "m_iSurfaceType"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CFuncShatterglass", "m_iSurfaceType", value); }
 	}
+	public int m_hMaterialDamageBase(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CFuncShatterglass", "m_hMaterialDamageBase", buffer, maxlen); }
 }

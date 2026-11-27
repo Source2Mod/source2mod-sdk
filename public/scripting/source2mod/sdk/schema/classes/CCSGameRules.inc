@@ -380,6 +380,10 @@ methodmap CCSGameRules < CTeamplayRules
 		public get() { return Source2ModSchema.GetInt(this, "CCSGameRules", "m_numSpectatorsCountMaxLnk"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSGameRules", "m_numSpectatorsCountMaxLnk", value); }
 	}
+	property bool m_bQueuedMatchmakingReportedRoundStatsPendingSend {
+		public get() { return Source2ModSchema.GetBool(this, "CCSGameRules", "m_bQueuedMatchmakingReportedRoundStatsPendingSend"); }
+		public set(bool value) { Source2ModSchema.SetBool(this, "CCSGameRules", "m_bQueuedMatchmakingReportedRoundStatsPendingSend", value); }
+	}
 	property int m_nCTsAliveAtFreezetimeEnd {
 		public get() { return Source2ModSchema.GetInt(this, "CCSGameRules", "m_nCTsAliveAtFreezetimeEnd"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSGameRules", "m_nCTsAliveAtFreezetimeEnd", value); }
@@ -700,6 +704,10 @@ methodmap CCSGameRules < CTeamplayRules
 	property int m_nRoundStartCount {
 		public get() { return Source2ModSchema.GetInt(this, "CCSGameRules", "m_nRoundStartCount"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CCSGameRules", "m_nRoundStartCount", value); }
+	}
+	property float m_flLastPerfSampleTime {
+		public get() { return Source2ModSchema.GetFloat(this, "CCSGameRules", "m_flLastPerfSampleTime"); }
+		public set(float value) { Source2ModSchema.SetFloat(this, "CCSGameRules", "m_flLastPerfSampleTime", value); }
 	}
 	public native void GoToIntermission(bool abortedMatch = false, Source2ModHookChain chain = HookChain_Default);
 	// C++ defaults to HookChain_Bypass here.

@@ -18,6 +18,8 @@ methodmap CFuncMoveLinear < CBaseToggle
 	public void Set_m_angMoveEntitySpace(const float vec[3]) { Source2ModSchema.SetVector(this, "CFuncMoveLinear", "m_angMoveEntitySpace", vec); }
 	public void m_vecMoveDirParentSpace(float vec[3]) { Source2ModSchema.GetVector(this, "CFuncMoveLinear", "m_vecMoveDirParentSpace", vec); }
 	public void Set_m_vecMoveDirParentSpace(const float vec[3]) { Source2ModSchema.SetVector(this, "CFuncMoveLinear", "m_vecMoveDirParentSpace", vec); }
+	public int m_soundStart(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncMoveLinear", "m_soundStart", buffer, maxlen); }
+	public int m_soundStop(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncMoveLinear", "m_soundStop", buffer, maxlen); }
 	public int m_currentSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncMoveLinear", "m_currentSound", buffer, maxlen); }
 	property float m_flBlockDamage {
 		public get() { return Source2ModSchema.GetFloat(this, "CFuncMoveLinear", "m_flBlockDamage"); }

@@ -64,6 +64,11 @@ methodmap CFuncTrackTrain < CBaseModelEntity
 		public get() { return Source2ModSchema.GetFloat(this, "CFuncTrackTrain", "m_dir"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CFuncTrackTrain", "m_dir", value); }
 	}
+	public int m_iszSoundMove(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncTrackTrain", "m_iszSoundMove", buffer, maxlen); }
+	public int m_iszSoundMovePing(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncTrackTrain", "m_iszSoundMovePing", buffer, maxlen); }
+	public int m_iszSoundStart(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncTrackTrain", "m_iszSoundStart", buffer, maxlen); }
+	public int m_iszSoundStop(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncTrackTrain", "m_iszSoundStop", buffer, maxlen); }
+	public int m_strPathTarget(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncTrackTrain", "m_strPathTarget", buffer, maxlen); }
 	property float m_flMoveSoundMinDuration {
 		public get() { return Source2ModSchema.GetFloat(this, "CFuncTrackTrain", "m_flMoveSoundMinDuration"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CFuncTrackTrain", "m_flMoveSoundMinDuration", value); }

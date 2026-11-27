@@ -42,6 +42,10 @@ methodmap CBaseDoor < CBaseToggle
 		public get() { return Source2ModSchema.GetFloat(this, "CBaseDoor", "m_flBlockDamage"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CBaseDoor", "m_flBlockDamage", value); }
 	}
+	public int m_NoiseMoving(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseDoor", "m_NoiseMoving", buffer, maxlen); }
+	public int m_NoiseArrived(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseDoor", "m_NoiseArrived", buffer, maxlen); }
+	public int m_NoiseMovingClosed(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseDoor", "m_NoiseMovingClosed", buffer, maxlen); }
+	public int m_NoiseArrivedClosed(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseDoor", "m_NoiseArrivedClosed", buffer, maxlen); }
 	public int m_ChainTarget(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CBaseDoor", "m_ChainTarget", buffer, maxlen); }
 	property bool m_bLoopMoveSound {
 		public get() { return Source2ModSchema.GetBool(this, "CBaseDoor", "m_bLoopMoveSound"); }

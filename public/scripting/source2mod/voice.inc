@@ -47,4 +47,14 @@ methodmap Source2ModVoice
 
 	/** Whether the receiver muted the sender themselves. Clients report the first 32 slots only. */
 	public static native bool IsSelfMuted(int receiver, int sender);
+
+	/**
+	 * Whether the receiver hears the sender only within proximity range
+	 * instead of everywhere (IVEngineServer2::SetClientProximity). The
+	 * engine's own setting for the pair, not merged between plugins like
+	 * SetListenOverride: the last call wins.
+	 *
+	 * @return False when either slot has no client
+	 */
+	public static native bool SetClientProximity(int receiver, int sender, bool useProximity);
 }

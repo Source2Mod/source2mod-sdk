@@ -117,6 +117,13 @@ methodmap CFuncMover < CBaseModelEntity
 		public get() { return Source2ModSchema.GetFloat(this, "CFuncMover", "m_flBeginStopT"); }
 		public set(float value) { Source2ModSchema.SetFloat(this, "CFuncMover", "m_flBeginStopT", value); }
 	}
+	public int m_iszStartForwardSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncMover", "m_iszStartForwardSound", buffer, maxlen); }
+	public int m_iszLoopForwardSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncMover", "m_iszLoopForwardSound", buffer, maxlen); }
+	public int m_iszStopForwardSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncMover", "m_iszStopForwardSound", buffer, maxlen); }
+	public int m_iszStartReverseSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncMover", "m_iszStartReverseSound", buffer, maxlen); }
+	public int m_iszLoopReverseSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncMover", "m_iszLoopReverseSound", buffer, maxlen); }
+	public int m_iszStopReverseSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncMover", "m_iszStopReverseSound", buffer, maxlen); }
+	public int m_iszArriveAtDestinationSound(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CFuncMover", "m_iszArriveAtDestinationSound", buffer, maxlen); }
 	property bool m_bStartAtClosestPoint {
 		public get() { return Source2ModSchema.GetBool(this, "CFuncMover", "m_bStartAtClosestPoint"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CFuncMover", "m_bStartAtClosestPoint", value); }
@@ -209,6 +216,8 @@ methodmap CFuncMover < CBaseModelEntity
 		public get() { return Source2ModSchema.GetInt(this, "CFuncMover", "m_eTransitionedToPathNodeAction"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CFuncMover", "m_eTransitionedToPathNodeAction", value); }
 	}
+	public void m_qTransitionSourceOrientation(float value[4]) { Source2ModSchema.GetFloats(this, "CFuncMover", "m_qTransitionSourceOrientation", value, 4); }
+	public void Set_m_qTransitionSourceOrientation(const float value[4]) { Source2ModSchema.SetFloats(this, "CFuncMover", "m_qTransitionSourceOrientation", value, 4); }
 	property int m_nDelayedTeleportToNode {
 		public get() { return Source2ModSchema.GetInt(this, "CFuncMover", "m_nDelayedTeleportToNode"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CFuncMover", "m_nDelayedTeleportToNode", value); }
@@ -288,6 +297,8 @@ methodmap CFuncMover < CBaseModelEntity
 		public get() { return Source2ModSchema.GetInt(this, "CFuncMover", "m_nFollowMoverConstraintPriority"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CFuncMover", "m_nFollowMoverConstraintPriority", value); }
 	}
+	public void m_vecFollowMoverCouplerRange(float value[2]) { Source2ModSchema.GetFloats(this, "CFuncMover", "m_vecFollowMoverCouplerRange", value, 2); }
+	public void Set_m_vecFollowMoverCouplerRange(const float value[2]) { Source2ModSchema.SetFloats(this, "CFuncMover", "m_vecFollowMoverCouplerRange", value, 2); }
 	property bool m_bFollowConstraintsInitialized {
 		public get() { return Source2ModSchema.GetBool(this, "CFuncMover", "m_bFollowConstraintsInitialized"); }
 		public set(bool value) { Source2ModSchema.SetBool(this, "CFuncMover", "m_bFollowConstraintsInitialized", value); }

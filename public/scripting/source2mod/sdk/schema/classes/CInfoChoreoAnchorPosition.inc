@@ -10,6 +10,8 @@ methodmap CInfoChoreoAnchorPosition < SchemaObject
 {
 	public void m_vOriginLS(float vec[3]) { Source2ModSchema.GetVector(this, "CInfoChoreoAnchorPosition", "m_vOriginLS", vec); }
 	public void Set_m_vOriginLS(const float vec[3]) { Source2ModSchema.SetVector(this, "CInfoChoreoAnchorPosition", "m_vOriginLS", vec); }
+	public void m_qAnglesLS(float value[4]) { Source2ModSchema.GetFloats(this, "CInfoChoreoAnchorPosition", "m_qAnglesLS", value, 4); }
+	public void Set_m_qAnglesLS(const float value[4]) { Source2ModSchema.SetFloats(this, "CInfoChoreoAnchorPosition", "m_qAnglesLS", value, 4); }
 	public void m_vExtentsMin(float vec[3]) { Source2ModSchema.GetVector(this, "CInfoChoreoAnchorPosition", "m_vExtentsMin", vec); }
 	public void Set_m_vExtentsMin(const float vec[3]) { Source2ModSchema.SetVector(this, "CInfoChoreoAnchorPosition", "m_vExtentsMin", vec); }
 	public void m_vExtentsMax(float vec[3]) { Source2ModSchema.GetVector(this, "CInfoChoreoAnchorPosition", "m_vExtentsMax", vec); }

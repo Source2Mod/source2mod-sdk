@@ -8,6 +8,7 @@
 
 methodmap DecalGroupOption_t < SchemaObject
 {
+	public int m_hMaterial(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "DecalGroupOption_t", "m_hMaterial", buffer, maxlen); }
 	public int m_sSequenceName(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "DecalGroupOption_t", "m_sSequenceName", buffer, maxlen); }
 	property float m_flProbability {
 		public get() { return Source2ModSchema.GetFloat(this, "DecalGroupOption_t", "m_flProbability"); }

@@ -14,6 +14,7 @@ methodmap CEnvBeam < CBeam
 		public get() { return Source2ModSchema.GetInt(this, "CEnvBeam", "m_active"); }
 		public set(int value) { Source2ModSchema.SetInt(this, "CEnvBeam", "m_active", value); }
 	}
+	public int m_spriteTexture(char[] buffer, int maxlen) { return Source2ModSchema.GetResourceName(this, "CEnvBeam", "m_spriteTexture", buffer, maxlen); }
 	public int m_iszStartEntity(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CEnvBeam", "m_iszStartEntity", buffer, maxlen); }
 	public int m_iszEndEntity(char[] buffer, int maxlen) { return Source2ModSchema.GetString(this, "CEnvBeam", "m_iszEndEntity", buffer, maxlen); }
 	property float m_life {
